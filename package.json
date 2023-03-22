@@ -1,0 +1,21 @@
+{
+  "name": "pippi-parser",
+  "version": "0.1.0",
+  "scripts": {
+    "postinstall": "husky install",
+    "commit": "cz"
+  },
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^17.4.4",
+    "@commitlint/config-conventional": "^17.4.4",
+    "@commitlint/cz-commitlint": "^17.4.4",
+    "commitizen": "^4.3.0",
+    "husky": "^8.0.3",
+    "inquirer": "^8.2.5"
+  }
+}
