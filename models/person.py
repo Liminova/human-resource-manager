@@ -5,6 +5,8 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import Self
 
+# NOTE: possible abstraction: split name and id into its own Entity class or
+# something, though i don't like that approach very much tbh - Rylie
 class Person:
     def __init__(
         self, name: str, dob: str,
