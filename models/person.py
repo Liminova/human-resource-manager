@@ -16,6 +16,9 @@ class Person:
         self.__dob = dob
         self.__id = id
         self.__phone = phone
+        # TODO: think of some way to decouple department members list and
+        # members being a part of departments, it's kinda a circle dependency
+        # rn. - Rylie
         self.__department = department
 
     @property
