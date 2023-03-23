@@ -1,4 +1,9 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-pnpm exec commitlint --edit $1
+if ! command -v pnpm &> /dev/null
+then
+	npx commitlint --edit $1
+else
+	pnpm exec commitlint --edit $1
+fi
