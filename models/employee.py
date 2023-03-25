@@ -12,7 +12,7 @@ else:
 class Employee:
     def __init__(
         self, name: str, dob: str,
-        id: str, phone: str, department: str, benefits: list[BenefitPlan]
+        id: str, phone: str, department: str, benefits: list
     ) -> None:
         self.__name = name
         self.__dob = dob
