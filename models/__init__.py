@@ -1,5 +1,5 @@
 from .company import Company
 from .department import Department
-from .person import Person
+from .employee import Employee
 
-__all__ = ["Company", "Department", "Person"]
+__all__ = ["Company", "Department", "Employee"]

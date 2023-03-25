@@ -1,4 +1,4 @@
-from models import Company, Department, Person
+from models import Company, Department, Employee
 import unittest
 
 class TestCompany(unittest.TestCase):
@@ -10,7 +10,7 @@ class TestCompany(unittest.TestCase):
     # FIXME: for some reason this is failing while mutating departments is fine.
     def test_mutate_company(self):
         company = Company("Doofenshmirtz Evil Inc.", [], [])
-        rylie = Person("Rylie", "2003-08-22", "727", "0123456727", "Sleep")
+        rylie = Employee("Rylie", "2003-08-22", "727", "0123456727", "Sleep")
         sleep = Department("Sleep", "SLP", [rylie])
 
         company.departments.append(sleep)

@@ -1,4 +1,4 @@
-from models import Department, Person
+from models import Department, Employee
 import unittest
 
 class TestDepartment(unittest.TestCase):
@@ -11,7 +11,7 @@ class TestDepartment(unittest.TestCase):
 
     def test_mutate_department(self):
         department = Department("Sleep", "SLP", [])
-        rylie = Person("Rylie", "2003-08-22", "727", "0123456727", "Sleep")
+        rylie = Employee("Rylie", "2003-08-22", "727", "0123456727", "Sleep")
         department.members.append(rylie)
 
         self.assertEqual(department.members, [rylie])

@@ -7,7 +7,7 @@ else:
 
 # NOTE: possible abstraction: split name and id into its own Entity class or
 # something, though i don't like that approach very much tbh - Rylie
-class Person:
+class Employee:
     def __init__(
         self, name: str, dob: str,
         id: str, phone: str, department: str
