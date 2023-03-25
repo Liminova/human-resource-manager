@@ -12,19 +12,6 @@ class Employee:
     def __init__(self, name: str, plans: list):
         self.name = name
         self.plans = []
-        
-    def get_name(self):
-        return self.name
-    
-    def get_all_plans(self):
-        if len(self.plans) == 0:
-            return "You are not enrolled in any benefit plans."
-        else:
-            for plan in self.plans:
-                return plan
-
-    def is_enrolled_in_benefit_plan(self, plan):
-        return plan in self.plans
 
     # function to request to enroll in benefit plan
     def request_enroll_in_benefit_plan(self, benefit_plan):
@@ -66,29 +53,6 @@ class Employee:
             action = input()
 
 # --------------------------------------
-
-class Admin:
-    def __init__(self, name: str):
-        self.name = name
-        
-    def get_name(self):
-        return self.name
-    
-    def accept_benefit_plan_enrollment(self, employee: Employee, benefit_plan: BenefitPlan):
-        # add employee to benefit plan
-        benefit_plan.enrolled_employees.append(employee.get_name())
-        # add benefit plan to employee
-        employee.plans.append(benefit_plan.get_name())
-        # return success message
-        return "You are accepted into this benefit plan."
-
-    def decline_benefit_plan_enrollment(self, employee: Employee, benefit_plan: BenefitPlan):
-        return "You are declined from this benefit plan."
-    
-    # function to view benefit plan details (3)
-    def view_benefit_plan_details(self, benefit_plan):
-        # get benefit plan details
-        return "Name: " + benefit_plan.get_name() + " Description: " + benefit_plan.get_description() + " Cost: " + str(benefit_plan.get_cost()*len(benefit_plan.get_enrolled_employees())) + " Enrolled Employees: " + str(benefit_plan.get_enrolled_employees())
 
     # function to pick options: view benefit plan details / accept benefit plan enrollment / decline benefit plan enrollment / go back
     def pick_options(self):
@@ -227,6 +191,4 @@ def main():
         print("Select a role:\n1. Employee\n2. Admin\n3. Exit")
         role = input()
 
-            
-    
 main()
