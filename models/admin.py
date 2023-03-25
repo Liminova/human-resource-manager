@@ -2,6 +2,9 @@ from .employee import Employee
 from .benefits import BenefitPlan
 
 class Admin(Employee):
+    def __init__(self) -> None:
+        super().__init__
+
     def accept_benefit_enrollment(
         self, employee: Employee, benefit: BenefitPlan
     ) -> str:
