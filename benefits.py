@@ -1,4 +1,3 @@
-
 # features:
 # Employees can:
 # 1. request to enroll in benefit plan
@@ -67,33 +66,6 @@ class Employee:
             action = input()
 
 # --------------------------------------
-
-class BenefitPlan:
-    def __init__(self, name: str, description: str, cost: float, enrolled_employees: list):
-        self.name = name
-        self.description = description
-        self.cost = cost
-        self.enrolled_employees = []
-        
-    def get_name(self):
-        return self.name
-    
-    def get_description(self):
-        return self.description
-    
-    def get_cost(self):
-        return self.cost   
-        
-    def get_benefit_plan_details(self):
-        if len(self.enrolled_employees) == 0:
-            return "Name: " + self.name + " Description: " + self.description + " Cost: " + str(self.cost) + " Enrolled Employees: None"
-        else:
-            return "Name: " + self.name + " Description: " + self.description + " Cost: " + str(self.cost) + " Enrolled Employees: " + str(self.get_enrolled_employees)
-
-    def get_enrolled_employees(self):   
-        if len(self.enrolled_employees) == 0:
-            return "None"
-        return self.enrolled_employees   
 
 class Admin:
     def __init__(self, name: str):
