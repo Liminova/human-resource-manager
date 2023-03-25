@@ -1,5 +1,4 @@
 import sys
-from .employee import Employee
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -9,7 +8,7 @@ else:
 class BenefitPlan:
     def __init__(
             self, name: str, description: str,
-            cost: float, enrolled_employees: list[Employee]) -> None:
+            cost: float, enrolled_employees: list) -> None:
         self.__name = name
         self.__description = description
         self.__cost = cost
@@ -28,7 +27,7 @@ class BenefitPlan:
         return self.__cost
 
     @property
-    def enrolled_employees(self) -> list[Employee]:
+    def enrolled_employees(self) -> list:
         return self.__enrolled_employees
 
     @name.setter
@@ -47,6 +46,6 @@ class BenefitPlan:
         return self
 
     @enrolled_employees.setter
-    def enrolled_employees(self, enrolled_employees: list[Employee]) -> Self:
+    def enrolled_employees(self, enrolled_employees: list) -> Self:
         self.__enrolled_employees = enrolled_employees
         return self
