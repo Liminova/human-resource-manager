@@ -1,5 +1,12 @@
+import sys
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
+
 class Payroll:          # tính lương theo tháng của mỗi nhân viên
-    def __init__(self) -> None:
+    def __init__(self) -> Self:
         self.__salary = 0    # lương cứng
         self.__bonus = 0     # thưởng
         self.__tax = 0       # thuế
@@ -27,20 +34,24 @@ class Payroll:          # tính lương theo tháng của mỗi nhân viên
         return self.__total
 
     @salary.setter
-    def salary(self, salary: int) -> None:
+    def salary(self, salary: int) -> Self:
         self.__salary = salary
+        return self
 
     @bonus.setter
-    def bonus(self, bonus: int) -> None:
+    def bonus(self, bonus: int) -> Self:
         self.__bonus = bonus
+        return self
 
     @tax.setter
-    def tax(self, tax: int) -> None:
+    def tax(self, tax: int) -> Self:
         self.__tax = tax
+        return self
 
     @punish.setter
-    def punish(self, punish: int) -> None:
+    def punish(self, punish: int) -> Self:
         self.__punish = punish
+        return self
 
     def calculate_total(self) -> None:
         self.__total = self.__salary + self.__bonus - self.__tax - self.__punish
