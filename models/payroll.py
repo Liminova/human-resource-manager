@@ -53,8 +53,9 @@ class Payroll:          # tính lương theo tháng của mỗi nhân viên
         self.__punish = punish
         return self
 
-    def calculate_total(self) -> None:
+    def calculate_total(self) -> Self:
         self.__total = self.__salary + self.__bonus - self.__tax - self.__punish
+        return self
 
     def set_month(self) -> None:
         while True:
