@@ -1,6 +1,7 @@
 import sys
 
 from .benefits import BenefitPlan
+from .payroll import Payroll
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -12,7 +13,8 @@ else:
 class Employee:
     def __init__(
         self, name: str, dob: str,
-        id: str, phone: str, department: str, benefits: list
+        id: str, phone: str, department: str, benefits: list,
+        payroll: Payroll
     ) -> None:
         self.__name = name
         self.__dob = dob
@@ -23,6 +25,7 @@ class Employee:
         # rn. - Rylie
         self.__department = department
         self.__benefits = benefits
+        self.__payroll = payroll
 
     @property
     def name(self) -> str:
@@ -47,6 +50,10 @@ class Employee:
     @property
     def benefits(self) -> list:
         return self.__benefits
+
+    @property
+    def payroll(self) -> Payroll:
+        return self.__payroll
 
     @name.setter
     def name(self, name: str) -> Self:
@@ -76,6 +83,11 @@ class Employee:
     @benefits.setter
     def benefits(self, benefits: list) -> Self:
         self.__benefits = benefits
+        return self
+
+    @payroll.setter
+    def payroll(self, payroll: Payroll) -> Self:
+        self.__payroll = payroll
         return self
 
     def is_enrolled_in_plan(self, benefit: BenefitPlan) -> bool:

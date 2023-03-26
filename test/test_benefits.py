@@ -1,4 +1,4 @@
-from models import BenefitPlan, Employee
+from models import BenefitPlan, Employee, Payroll
 import unittest
 
 class TestBenefit(unittest.TestCase):
@@ -11,7 +11,8 @@ class TestBenefit(unittest.TestCase):
 
     def test_mutate_benefit(self):
         benefit = BenefitPlan("Beds", "Beds for sleeping.", 5000.0, [])
-        rylie = Employee("Rylie", "2003-08-22", "727", "0123456727", "Sleep" , [])
+        payroll = Payroll(5000, 500)
+        rylie = Employee("Rylie", "2003-08-22", "727", "0123456727", "Sleep" , [], payroll)
 
         benefit.enrolled_employees.append(rylie)
 

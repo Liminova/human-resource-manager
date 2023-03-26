@@ -1,4 +1,4 @@
-from models import Department, Employee
+from models import Department, Employee, Payroll
 import unittest
 
 class TestDepartment(unittest.TestCase):
@@ -11,7 +11,8 @@ class TestDepartment(unittest.TestCase):
 
     def test_mutate_department(self):
         department = Department("Sleep", "SLP", [])
-        rylie = Employee("Rylie", "2003-08-22", "727", "0123456727", "Sleep", [])
+        payroll = Payroll(5000, 500)
+        rylie = Employee("Rylie", "2003-08-22", "727", "0123456727", "Sleep", [], payroll)
         department.members.append(rylie)
 
         self.assertEqual(department.members, [rylie])
