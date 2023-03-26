@@ -6,7 +6,7 @@ else:
     from typing_extensions import Self
 
 class Payroll:          # tính lương theo tháng của mỗi nhân viên
-    def __init__(self) -> Self:
+    def __init__(self) -> None:
         self.__salary = 0    # lương cứng
         self.__bonus = 0     # thưởng
         self.__tax = 0       # thuế
