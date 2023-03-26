@@ -1,9 +1,5 @@
 class Payroll:          # tính lương theo tháng của mỗi nhân viên
     def __init__(self) -> None:
-        #punishment depends on the number of days absent
-        #bonus depends on the number of days present and performance
-        # so I need to import the class attendance and performance from Duc's code
-        #this code is just the core of the payroll class, I will fix later after reading Duc's code
         self.__salary = 0    #lương cứng
         self.__bonus = 0     #thưởng
         self.__tax = 0       #thuế
