@@ -1,8 +1,3 @@
-# Create a program to track employee attendance, time off requests, and leave balances. It can also provide reports on attendance and time-off patterns.
-# Use a dictionary to store the employee data. The keys are the employee names and the values are lists of the employee’s attendance and time-off data.
-# Object Oriented Programming including classes, methods, and inheritance is used to create the program.
-# Annotations are used to document the program.
-
 import datetime
 import os
 import pickle
