@@ -8,19 +8,19 @@ class Payroll:          # tính lương theo tháng của mỗi nhân viên
 
     def get_salary(self) -> int:
         return self.__salary
-    
+
     def get_bonus(self) -> int:
         return self.__bonus
-    
+
     def get_tax(self) -> int:
         return self.__tax
-    
+
     def get_punish(self) -> int:
         return self.__punish
-    
+
     def get_total(self) -> int:
         return self.__total
-    
+
     def set_salary(self, salary: int) -> None:
         self.__salary = salary
 
@@ -32,7 +32,7 @@ class Payroll:          # tính lương theo tháng của mỗi nhân viên
     
     def set_punish(self, punish: int) -> None:
         self.__punish = punish
-    
+
     def set_total(self, total: int) -> None:
         self.__total = total
 
@@ -47,10 +47,10 @@ class Payroll:          # tính lương theo tháng của mỗi nhân viên
                 break
             else:
                 print("Invalid month! Enter again!")
-                
+
     def get_month(self) -> int:
         return self.__month
-    
+
     def set_year(self) -> None:
         while True:
             year = input("Enter year: ")
