@@ -9,13 +9,13 @@ Afterwards, you should clone the repository to your local machine, using:
 - If you're using HTTPS:
 
 ```shell
-git clone https://github.com/<USERNAME>/python-project
+$ git clone https://github.com/<USERNAME>/python-project
 ```
 
 - If you're using SSH:
 
 ```shell
-git clone git@github.com:<USERNAME>/python-project
+$ git clone git@github.com:<USERNAME>/python-project
 ```
 
 Replace `<USERNAME>` with your GitHub username.
@@ -25,7 +25,7 @@ This cleans up your own fork, and in turn, the main branch from merge commits
 when you try to sync up code with the main branch.
 
 ```shell
-git config --global pull.rebase true
+$ git config --global pull.rebase true
 ```
 
 ## Development requirements
@@ -46,13 +46,13 @@ For the best experience in committing code, you should have
   `yarn.lock` into the `.gitignore` file.
 
 ```shell
-npm i -g pnpm
+$ npm i -g pnpm
 ```
 
 - Install dependencies using `pnpm`:
 
 ```shell
-pnpm i
+$ pnpm i
 ```
 
 - Every time you want to commit something, use `pnpm cz` after adding files
