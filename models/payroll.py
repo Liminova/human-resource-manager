@@ -36,21 +36,25 @@ class Payroll:          # tính lương theo tháng của mỗi nhân viên
     @salary.setter
     def salary(self, salary: int) -> Self:
         self.__salary = salary
+        self.calculate_total()
         return self
 
     @bonus.setter
     def bonus(self, bonus: int) -> Self:
         self.__bonus = bonus
+        self.calculate_total()
         return self
 
     @tax.setter
     def tax(self, tax: int) -> Self:
         self.__tax = tax
+        self.calculate_total()
         return self
 
     @punish.setter
     def punish(self, punish: int) -> Self:
         self.__punish = punish
+        self.calculate_total()
         return self
 
     def calculate_total(self) -> Self:
