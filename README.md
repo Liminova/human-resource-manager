@@ -33,6 +33,6 @@ Everything else can be ran under the environment managed by `pipenv` by:
 $ pipenv run <command>
 ```
 
-# Contributing
+## Contributing
 
 Check out the [Contributing Guide](CONTRIBUTING.md) to get started.
