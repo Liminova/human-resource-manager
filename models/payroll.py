@@ -41,8 +41,8 @@ class Payroll:          # tính lương theo tháng của mỗi nhân viên
 
     def set_month(self) -> None:
         while True:
-            month = input("Enter month: ")
-            if month >=1 and month <= 12:
+            month = int(input("Enter month: "))
+            if month >= 1 and month <= 12:
                 self.__month = month
                 break
             else:
@@ -53,12 +53,12 @@ class Payroll:          # tính lương theo tháng của mỗi nhân viên
 
     def set_year(self) -> None:
         while True:
-            year = input("Enter year: ")
+            year = int(input("Enter year: "))
             if year >= 2000:
                 self.__year = year
                 break
             else:
-                print("Invalid ! Enter again!")
+                print("Invalid year! Enter again!")
 
     def get_year(self) -> int:
         return self.__year
