@@ -1,5 +1,7 @@
 import sys
 
+from .benefits import BenefitPlan
+
 if sys.version_info >= (3, 11):
     from typing import Self
 else:
@@ -10,7 +12,7 @@ else:
 class Employee:
     def __init__(
         self, name: str, dob: str,
-        id: str, phone: str, department: str
+        id: str, phone: str, department: str, benefits: list
     ) -> None:
         self.__name = name
         self.__dob = dob
@@ -20,6 +22,7 @@ class Employee:
         # members being a part of departments, it's kinda a circle dependency
         # rn. - Rylie
         self.__department = department
+        self.__benefits = benefits
 
     @property
     def name(self) -> str:
@@ -40,6 +43,10 @@ class Employee:
     @property
     def department(self) -> str:
         return self.__department
+
+    @property
+    def benefits(self) -> list:
+        return self.__benefits
 
     @name.setter
     def name(self, name: str) -> Self:
@@ -65,3 +72,11 @@ class Employee:
     def department(self, department: str) -> Self:
         self.__department = department
         return self
+
+    @benefits.setter
+    def benefits(self, benefits: list) -> Self:
+        self.__benefits = benefits
+        return self
+
+    def is_enrolled_in_plan(self, benefit: BenefitPlan) -> bool:
+        return benefit in self.__benefits

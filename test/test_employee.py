@@ -3,7 +3,7 @@ import unittest
 
 class TestEmployee(unittest.TestCase):
     def test_create_employee(self):
-        employee = Employee("Rylie", "2003-08-22", "727", "0123456727", "Sleep")
+        employee = Employee("Rylie", "2003-08-22", "727", "0123456727", "Sleep", [])
 
         self.assertEqual(employee.name, "Rylie")
         self.assertEqual(employee.dob, "2003-08-22")
@@ -12,7 +12,7 @@ class TestEmployee(unittest.TestCase):
         self.assertEqual(employee.department, "Sleep")
 
     def test_mutate_employee(self):
-        employee = Employee("Rylie", "2003-08-22", "727", "0123456727", "Sleep")
+        employee = Employee("Rylie", "2003-08-22", "727", "0123456727", "Sleep", [])
 
         self.assertEqual(employee.id, "727")
 
