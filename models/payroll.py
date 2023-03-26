@@ -6,35 +6,43 @@ class Payroll:          # tính lương theo tháng của mỗi nhân viên
         self.__punish = 0    #phạt
         self.__total = 0     #tổng lương
 
-    def get_salary(self) -> int:
+    @property
+    def salary(self) -> int:
         return self.__salary
 
-    def get_bonus(self) -> int:
+    @property
+    def bonus(self) -> int:
         return self.__bonus
 
-    def get_tax(self) -> int:
+    @property
+    def tax(self) -> int:
         return self.__tax
 
-    def get_punish(self) -> int:
+    @property
+    def punish(self) -> int:
         return self.__punish
 
-    def get_total(self) -> int:
+    @property
+    def total(self) -> int:
         return self.__total
 
-    def set_salary(self, salary: int) -> None:
+    @salary.setter
+    def salary(self, salary: int) -> None:
         self.__salary = salary
 
-    def set_bonus(self, bonus: int) -> None:
+    @bonus.setter
+    def bonus(self, bonus: int) -> None:
         self.__bonus = bonus
 
-    def set_tax(self, tax: int) -> None:
+    @tax.setter
+    def tax(self, tax: int) -> None:
         self.__tax = tax
-    
-    def set_punish(self, punish: int) -> None:
-        self.__punish = punish
 
     def set_total(self, total: int) -> None:
         self.__total = total
+    @punish.setter
+    def punish(self, punish: int) -> None:
+        self.__punish = punish
 
     def calculate(self) -> None:
         self.__total = self.__salary + self.__bonus - self.__tax - self.__punish
