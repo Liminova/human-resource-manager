@@ -6,12 +6,12 @@ else:
     from typing_extensions import Self
 
 class Payroll:          # tính lương theo tháng của mỗi nhân viên
-    def __init__(self) -> None:
-        self.__salary = 0    # lương cứng
-        self.__bonus = 0     # thưởng
-        self.__tax = 0       # thuế
-        self.__punish = 0    # phạt
-        self.__total = 0     # tổng lương
+    def __init__(self, salary: int, tax: int) -> None:
+        self.__salary = salary    # lương cứng
+        self.__bonus = 0          # thưởng
+        self.__tax = tax          # thuế
+        self.__punish = 0         # phạt
+        self.__total = 0          # tổng lương
 
     @property
     def salary(self) -> int:
