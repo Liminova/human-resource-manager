@@ -51,10 +51,10 @@ class Employee:
 
     def __str__(self):
         return self.name
-    
+
     def __repr__(self):
         return self.name
-    
+
 # Define the EmployeeList class
 class EmployeeList:
     def __init__(self):
@@ -74,10 +74,10 @@ class EmployeeList:
 
     def __str__(self):
         return str(self.employees)
-    
+
     def __repr__(self):
         return str(self.employees)
-    
+
 # Define the AttendanceCheck class which inherits from the EmployeeList class
 class AttendanceCheck(EmployeeList):
     def __init__(self):
@@ -148,7 +148,7 @@ class AttendanceCheck(EmployeeList):
 
         with open(self.time_off_file, 'wb') as f:
             pickle.dump(time_off, f)
-        
+
 # Define the AttendanceCheckUI class which inherits from the AttendanceCheck class
 class AttendanceCheckUI(AttendanceCheck):
     def __init__(self):
