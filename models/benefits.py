@@ -1,14 +1,18 @@
+from __future__ import annotations
 import sys
 
 if sys.version_info >= (3, 11):
-    from typing import Self
+    from typing import Self, TYPE_CHECKING
 else:
-    from typing_extensions import Self
+    from typing_extensions import Self, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .employee import Employee
 
 class BenefitPlan:
     def __init__(
             self, name: str, description: str,
-            cost: float, enrolled_employees: list) -> None:
+            cost: float, enrolled_employees: list[Employee]) -> None:
         self.__name = name
         self.__description = description
         self.__cost = cost
