@@ -1,4 +1,5 @@
 import sys
+from option import Result, Ok, Err
 import textwrap
 
 if sys.version_info >= (3, 11):
@@ -35,29 +36,38 @@ class Payroll:
     def total(self) -> int:
         return self.__total
 
-    @salary.setter
-    def salary(self, salary: int) -> Self:
+    def salary(self, salary: int) -> Result[Self, str]:
+        if not self.verify(salary):
+            return Err("Salary cannot be negative.")
         self.__salary = salary
         self.calculate_total()
-        return self
+        return Ok(self)
 
-    @bonus.setter
-    def bonus(self, bonus: int) -> Self:
+    def bonus(self, bonus: int) -> Result[Self, str]:
+        if not self.verify(bonus):
+            return Err("Bonus cannot be negative.")
         self.__bonus = bonus
         self.calculate_total()
-        return self
+        return Ok(self)
 
-    @tax.setter
-    def tax(self, tax: int) -> Self:
+    def tax(self, tax: int) -> Result[Self, str]:
+        if not self.verify(tax):
+            return Err("Tax cannot be negative.")
         self.__tax = tax
         self.calculate_total()
-        return self
+        return Ok(self)
 
-    @punish.setter
-    def punish(self, punish: int) -> Self:
+    def punish(self, punish: int) -> Result[Self, str]:
+        if not self.verify(punish):
+            return Err("Punishment cannot be negative.")
         self.__punish = punish
         self.calculate_total()
-        return self
+        return Ok(self)
+
+    def verify(self, value: int) -> bool:
+        if value < 0:
+            return False
+        return True
 
     def calculate_total(self) -> Self:
         self.__total = self.__salary + self.__bonus - self.__tax - self.__punish
