@@ -1,70 +1,67 @@
-class Payroll:          # tính lương theo tháng của mỗi nhân viên
-    def __init__(self) -> None:
-        self.__salary = 0    #lương cứng
-        self.__bonus = 0     #thưởng
-        self.__tax = 0       #thuế
-        self.__punish = 0    #phạt
-        self.__total = 0     #tổng lương
+import sys
 
-    def get_salary(self) -> int:
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
+
+class Payroll:          # tính lương theo tháng của mỗi nhân viên
+    def __init__(self, salary: int, tax: int) -> None:
+        self.__salary = salary    # lương cứng
+        self.__bonus = 0          # thưởng
+        self.__tax = tax          # thuế
+        self.__punish = 0         # phạt
+        self.__total = 0          # tổng lương
+
+    @property
+    def salary(self) -> int:
         return self.__salary
 
-    def get_bonus(self) -> int:
+    @property
+    def bonus(self) -> int:
         return self.__bonus
 
-    def get_tax(self) -> int:
+    @property
+    def tax(self) -> int:
         return self.__tax
 
-    def get_punish(self) -> int:
+    @property
+    def punish(self) -> int:
         return self.__punish
 
-    def get_total(self) -> int:
+    @property
+    def total(self) -> int:
         return self.__total
 
-    def set_salary(self, salary: int) -> None:
+    @salary.setter
+    def salary(self, salary: int) -> Self:
         self.__salary = salary
+        self.calculate_total()
+        return self
 
-    def set_bonus(self, bonus: int) -> None:
+    @bonus.setter
+    def bonus(self, bonus: int) -> Self:
         self.__bonus = bonus
+        self.calculate_total()
+        return self
 
-    def set_tax(self, tax: int) -> None:
+    @tax.setter
+    def tax(self, tax: int) -> Self:
         self.__tax = tax
-    
-    def set_punish(self, punish: int) -> None:
+        self.calculate_total()
+        return self
+
+    @punish.setter
+    def punish(self, punish: int) -> Self:
         self.__punish = punish
+        self.calculate_total()
+        return self
 
-    def set_total(self, total: int) -> None:
-        self.__total = total
-
-    def calculate(self) -> None:
+    def calculate_total(self) -> Self:
         self.__total = self.__salary + self.__bonus - self.__tax - self.__punish
-
-    def set_month(self) -> None:
-        while True:
-            month = int(input("Enter month: "))
-            if month >= 1 and month <= 12:
-                self.__month = month
-                break
-            else:
-                print("Invalid month! Enter again!")
-
-    def get_month(self) -> int:
-        return self.__month
-
-    def set_year(self) -> None:
-        while True:
-            year = int(input("Enter year: "))
-            if year >= 2000:
-                self.__year = year
-                break
-            else:
-                print("Invalid year! Enter again!")
-
-    def get_year(self) -> int:
-        return self.__year
+        return self
 
     def display(self) -> None:
-        print(f"Month: {self.__month}")
         print(f"Salary: {self.__salary}")
         print(f"Bonus: {self.__bonus}")
         print(f"Tax: {self.__tax}")
