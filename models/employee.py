@@ -15,21 +15,18 @@ if TYPE_CHECKING:
 # NOTE: possible abstraction: split name and id into its own Entity class or
 # something, though i don't like that approach very much tbh - Rylie
 class Employee:
-    def __init__(
-        self, name: str, dob: str,
-        id: str, phone: str, department: Department, benefits: list[BenefitPlan],
-        payroll: Payroll
-    ) -> None:
-        self.__name = name
-        self.__dob = dob
-        self.__id = id
-        self.__phone = phone
+    def __init__(self) -> None:
+        self.__name = ""
+        self.__dob = ""
+        self.__email = ""
+        self.__id = ""
+        self.__phone = ""
         # TODO: think of some way to decouple department members list and
         # members being a part of departments, it's kinda a circle dependency
         # rn. - Rylie
-        self.__department = department
-        self.__benefits = benefits
-        self.__payroll = payroll
+        self.__department = Department()
+        self.__benefits = []
+        self.__payroll = Payroll()
         self.__attendance = Attendance()
         self.__performance = Performance()
 
