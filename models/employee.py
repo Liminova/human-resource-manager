@@ -1,5 +1,9 @@
 from __future__ import annotations
+import re
 import sys
+import textwrap
+from datetime import datetime
+from option import Result, Ok, Err
 
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
@@ -12,8 +16,11 @@ if TYPE_CHECKING:
     from .department import Department
     from .payroll import Payroll
     from .performance import Performance
+
 # NOTE: possible abstraction: split name and id into its own Entity class or
 # something, though i don't like that approach very much tbh - Rylie
+
+
 class Employee:
     def __init__(self) -> None:
         self.__name = ""
@@ -70,15 +77,35 @@ class Employee:
     def performance(self) -> Performance:
         return self.__performance
 
-    @name.setter
-    def name(self, name: str) -> Self:
+    def name(self, name: str) -> Result[Self, str]:
+        if name == "":
+            return Err("Name cannot be empty!")
+        if any(char.isdigit() for char in name):
+            return Err("Name cannot contain numbers!")
         self.__name = name
-        return self
+        return Ok(self)
 
-    @dob.setter
-    def dob(self, dob: str) -> Self:
+    def dob(self, dob: str) -> Result[Self, str]:
+        if (len(dob) != 10) or (dob[4] != "-" or dob[7] != "-"):
+            return Err("Invalid date of birth format!")
+
+        year, month, day = dob.split("-")
+        year, month, day = int(year), int(month), int(day)
+
+        is_leap_year = (year % 4 == 0 and year % 100 != 0) or year % 400 == 0
+        valid_day = month in (1, 3, 5, 7, 8, 10, 12) and 1 <= day <= 31 or \
+            month in (4, 6, 9, 11) and 1 <= day <= 30 or \
+            month == 2 and 1 <= day <= 29 and is_leap_year or \
+            month == 2 and 1 <= day <= 28 and not is_leap_year
+        valid_month = 1 <= month <= 12
+        valid_year = 1900 <= year <= datetime.now().year
+
+        if not valid_day or not valid_month or not valid_year:
+            return Err("Invalid date of birth format!")
+
         self.__dob = dob
-        return self
+        return Ok(self)
+
     def email(self, email: str) -> Result[Self, str]:
         pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
         if not re.match(pattern, email):
@@ -86,40 +113,37 @@ class Employee:
         self.__email = email
         return Ok(self)
 
-    @id.setter
-    def id(self, id: str) -> Self:
+    def id(self, id: str) -> Result[Self, str]:
         self.__id = id
-        return self
+        return Ok(self)
 
-    @phone.setter
-    def phone(self, phone: str) -> Self:
+    def phone(self, phone: str) -> Result[Self, str]:
+        if len(phone) == 0:
+            return Err("Phone number cannot be empty!")
+        if any(char.isalpha() for char in phone):
+            return Err("Phone number cannot contain letters!")
         self.__phone = phone
-        return self
+        return Ok(self)
 
-    @department.setter
-    def department(self, department: Department) -> Self:
+    def department(self, department: Department) -> Result[Self, str]:
         self.__department = department
-        return self
+        return Ok(self)
 
-    @benefits.setter
-    def benefits(self, benefits: list[BenefitPlan]) -> Self:
+    def benefits(self, benefits: list[BenefitPlan]) -> Result[Self, str]:
         self.__benefits = benefits
-        return self
+        return Ok(self)
 
-    @payroll.setter
-    def payroll(self, payroll: Payroll) -> Self:
+    def payroll(self, payroll: Payroll) -> Result[Self, str]:
         self.__payroll = payroll
-        return self
+        return Ok(self)
 
-    @attendance.setter
-    def attendance(self, attendance: Attendance) -> Self:
+    def attendance(self, attendance: Attendance) -> Result[Self, str]:
         self.__attendance = attendance
-        return self
+        return Ok(self)
 
-    @performance.setter
-    def performance(self, performance: Performance) -> Self:
+    def performance(self, performance: Performance) -> Result[Self, str]:
         self.__performance = performance
-        return self
+        return Ok(self)
 
     def is_enrolled_in_plan(self, benefit: BenefitPlan) -> bool:
         return benefit in self.__benefits
