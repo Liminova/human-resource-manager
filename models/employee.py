@@ -1,19 +1,22 @@
+from __future__ import annotations
 import sys
 
-from .benefits import BenefitPlan
-from .payroll import Payroll
-
 if sys.version_info >= (3, 11):
-    from typing import Self
+    from typing import Self, TYPE_CHECKING
 else:
-    from typing_extensions import Self
+    from typing_extensions import Self, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .benefits import BenefitPlan
+    from .department import Department
+    from .payroll import Payroll
 
 # NOTE: possible abstraction: split name and id into its own Entity class or
 # something, though i don't like that approach very much tbh - Rylie
 class Employee:
     def __init__(
         self, name: str, dob: str,
-        id: str, phone: str, department: str, benefits: list,
+        id: str, phone: str, department: Department, benefits: list,
         payroll: Payroll
     ) -> None:
         self.__name = name
@@ -44,7 +47,7 @@ class Employee:
         return self.__phone
 
     @property
-    def department(self) -> str:
+    def department(self) -> Department:
         return self.__department
 
     @property
@@ -76,7 +79,7 @@ class Employee:
         return self
 
     @department.setter
-    def department(self, department: str) -> Self:
+    def department(self, department: Department) -> Self:
         self.__department = department
         return self
 
