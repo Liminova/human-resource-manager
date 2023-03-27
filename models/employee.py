@@ -1,5 +1,6 @@
 from __future__ import annotations
 import sys
+import datetime as dt
 
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
@@ -7,6 +8,7 @@ else:
     from typing_extensions import Self, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from .attendance_check import Attendance
     from .benefits import BenefitPlan
     from .department import Department
     from .payroll import Payroll
@@ -29,6 +31,7 @@ class Employee:
         self.__department = department
         self.__benefits = benefits
         self.__payroll = payroll
+        self.__attendance = Attendance()
 
     @property
     def name(self) -> str:
@@ -57,6 +60,10 @@ class Employee:
     @property
     def payroll(self) -> Payroll:
         return self.__payroll
+
+    @property
+    def attendance(self) -> Attendance:
+        return self.__attendance
 
     @name.setter
     def name(self, name: str) -> Self:
@@ -91,6 +98,11 @@ class Employee:
     @payroll.setter
     def payroll(self, payroll: Payroll) -> Self:
         self.__payroll = payroll
+        return self
+
+    @attendance.setter
+    def attendance(self, attendance: Attendance) -> Self:
+        self.__attendance = attendance
         return self
 
     def is_enrolled_in_plan(self, benefit: BenefitPlan) -> bool:
