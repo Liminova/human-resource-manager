@@ -43,3 +43,14 @@ class Department:
     def members(self, members: list[Employee]) -> Self:
         self.__members = members
         return self
+
+    # NOTE: maybe we should only display the member's name instead of their
+    # full info? - Rylie
+    def display(self) -> None:
+        print(f"- Name: {self.__name}")
+        print(f"- ID: {self.__id}")
+        print("- Members:")
+        for (i, employee) in enumerate(self.__members, 1):
+            print(f"Member {i}:")
+            employee.display()
+            print()
