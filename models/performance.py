@@ -110,7 +110,10 @@ class Performance:
         total_rating = 0
         for sale in self.__sale_list:
             total_rating += sale.client_rating
-        self.__average_rating = round(total_rating / self.__sales_count, 1)
+        if self.__sales_count == 0:
+            self.__average_rating = 0
+        else:
+            self.__average_rating = round(total_rating / self.__sales_count, 1)
 
     def get_sale_by_id(self, sale_id: str) -> Sale:
         for sale in self.__sale_list:
