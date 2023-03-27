@@ -1,3 +1,10 @@
+import sys
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
+
 class Sale:
     def __init__(self) -> None:
         self.__sale_id = "" # YYYYMMDDHHMM_CLIEND_ID
@@ -37,32 +44,39 @@ class Sale:
         return self.__client_comment
 
     @sale_id.setter
-    def sale_id(self, sale_id: str) -> None:
+    def sale_id(self, sale_id: str) -> Self:
         self.__sale_id = sale_id
+        return self
 
     @revenue.setter
-    def revenue(self, revenue: float) -> None:
+    def revenue(self, revenue: float) -> Self:
         self.__revenue = revenue
+        return self
 
     @cost.setter
-    def cost(self, cost: float) -> None:
+    def cost(self, cost: float) -> Self:
         self.__cost = cost
+        return self
 
     @profit.setter
-    def profit(self, profit: float) -> None:
+    def profit(self, profit: float) -> Self:
         self.__profit = profit
+        return self
 
     @client_id.setter
-    def client_id(self, client_id: str) -> None:
+    def client_id(self, client_id: str) -> Self:
         self.__client_id = client_id
+        return self
 
     @client_rating.setter
-    def client_rating(self, client_rating: float) -> None:
+    def client_rating(self, client_rating: float) -> Self:
         self.__client_rating = client_rating
+        return self
 
     @client_comment.setter
-    def client_comment(self, client_comment: str) -> None:
+    def client_comment(self, client_comment: str) -> Self:
         self.__client_comment = client_comment
+        return self
 
 class Performance:
     """Monitoring an employee's performance."""
