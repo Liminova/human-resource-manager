@@ -42,6 +42,10 @@ class Employee:
         return self.__dob
 
     @property
+    def email(self) -> str:
+        return self.__email
+
+    @property
     def id(self) -> str:
         return self.__id
 
@@ -78,6 +82,12 @@ class Employee:
     def dob(self, dob: str) -> Self:
         self.__dob = dob
         return self
+    def email(self, email: str) -> Result[Self, str]:
+        pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+        if not re.match(pattern, email):
+            return Err("Invalid email format!")
+        self.__email = email
+        return Ok(self)
 
     @id.setter
     def id(self, id: str) -> Self:
