@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from .benefits import BenefitPlan
     from .department import Department
     from .payroll import Payroll
-
+    from .performance import Performance
 # NOTE: possible abstraction: split name and id into its own Entity class or
 # something, though i don't like that approach very much tbh - Rylie
 class Employee:
@@ -31,6 +31,7 @@ class Employee:
         self.__benefits = benefits
         self.__payroll = payroll
         self.__attendance = Attendance()
+        self.__performance = Performance()
 
     @property
     def name(self) -> str:
@@ -63,6 +64,10 @@ class Employee:
     @property
     def attendance(self) -> Attendance:
         return self.__attendance
+
+    @property
+    def performance(self) -> Performance:
+        return self.__performance
 
     @name.setter
     def name(self, name: str) -> Self:
@@ -102,6 +107,11 @@ class Employee:
     @attendance.setter
     def attendance(self, attendance: Attendance) -> Self:
         self.__attendance = attendance
+        return self
+
+    @performance.setter
+    def performance(self, performance: Performance) -> Self:
+        self.__performance = performance
         return self
 
     def is_enrolled_in_plan(self, benefit: BenefitPlan) -> bool:
