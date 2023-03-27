@@ -5,13 +5,14 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import Self
 
-class Payroll:          # tính lương theo tháng của mỗi nhân viên
-    def __init__(self, salary: int, tax: int) -> None:
-        self.__salary = salary    # lương cứng
-        self.__bonus = 0          # thưởng
-        self.__tax = tax          # thuế
-        self.__punish = 0         # phạt
-        self.__total = 0          # tổng lương
+class Payroll:
+    """Monthly payroll for an employee."""
+    def __init__(self) -> None:
+        self.__salary = 0
+        self.__bonus = 0
+        self.__tax = 0
+        self.__punish = 0
+        self.__total = 0
 
     @property
     def salary(self) -> int:
