@@ -1,4 +1,5 @@
 import sys
+import textwrap
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -62,9 +63,11 @@ class Payroll:
         self.__total = self.__salary + self.__bonus - self.__tax - self.__punish
         return self
 
-    def display(self) -> None:
-        print(f"Salary: {self.__salary}")
-        print(f"Bonus: {self.__bonus}")
-        print(f"Tax: {self.__tax}")
-        print(f"Punish: {self.__punish}")
-        print(f"Total: {self.__total}")
+    def __str__(self) -> str:
+        return textwrap.dedent(f"""\
+            - Salary: {self.__salary}
+            - Bonus: {self.__bonus}
+            - Tax: {self.__tax}
+            - Punish: {self.__punish}
+            - Total: {self.__total}
+        """)
