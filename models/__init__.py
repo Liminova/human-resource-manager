@@ -5,6 +5,7 @@ from .company import Company
 from .department import Department
 from .employee import Employee
 from .payroll import Payroll
+from .performance import Performance, Sale
 
 __all__ = ["Admin", "Attendance", "BenefitPlan", "Company", "Department",
-           "Employee", "Payroll"]
+           "Employee", "Payroll", "Performance", "Sale"]
