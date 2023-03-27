@@ -1,12 +1,10 @@
 import datetime as dt
-import os
-import pickle
 import sys
 
 if sys.version_info >= (3, 11):
-    from typing import Self, TYPE_CHECKING
+    from typing import Self
 else:
-    from typing_extensions import Self, TYPE_CHECKING
+    from typing_extensions import Self
 
 DEFAULT_LEAVE_BALANCE = 3
 
