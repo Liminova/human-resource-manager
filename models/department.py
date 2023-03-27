@@ -10,12 +10,12 @@ if TYPE_CHECKING:
     from .employee import Employee
 
 class Department:
-    def __init__(self, name: str, id: str, members: list[Employee]) -> None:
-        self.__name = name
+    def __init__(self) -> None:
+        self.__name = ""
         # NOTE: maybe we don't need id for departments? food for thoughts.
         # - Rylie
-        self.__id = id
-        self.__members = members
+        self.__id = ""
+        self.__members = []
 
     @property
     def name(self) -> str:
