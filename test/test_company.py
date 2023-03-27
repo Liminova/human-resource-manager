@@ -11,8 +11,9 @@ class TestCompany(unittest.TestCase):
     def test_mutate_company(self):
         company = Company("Doofenshmirtz Evil Inc.", [], [])
         payroll = Payroll(5000, 500)
-        rylie = Employee("Rylie", "2003-08-22", "727", "0123456727", "Sleep" , [], payroll)
-        sleep = Department("Sleep", "SLP", [rylie])
+        sleep = Department("Sleep", "SLP", [])
+        rylie = Employee("Rylie", "2003-08-22", "727", "0123456727", sleep, [], payroll)
+        sleep.members.append(rylie)
 
         company.departments.append(sleep)
         company.employees.append(rylie)

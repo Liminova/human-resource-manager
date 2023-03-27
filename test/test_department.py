@@ -12,7 +12,7 @@ class TestDepartment(unittest.TestCase):
     def test_mutate_department(self):
         department = Department("Sleep", "SLP", [])
         payroll = Payroll(5000, 500)
-        rylie = Employee("Rylie", "2003-08-22", "727", "0123456727", "Sleep", [], payroll)
+        rylie = Employee("Rylie", "2003-08-22", "727", "0123456727", department, [], payroll)
         department.members.append(rylie)
 
         self.assertEqual(department.members, [rylie])
