@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class Employee:
     def __init__(
         self, name: str, dob: str,
-        id: str, phone: str, department: Department, benefits: list,
+        id: str, phone: str, department: Department, benefits: list[BenefitPlan],
         payroll: Payroll
     ) -> None:
         self.__name = name
@@ -84,7 +84,7 @@ class Employee:
         return self
 
     @benefits.setter
-    def benefits(self, benefits: list) -> Self:
+    def benefits(self, benefits: list[BenefitPlan]) -> Self:
         self.__benefits = benefits
         return self
 
@@ -95,3 +95,13 @@ class Employee:
 
     def is_enrolled_in_plan(self, benefit: BenefitPlan) -> bool:
         return benefit in self.__benefits
+
+    def display(self):
+        print(f"- Name: {self.__name}")
+        print(f"- DoB: {self.__dob}")
+        print(f"- ID: {self.__id}")
+        print(f"- Phone: {self.__phone}")
+        print(f"- Department: {self.__department}")
+        print("- Benefit plans: ")
+        for benefit in self.__benefits:
+            print(f"+ {benefit.name}")
