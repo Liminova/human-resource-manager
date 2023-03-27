@@ -1,12 +1,16 @@
+from __future__ import annotations
 import sys
 
 if sys.version_info >= (3, 11):
-    from typing import Self
+    from typing import Self, TYPE_CHECKING
 else:
-    from typing_extensions import Self
+    from typing_extensions import Self, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .employee import Employee
 
 class Department:
-    def __init__(self, name: str, id: str, members: list) -> None:
+    def __init__(self, name: str, id: str, members: list[Employee]) -> None:
         self.__name = name
         # NOTE: maybe we don't need id for departments? food for thoughts.
         # - Rylie
@@ -22,7 +26,7 @@ class Department:
         return self.__id
 
     @property
-    def members(self) -> list:
+    def members(self) -> list[Employee]:
         return self.__members
 
     @name.setter
@@ -36,6 +40,6 @@ class Department:
         return self
 
     @members.setter
-    def members(self, members: list) -> Self:
+    def members(self, members: list[Employee]) -> Self:
         self.__members = members
         return self
