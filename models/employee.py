@@ -96,12 +96,12 @@ class Employee:
     def is_enrolled_in_plan(self, benefit: BenefitPlan) -> bool:
         return benefit in self.__benefits
 
-    def display(self):
+    def display(self) -> None:
         print(f"- Name: {self.__name}")
         print(f"- DoB: {self.__dob}")
         print(f"- ID: {self.__id}")
         print(f"- Phone: {self.__phone}")
         print(f"- Department: {self.__department}")
         print("- Benefit plans: ")
-        for benefit in self.__benefits:
-            print(f"+ {benefit.name}")
+        for (i, benefit) in enumerate(self.__benefits, 1):
+            print(f"{i}. {benefit.name}")

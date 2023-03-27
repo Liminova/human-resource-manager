@@ -54,10 +54,13 @@ class BenefitPlan:
         self.__enrolled_employees = enrolled_employees
         return self
 
-    def display(self):
+    # NOTE: same note as department's display method. - Rylie
+    def display(self) -> None:
         print(f"- Name: {self.__name}")
         print(f"- Description: {self.__description}")
         print(f"- Cost: {self.__cost}")
         print("- Enrolled employees:")
-        for employee in self.__enrolled_employees:
+        for (i, employee) in enumerate(self.__enrolled_employees, 1):
+            print(f"Employee {i}:")
             employee.display()
+            print()
