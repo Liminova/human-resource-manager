@@ -32,3 +32,7 @@ Everything else can be ran under the environment managed by `pipenv` by:
 ```shell
 $ pipenv run <command>
 ```
+
+## Contributing
+
+Check out the [Contributing Guide](CONTRIBUTING.md) to get started.
