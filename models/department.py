@@ -26,7 +26,7 @@ class Department:
         return self.__id
 
     @property
-    def members(self) -> list[Employee]:
+    def members(self) -> 'list[Employee]':
         return self.__members
 
     @name.setter
