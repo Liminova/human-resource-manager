@@ -3,18 +3,18 @@ import unittest
 
 class TestDepartment(unittest.TestCase):
     def test_create_department(self):
-        department = Department()
-        department.name = "Sleep"
-        department.id = "SLP"
+        department = Department() \
+            .set_name("Sleep").unwrap() \
+            .set_id("SLP").unwrap()
 
         self.assertEqual(department.name, "Sleep")
         self.assertEqual(department.id, "SLP")
         self.assertEqual(department.members, [])
 
     def test_mutate_department(self):
-        department = Department()
-        department.name = "Sleep"
-        department.id = "SLP"
+        department = Department() \
+            .set_name("Sleep").unwrap() \
+            .set_id("SLP").unwrap()
 
         rylie = Employee() \
             .set_name("Rylie").unwrap() \
