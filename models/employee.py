@@ -10,12 +10,11 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import Self, TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from .attendance_check import Attendance
-    from .benefits import BenefitPlan
-    from .department import Department
-    from .payroll import Payroll
-    from .performance import Performance
+from .attendance_check import Attendance
+from .benefits import BenefitPlan
+from .department import Department
+from .payroll import Payroll
+from .performance import Performance
 
 # NOTE: possible abstraction: split name and id into its own Entity class or
 # something, though i don't like that approach very much tbh - Rylie

@@ -20,10 +20,10 @@ class CompanyMeta(type):
         return cls._instances[cls]
 
 class Company(metaclass=CompanyMeta):
-    def __init__(self, name: str, departments: list, employees: list) -> None:
-        self.__name = name
-        self.__departments = departments
-        self.__employees = employees
+    def __init__(self) -> None:
+        self.__name = ""
+        self.__departments = []
+        self.__employees = []
 
     @property
     def name(self) -> str:
