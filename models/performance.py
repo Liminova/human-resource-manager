@@ -7,7 +7,7 @@ else:
 
 class Sale:
     def __init__(self) -> None:
-        self.__sale_id = "" # YYYYMMDDHHMM_CLIEND_ID
+        self.__sale_id = "" # YYYYMMDDHHMM_CLIENT_ID
         self.__revenue = 0.0
         self.__cost = 0.0
         self.__profit = 0.0

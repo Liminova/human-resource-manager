@@ -1,5 +1,6 @@
 import sys
 from threading import Lock
+from option import Result, Ok, Err
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -37,17 +38,8 @@ class Company(metaclass=CompanyMeta):
     def employees(self) -> list:
         return self.__employees
 
-    @name.setter
-    def name(self, name: str) -> Self:
+    def set_name(self, name: str) -> Result[Self, str]:
+        if name == "":
+            return Err("Name cannot be empty!")
         self.__name = name
-        return self
-
-    @departments.setter
-    def departments(self, departments: list) -> Self:
-        self.__departments = departments
-        return self
-
-    @employees.setter
-    def employees(self, employees: list) -> Self:
-        self.__employees = employees
-        return self
+        return Ok(self)

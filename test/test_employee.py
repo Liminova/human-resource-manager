@@ -3,9 +3,9 @@ import unittest
 
 class TestEmployee(unittest.TestCase):
     def test_create_employee(self):
-        department = Department()
-        department.name = "Sleep"
-        department.id = "SLP"
+        department = Department() \
+            .set_name("Sleep").unwrap() \
+            .set_id("SLP").unwrap()
 
         employee = Employee() \
             .set_name("Rylie").unwrap() \
