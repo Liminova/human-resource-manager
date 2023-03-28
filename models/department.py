@@ -39,10 +39,6 @@ class Department:
         self.__id = id
         return self
 
-    @members.setter
-    def members(self, members: list[Employee]) -> Self:
-        self.__members = members
-        return self
 
     # NOTE: maybe we should only display the member's name instead of their
     # full info? - Rylie
