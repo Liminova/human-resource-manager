@@ -76,7 +76,7 @@ class Employee:
     def performance(self) -> Performance:
         return self.__performance
 
-    def name(self, name: str) -> Result[Self, str]:
+    def set_name(self, name: str) -> Result[Self, str]:
         if name == "":
             return Err("Name cannot be empty!")
         if any(char.isdigit() for char in name):
@@ -84,7 +84,7 @@ class Employee:
         self.__name = name
         return Ok(self)
 
-    def dob(self, dob: str) -> Result[Self, str]:
+    def set_dob(self, dob: str) -> Result[Self, str]:
         if (len(dob) != 10) or (dob[4] != "-" or dob[7] != "-"):
             return Err("Invalid date of birth format!")
 
@@ -105,18 +105,18 @@ class Employee:
         self.__dob = dob
         return Ok(self)
 
-    def email(self, email: str) -> Result[Self, str]:
+    def set_email(self, email: str) -> Result[Self, str]:
         pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
         if not re.match(pattern, email):
             return Err("Invalid email format!")
         self.__email = email
         return Ok(self)
 
-    def id(self, id: str) -> Result[Self, str]:
+    def set_id(self, id: str) -> Result[Self, str]:
         self.__id = id
         return Ok(self)
 
-    def phone(self, phone: str) -> Result[Self, str]:
+    def set_phone(self, phone: str) -> Result[Self, str]:
         if len(phone) == 0:
             return Err("Phone number cannot be empty!")
         if any(char.isalpha() for char in phone):
@@ -124,23 +124,23 @@ class Employee:
         self.__phone = phone
         return Ok(self)
 
-    def department(self, department: Department) -> Result[Self, str]:
+    def set_department(self, department: Department) -> Result[Self, str]:
         self.__department = department
         return Ok(self)
 
-    def benefits(self, benefits: list[BenefitPlan]) -> Result[Self, str]:
+    def set_benefits(self, benefits: list[BenefitPlan]) -> Result[Self, str]:
         self.__benefits = benefits
         return Ok(self)
 
-    def payroll(self, payroll: Payroll) -> Result[Self, str]:
+    def set_payroll(self, payroll: Payroll) -> Result[Self, str]:
         self.__payroll = payroll
         return Ok(self)
 
-    def attendance(self, attendance: Attendance) -> Result[Self, str]:
+    def set_attendance(self, attendance: Attendance) -> Result[Self, str]:
         self.__attendance = attendance
         return Ok(self)
 
-    def performance(self, performance: Performance) -> Result[Self, str]:
+    def set_performance(self, performance: Performance) -> Result[Self, str]:
         self.__performance = performance
         return Ok(self)
 
