@@ -36,28 +36,28 @@ class Payroll:
     def total(self) -> int:
         return self.__total
 
-    def salary(self, salary: int) -> Result[Self, str]:
+    def set_salary(self, salary: int) -> Result[Self, str]:
         if not self.verify(salary):
             return Err("Salary cannot be negative.")
         self.__salary = salary
         self.calculate_total()
         return Ok(self)
 
-    def bonus(self, bonus: int) -> Result[Self, str]:
+    def set_bonus(self, bonus: int) -> Result[Self, str]:
         if not self.verify(bonus):
             return Err("Bonus cannot be negative.")
         self.__bonus = bonus
         self.calculate_total()
         return Ok(self)
 
-    def tax(self, tax: int) -> Result[Self, str]:
+    def set_tax(self, tax: int) -> Result[Self, str]:
         if not self.verify(tax):
             return Err("Tax cannot be negative.")
         self.__tax = tax
         self.calculate_total()
         return Ok(self)
 
-    def punish(self, punish: int) -> Result[Self, str]:
+    def set_punish(self, punish: int) -> Result[Self, str]:
         if not self.verify(punish):
             return Err("Punishment cannot be negative.")
         self.__punish = punish
