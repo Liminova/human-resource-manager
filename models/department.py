@@ -52,5 +52,5 @@ class Department:
         print("- Members:")
         for (i, employee) in enumerate(self.__members, 1):
             print(f"Member {i}:")
-            employee.display()
+            print(employee)
             print()
