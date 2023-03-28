@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class BenefitPlan:
     def __init__(
             self, name: str, description: str,
-            cost: float, enrolled_employees: 'list[Employee]') -> None:
+            cost: float, enrolled_employees: list[Employee]) -> None:
         self.__name = name
         self.__description = description
         self.__cost = cost
