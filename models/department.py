@@ -29,15 +29,17 @@ class Department:
     def members(self) -> list[Employee]:
         return self.__members
 
-    @name.setter
-    def name(self, name: str) -> Self:
+    def set_name(self, name: str) -> Result[Self, str]:
+        if name == "":
+            return Err("Name cannot be empty!")
         self.__name = name
-        return self
+        return Ok(self)
 
-    @id.setter
-    def id(self, id: str) -> Self:
+    def set_id(self, id: str) -> Result[Self, str]:
+        if id == "":
+            return Err("ID cannot be empty!")
         self.__id = id
-        return self
+        return Ok(self)
 
 
     # NOTE: maybe we should only display the member's name instead of their
