@@ -29,7 +29,7 @@ class Attendance:
         return self
 
     @start_date.setter
-    def start_date(self, start_date) -> Self:
+    def start_date(self, start_date: dt.datetime) -> Self:
         self.__start_date = start_date
         return self
 
