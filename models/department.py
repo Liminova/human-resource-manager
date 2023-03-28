@@ -1,5 +1,7 @@
 from __future__ import annotations
 import sys
+import textwrap
+from option import Result, Ok, Err
 
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
@@ -41,14 +43,11 @@ class Department:
         self.__id = id
         return Ok(self)
 
-
-    # NOTE: maybe we should only display the member's name instead of their
-    # full info? - Rylie
-    def display(self) -> None:
-        print(f"- Name: {self.__name}")
-        print(f"- ID: {self.__id}")
-        print("- Members:")
-        for (i, employee) in enumerate(self.__members, 1):
-            print(f"Member {i}:")
-            print(employee)
-            print()
+    def __str__(self) -> None:
+        data = textwrap.dedent(f"""\
+                - Name: {self.__name}
+                - ID: {self.__id}
+                - Members:
+            """)
+        for (i, member) in enumerate(self.__members, 1):
+            data += f"{i}. {member.name}\n"
