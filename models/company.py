@@ -43,13 +43,3 @@ class Company(metaclass=CompanyMeta):
             return Err("Name cannot be empty!")
         self.__name = name
         return Ok(self)
-
-    @departments.setter
-    def departments(self, departments: list) -> Self:
-        self.__departments = departments
-        return self
-
-    @employees.setter
-    def employees(self, employees: list) -> Self:
-        self.__employees = employees
-        return self
