@@ -11,13 +11,11 @@ if TYPE_CHECKING:
     from .employee import Employee
 
 class BenefitPlan:
-    def __init__(
-            self, name: str, description: str,
-            cost: float, enrolled_employees: list[Employee]) -> None:
-        self.__name = name
-        self.__description = description
-        self.__cost = cost
-        self.__enrolled_employees = enrolled_employees
+    def __init__(self) -> None:
+        self.__name = ""
+        self.__description = ""
+        self.__cost = 0.0
+        self.__enrolled_employees = []
 
     @property
     def name(self) -> str:
