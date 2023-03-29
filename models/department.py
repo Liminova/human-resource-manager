@@ -14,8 +14,6 @@ if TYPE_CHECKING:
 class Department:
     def __init__(self) -> None:
         self.__name = ""
-        # NOTE: maybe we don't need id for departments? food for thoughts.
-        # - Rylie
         self.__id = ""
         self.__members = []
 
@@ -43,7 +41,7 @@ class Department:
         self.__id = id
         return Ok(self)
 
-    def __str__(self) -> None:
+    def __str__(self) -> str:
         data = textwrap.dedent(f"""\
                 - Name: {self.__name}
                 - ID: {self.__id}
@@ -51,3 +49,4 @@ class Department:
             """)
         for (i, member) in enumerate(self.__members, 1):
             data += f"{i}. {member.name}\n"
+        return data

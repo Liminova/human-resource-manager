@@ -25,6 +25,7 @@ class Company(metaclass=CompanyMeta):
         self.__name = ""
         self.__departments = []
         self.__employees = []
+        self.__benefits = []
 
     @property
     def name(self) -> str:
@@ -37,6 +38,10 @@ class Company(metaclass=CompanyMeta):
     @property
     def employees(self) -> list:
         return self.__employees
+
+    @property
+    def benefits(self) -> list:
+        return self.__benefits
 
     def set_name(self, name: str) -> Result[Self, str]:
         if name == "":

@@ -128,10 +128,6 @@ class Employee:
         self.__department = department
         return Ok(self)
 
-    def set_benefits(self, benefits: list[BenefitPlan]) -> Result[Self, str]:
-        self.__benefits = benefits
-        return Ok(self)
-
     def set_payroll(self, payroll: Payroll) -> Result[Self, str]:
         self.__payroll = payroll
         return Ok(self)
@@ -147,7 +143,7 @@ class Employee:
     def is_enrolled_in_plan(self, benefit: BenefitPlan) -> bool:
         return benefit in self.__benefits
 
-    def __str__(self) -> None:
+    def __str__(self) -> str:
         data = textwrap.dedent(f"""\
             - Name: {self.__name}
             - DoB: {self.__dob}
@@ -158,3 +154,4 @@ class Employee:
         """)
         for (i, benefit) in enumerate(self.__benefits, 1):
             data += f"{i}. {benefit.name}\n"
+        return data
