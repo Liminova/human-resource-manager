@@ -110,17 +110,17 @@ class Employee:
         if not re.match(pattern, email):
             return Err("Invalid email format!")
         self.__email = email
-        return Ok(self)
+        return Ok(self) if email else Err("Email cannot be empty!")
 
     def set_id(self, id: str = "") -> Result[Self, str]:
         self.__id = id
-        return Ok(self)
+        return Ok(self) if id else Err("ID cannot be empty!")
 
     def set_phone(self, phone: str = "") -> Result[Self, str]:
         if any(char.isalpha() for char in phone):
             return Err("Phone number cannot contain letters!")
         self.__phone = phone
-        return Ok(self)
+        return Ok(self) if phone else Err("Phone number cannot be empty!")
 
     def set_department(self, department: Department) -> Result[Self, str]:
         self.__department = department
