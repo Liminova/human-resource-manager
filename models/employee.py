@@ -154,3 +154,4 @@ class Employee:
         """)
         for (i, benefit) in enumerate(self.__benefits, 1):
             data += f"{i}. {benefit.name}\n"
+        return data
