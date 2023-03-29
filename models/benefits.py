@@ -1,5 +1,6 @@
 from __future__ import annotations
 import sys
+from option import Result, Ok, Err
 
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
@@ -35,24 +36,24 @@ class BenefitPlan:
         return self.__enrolled_employees
 
     @name.setter
-    def name(self, name: str) -> Self:
+    def name(self, name: str) -> Result[Self, str]:
         self.__name = name
-        return self
+        return Ok(self) if name else Err("Name cannot be empty.")
 
     @description.setter
-    def description(self, description: str) -> Self:
+    def description(self, description: str) -> Result[Self, str]:
         self.__description = description
-        return self
+        return Ok(self) if description else Err("Description cannot be empty.")
 
     @cost.setter
-    def cost(self, cost: float) -> Self:
+    def cost(self, cost: float) -> Result[Self, str]:
         self.__cost = cost
-        return self
+        return Ok(self) if cost else Err("Cost cannot be empty.")
 
     @enrolled_employees.setter
-    def enrolled_employees(self, enrolled_employees: list) -> Self:
+    def enrolled_employees(self, enrolled_employees: list) -> Result[Self, str]:
         self.__enrolled_employees = enrolled_employees
-        return self
+        return Ok(self) if enrolled_employees else Err("Enrolled employees cannot be empty.")
 
     # NOTE: same note as department's display method. - Rylie
     def display(self) -> None:
