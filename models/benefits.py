@@ -34,22 +34,18 @@ class BenefitPlan:
     def enrolled_employees(self) -> list:
         return self.__enrolled_employees
 
-    @name.setter
     def name(self, name: str) -> Result[Self, str]:
         self.__name = name
         return Ok(self) if name else Err("Name cannot be empty.")
 
-    @description.setter
     def description(self, description: str) -> Result[Self, str]:
         self.__description = description
         return Ok(self) if description else Err("Description cannot be empty.")
 
-    @cost.setter
     def cost(self, cost: float) -> Result[Self, str]:
         self.__cost = cost
         return Ok(self) if cost else Err("Cost cannot be empty.")
 
-    @enrolled_employees.setter
     def enrolled_employees(self, enrolled_employees: list) -> Result[Self, str]:
         self.__enrolled_employees = enrolled_employees
         return Ok(self) if enrolled_employees else Err("Enrolled employees cannot be empty.")
