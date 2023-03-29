@@ -46,10 +46,6 @@ class BenefitPlan:
         self.__cost = cost
         return Ok(self) if cost else Err("Cost cannot be empty.")
 
-    def enrolled_employees(self, enrolled_employees: list) -> Result[Self, str]:
-        self.__enrolled_employees = enrolled_employees
-        return Ok(self) if enrolled_employees else Err("Enrolled employees cannot be empty.")
-
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\
             - Name: {self.__name}
