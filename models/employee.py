@@ -105,20 +105,18 @@ class Employee:
         self.__dob = dob
         return Ok(self)
 
-    def set_email(self, email: str) -> Result[Self, str]:
+    def set_email(self, email: str = "") -> Result[Self, str]:
         pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
         if not re.match(pattern, email):
             return Err("Invalid email format!")
         self.__email = email
         return Ok(self)
 
-    def set_id(self, id: str) -> Result[Self, str]:
+    def set_id(self, id: str = "") -> Result[Self, str]:
         self.__id = id
         return Ok(self)
 
-    def set_phone(self, phone: str) -> Result[Self, str]:
-        if len(phone) == 0:
-            return Err("Phone number cannot be empty!")
+    def set_phone(self, phone: str = "") -> Result[Self, str]:
         if any(char.isalpha() for char in phone):
             return Err("Phone number cannot contain letters!")
         self.__phone = phone
