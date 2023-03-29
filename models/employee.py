@@ -143,7 +143,7 @@ class Employee:
     def is_enrolled_in_plan(self, benefit: BenefitPlan) -> bool:
         return benefit in self.__benefits
 
-    def __str__(self) -> None:
+    def __str__(self) -> str:
         data = textwrap.dedent(f"""\
             - Name: {self.__name}
             - DoB: {self.__dob}
