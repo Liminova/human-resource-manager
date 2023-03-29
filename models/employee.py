@@ -128,10 +128,6 @@ class Employee:
         self.__department = department
         return Ok(self)
 
-    def set_benefits(self, benefits: list[BenefitPlan]) -> Result[Self, str]:
-        self.__benefits = benefits
-        return Ok(self)
-
     def set_payroll(self, payroll: Payroll) -> Result[Self, str]:
         self.__payroll = payroll
         return Ok(self)
