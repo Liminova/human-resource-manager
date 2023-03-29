@@ -1,5 +1,6 @@
 from __future__ import annotations
 import sys
+import textwrap
 from option import Result, Ok, Err
 
 if sys.version_info >= (3, 11):
@@ -53,13 +54,13 @@ class BenefitPlan:
         self.__enrolled_employees = enrolled_employees
         return Ok(self) if enrolled_employees else Err("Enrolled employees cannot be empty.")
 
-    # NOTE: same note as department's display method. - Rylie
-    def display(self) -> None:
-        print(f"- Name: {self.__name}")
-        print(f"- Description: {self.__description}")
-        print(f"- Cost: {self.__cost}")
-        print("- Enrolled employees:")
+    def __str__(self) -> str:
+        data = textwrap.dedent(f"""\
+            - Name: {self.__name}
+            - Description: {self.__description}
+            - Cost: {self.__cost}
+            - Enrolled employees:
+        """)
         for (i, employee) in enumerate(self.__enrolled_employees, 1):
-            print(f"Employee {i}:")
-            print(employee)
-            print()
+            data += f"{i}: {employee}\n"
+        return data
