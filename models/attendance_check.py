@@ -23,12 +23,10 @@ class Attendance:
     def start_date(self) -> dt.datetime:
         return self.__start_date
 
-    @leave_balance.setter
     def leave_balance(self, leave_balance: int) -> Self:
         self.__leave_balance = leave_balance
         return self
 
-    @start_date.setter
     def start_date(self, start_date: dt.datetime) -> Self:
         self.__start_date = start_date
         return self
