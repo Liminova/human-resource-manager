@@ -62,5 +62,5 @@ class BenefitPlan:
         print("- Enrolled employees:")
         for (i, employee) in enumerate(self.__enrolled_employees, 1):
             print(f"Employee {i}:")
-            employee.display()
+            print(employee)
             print()

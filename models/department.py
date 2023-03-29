@@ -1,5 +1,7 @@
 from __future__ import annotations
 import sys
+import textwrap
+from option import Result, Ok, Err
 
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
@@ -10,12 +12,12 @@ if TYPE_CHECKING:
     from .employee import Employee
 
 class Department:
-    def __init__(self, name: str, id: str, members: list[Employee]) -> None:
-        self.__name = name
+    def __init__(self) -> None:
+        self.__name = ""
         # NOTE: maybe we don't need id for departments? food for thoughts.
         # - Rylie
-        self.__id = id
-        self.__members = members
+        self.__id = ""
+        self.__members = []
 
     @property
     def name(self) -> str:
@@ -29,28 +31,23 @@ class Department:
     def members(self) -> list[Employee]:
         return self.__members
 
-    @name.setter
-    def name(self, name: str) -> Self:
+    def set_name(self, name: str) -> Result[Self, str]:
+        if name == "":
+            return Err("Name cannot be empty!")
         self.__name = name
-        return self
+        return Ok(self)
 
-    @id.setter
-    def id(self, id: str) -> Self:
+    def set_id(self, id: str) -> Result[Self, str]:
+        if id == "":
+            return Err("ID cannot be empty!")
         self.__id = id
-        return self
+        return Ok(self)
 
-    @members.setter
-    def members(self, members: list[Employee]) -> Self:
-        self.__members = members
-        return self
-
-    # NOTE: maybe we should only display the member's name instead of their
-    # full info? - Rylie
-    def display(self) -> None:
-        print(f"- Name: {self.__name}")
-        print(f"- ID: {self.__id}")
-        print("- Members:")
-        for (i, employee) in enumerate(self.__members, 1):
-            print(f"Member {i}:")
-            employee.display()
-            print()
+    def __str__(self) -> None:
+        data = textwrap.dedent(f"""\
+                - Name: {self.__name}
+                - ID: {self.__id}
+                - Members:
+            """)
+        for (i, member) in enumerate(self.__members, 1):
+            data += f"{i}. {member.name}\n"

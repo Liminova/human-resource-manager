@@ -11,9 +11,8 @@ class TestBenefit(unittest.TestCase):
 
     def test_mutate_benefit(self):
         benefit = BenefitPlan("Beds", "Beds for sleeping.", 5000.0, [])
-        payroll = Payroll(5000, 500)
-        department = Department("Sleep", "SLP", [])
-        rylie = Employee("Rylie", "2003-08-22", "727", "0123456727", department, [], payroll)
+        rylie = Employee() \
+            .set_name("Rylie").unwrap()
 
         benefit.enrolled_employees.append(rylie)
 

@@ -1,11 +1,18 @@
-from models import Department, Employee, Payroll
+from models import Department, Employee
 import unittest
 
 class TestEmployee(unittest.TestCase):
     def test_create_employee(self):
-        department = Department("Sleep", "SLP", [])
-        payroll = Payroll(5000, 500)
-        employee = Employee("Rylie", "2003-08-22", "727", "0123456727", department, [], payroll)
+        department = Department() \
+            .set_name("Sleep").unwrap() \
+            .set_id("SLP").unwrap()
+
+        employee = Employee() \
+            .set_name("Rylie").unwrap() \
+            .set_dob("2003-08-22").unwrap() \
+            .set_id("727").unwrap() \
+            .set_phone("0123456727").unwrap() \
+            .set_department(department).unwrap()
 
         self.assertEqual(employee.name, "Rylie")
         self.assertEqual(employee.dob, "2003-08-22")
@@ -14,13 +21,15 @@ class TestEmployee(unittest.TestCase):
         self.assertEqual(employee.department.name, "Sleep")
 
     def test_mutate_employee(self):
-        department = Department("Sleep", "SLP", [])
-        payroll = Payroll(5000, 500)
-        employee = Employee("Rylie", "2003-08-22", "727", "0123456727", department, [], payroll)
+        employee = Employee() \
+            .set_name("Rylie").unwrap() \
+            .set_dob("2003-08-22").unwrap() \
+            .set_id("727").unwrap() \
+            .set_phone("0123456727").unwrap() \
 
         self.assertEqual(employee.id, "727")
 
-        employee.id = "420"
+        employee.set_id("420").unwrap()
 
         self.assertEqual(employee.id, "420")
 
