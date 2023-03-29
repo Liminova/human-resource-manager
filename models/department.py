@@ -14,8 +14,6 @@ if TYPE_CHECKING:
 class Department:
     def __init__(self) -> None:
         self.__name = ""
-        # NOTE: maybe we don't need id for departments? food for thoughts.
-        # - Rylie
         self.__id = ""
         self.__members = []
 
