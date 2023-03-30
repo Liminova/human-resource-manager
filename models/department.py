@@ -30,16 +30,12 @@ class Department:
         return self.__members
 
     def set_name(self, name: str) -> Result[Self, str]:
-        if name == "":
-            return Err("Name cannot be empty!")
         self.__name = name
-        return Ok(self)
+        return Ok(self) if name else Err("Name cannot be empty.")
 
     def set_id(self, id: str) -> Result[Self, str]:
-        if id == "":
-            return Err("ID cannot be empty!")
         self.__id = id
-        return Ok(self)
+        return Ok(self) if id else Err("ID cannot be empty.")
 
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\

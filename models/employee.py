@@ -19,7 +19,6 @@ from .performance import Performance
 # NOTE: possible abstraction: split name and id into its own Entity class or
 # something, though i don't like that approach very much tbh - Rylie
 
-
 class Employee:
     def __init__(self) -> None:
         self.__name = ""
@@ -61,7 +60,7 @@ class Employee:
         return self.__department
 
     @property
-    def benefits(self) -> list:
+    def benefits(self) -> list[BenefitPlan]:
         return self.__benefits
 
     @property
@@ -105,24 +104,22 @@ class Employee:
         self.__dob = dob
         return Ok(self)
 
-    def set_email(self, email: str) -> Result[Self, str]:
+    def set_email(self, email: str = "") -> Result[Self, str]:
         pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
         if not re.match(pattern, email):
             return Err("Invalid email format!")
         self.__email = email
-        return Ok(self)
+        return Ok(self) if email else Err("Email cannot be empty!")
 
-    def set_id(self, id: str) -> Result[Self, str]:
+    def set_id(self, id: str = "") -> Result[Self, str]:
         self.__id = id
-        return Ok(self)
+        return Ok(self) if id else Err("ID cannot be empty!")
 
-    def set_phone(self, phone: str) -> Result[Self, str]:
-        if len(phone) == 0:
-            return Err("Phone number cannot be empty!")
+    def set_phone(self, phone: str = "") -> Result[Self, str]:
         if any(char.isalpha() for char in phone):
             return Err("Phone number cannot contain letters!")
         self.__phone = phone
-        return Ok(self)
+        return Ok(self) if phone else Err("Phone number cannot be empty!")
 
     def set_department(self, department: Department) -> Result[Self, str]:
         self.__department = department
