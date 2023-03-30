@@ -66,5 +66,5 @@ class Payroll:
             - Bonus: {self.__bonus}
             - Tax: {self.__tax}
             - Punish: {self.__punish}
-            - Total: {self.__total}
+            - Total: {self.__total}\
         """)
