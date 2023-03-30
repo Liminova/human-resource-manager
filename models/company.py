@@ -1,11 +1,17 @@
+from __future__ import annotations
 import sys
 from threading import Lock
 from option import Result, Ok, Err
 
 if sys.version_info >= (3, 11):
-    from typing import Self
+    from typing import Self, TYPE_CHECKING
 else:
-    from typing_extensions import Self
+    from typing_extensions import Self, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .benefits import BenefitPlan
+    from .department import Department
+    from .employee import Employee
 
 # thread-safe singleton implementation, there should only be one instance of
 # Company existing at all times.
@@ -25,18 +31,23 @@ class Company(metaclass=CompanyMeta):
         self.__name = ""
         self.__departments = []
         self.__employees = []
+        self.__benefits = []
 
     @property
     def name(self) -> str:
         return self.__name
 
     @property
-    def departments(self) -> list:
+    def departments(self) -> list[Department]:
         return self.__departments
 
     @property
-    def employees(self) -> list:
+    def employees(self) -> list[Employee]:
         return self.__employees
+
+    @property
+    def benefits(self) -> list[BenefitPlan]:
+        return self.__benefits
 
     def set_name(self, name: str) -> Result[Self, str]:
         if name == "":

@@ -34,50 +34,35 @@ class Payroll:
 
     @property
     def total(self) -> int:
+        self.calculate_total()
         return self.__total
 
     def set_salary(self, salary: int) -> Result[Self, str]:
-        if not self.verify(salary):
-            return Err("Salary cannot be negative.")
         self.__salary = salary
-        self.calculate_total()
-        return Ok(self)
+        return Ok(self) if salary >= 0 else Err("Salary cannot be negative.")
 
     def set_bonus(self, bonus: int) -> Result[Self, str]:
-        if not self.verify(bonus):
-            return Err("Bonus cannot be negative.")
         self.__bonus = bonus
-        self.calculate_total()
-        return Ok(self)
+        return Ok(self) if bonus >= 0 else Err("Bonus cannot be negative.")
 
     def set_tax(self, tax: int) -> Result[Self, str]:
-        if not self.verify(tax):
-            return Err("Tax cannot be negative.")
         self.__tax = tax
-        self.calculate_total()
-        return Ok(self)
+        return Ok(self) if tax >= 0 else Err("Tax cannot be negative.")
 
     def set_punish(self, punish: int) -> Result[Self, str]:
-        if not self.verify(punish):
-            return Err("Punishment cannot be negative.")
         self.__punish = punish
-        self.calculate_total()
-        return Ok(self)
+        return Ok(self) if punish >= 0 else Err("Punish cannot be negative.")
 
-    def verify(self, value: int) -> bool:
-        if value < 0:
-            return False
-        return True
-
-    def calculate_total(self) -> Self:
+    def calculate_total(self) -> None:
         self.__total = self.__salary + self.__bonus - self.__tax - self.__punish
-        return self
+        return None
 
     def __str__(self) -> str:
+        self.calculate_total()
         return textwrap.dedent(f"""\
             - Salary: {self.__salary}
             - Bonus: {self.__bonus}
             - Tax: {self.__tax}
             - Punish: {self.__punish}
-            - Total: {self.__total}
+            - Total: {self.__total}\
         """)

@@ -14,8 +14,6 @@ if TYPE_CHECKING:
 class Department:
     def __init__(self) -> None:
         self.__name = ""
-        # NOTE: maybe we don't need id for departments? food for thoughts.
-        # - Rylie
         self.__id = ""
         self.__members = []
 
@@ -32,18 +30,14 @@ class Department:
         return self.__members
 
     def set_name(self, name: str) -> Result[Self, str]:
-        if name == "":
-            return Err("Name cannot be empty!")
         self.__name = name
-        return Ok(self)
+        return Ok(self) if name else Err("Name cannot be empty.")
 
     def set_id(self, id: str) -> Result[Self, str]:
-        if id == "":
-            return Err("ID cannot be empty!")
         self.__id = id
-        return Ok(self)
+        return Ok(self) if id else Err("ID cannot be empty.")
 
-    def __str__(self) -> None:
+    def __str__(self) -> str:
         data = textwrap.dedent(f"""\
                 - Name: {self.__name}
                 - ID: {self.__id}
@@ -51,3 +45,4 @@ class Department:
             """)
         for (i, member) in enumerate(self.__members, 1):
             data += f"{i}. {member.name}\n"
+        return data
