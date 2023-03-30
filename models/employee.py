@@ -22,7 +22,7 @@ from .performance import Performance
 class Employee:
     def __init__(self) -> None:
         self.__name = ""
-        self.__dob = ""
+        self.__dob: datetime = None
         self.__email = ""
         self.__id = ""
         self.__phone = ""
@@ -84,23 +84,10 @@ class Employee:
         return Ok(self)
 
     def set_dob(self, dob: str) -> Result[Self, str]:
-        if (len(dob) != 10) or (dob[4] != "-" or dob[7] != "-"):
+        try:
+            dob = datetime.strptime(dob, "%Y-%m-%d")
+        except ValueError:
             return Err("Invalid date of birth format!")
-
-        year, month, day = dob.split("-")
-        year, month, day = int(year), int(month), int(day)
-
-        is_leap_year = (year % 4 == 0 and year % 100 != 0) or year % 400 == 0
-        valid_day = month in (1, 3, 5, 7, 8, 10, 12) and 1 <= day <= 31 or \
-            month in (4, 6, 9, 11) and 1 <= day <= 30 or \
-            month == 2 and 1 <= day <= 29 and is_leap_year or \
-            month == 2 and 1 <= day <= 28 and not is_leap_year
-        valid_month = 1 <= month <= 12
-        valid_year = 1900 <= year <= datetime.now().year
-
-        if not valid_day or not valid_month or not valid_year:
-            return Err("Invalid date of birth format!")
-
         self.__dob = dob
         return Ok(self)
 
