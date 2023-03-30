@@ -34,26 +34,23 @@ class Payroll:
 
     @property
     def total(self) -> int:
+        self.calculate_total()
         return self.__total
 
     def set_salary(self, salary: int) -> Result[Self, str]:
         self.__salary = salary
-        self.calculate_total()
         return Ok(self) if salary >= 0 else Err("Salary cannot be negative.")
 
     def set_bonus(self, bonus: int) -> Result[Self, str]:
         self.__bonus = bonus
-        self.calculate_total()
         return Ok(self) if bonus >= 0 else Err("Bonus cannot be negative.")
 
     def set_tax(self, tax: int) -> Result[Self, str]:
         self.__tax = tax
-        self.calculate_total()
         return Ok(self) if tax >= 0 else Err("Tax cannot be negative.")
 
     def set_punish(self, punish: int) -> Result[Self, str]:
         self.__punish = punish
-        self.calculate_total()
         return Ok(self) if punish >= 0 else Err("Punish cannot be negative.")
 
     def calculate_total(self) -> None:
@@ -61,6 +58,7 @@ class Payroll:
         return None
 
     def __str__(self) -> str:
+        self.calculate_total()
         return textwrap.dedent(f"""\
             - Salary: {self.__salary}
             - Bonus: {self.__bonus}
