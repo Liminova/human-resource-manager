@@ -97,6 +97,7 @@ class Sale:
 
 class Performance:
     """Monitoring an employee's performance."""
+
     def __init__(self) -> None:
         self.__sale_list = []
         self.__sales_count = 0
@@ -152,14 +153,14 @@ class Performance:
                 return sale
         return None
 
-    def get_sales_by_client_id(self, client_id: str) -> list:
+    def get_sales_by_client_id(self, client_id: str) -> list[Sale]:
         sales = []
         for sale in self.__sale_list:
             if sale.client_id == client_id:
                 sales.append(sale)
         return sales
 
-    def get_sales_by_rating(self, rating: int) -> list:
+    def get_sales_by_rating(self, rating: int) -> list[Sale]:
         sales = []
         if rating == 0:
             return self.__sale_list
@@ -169,9 +170,19 @@ class Performance:
                     sales.append(sale)
             return sales
 
-    def get_sales_by_date(self, date: str) -> list:
+    def get_sales_by_date(self, date: str) -> list[Sale]:
         sales = []
         for sale in self.__sale_list:
-            if sale.sale_id.startswith(date):
+            if sale.sale_id.date() == date:
                 sales.append(sale)
         return sales
+
+    def __str__(self) -> str:
+        data = textwrap.dedent(f"""\
+            - Sales count: {self.sales_count}
+            - Total revenue: {self.total_revenue}
+            - Total cost: {self.total_cost}
+            - Total profit: {self.total_profit}
+            - Average rating: {self.average_rating}\
+            """)
+        return data
