@@ -32,12 +32,18 @@ class Attendance:
     def absences(self) -> list:
         return self.__absences
 
+    def strip(self, date: datetime) -> datetime:
+        """Strip the time part of the datetime object."""
+        return datetime(date.year, date.month, date.day)
+
     def get_attendance(self, date: datetime) -> Result[bool, str]:
+        date = self.strip(date)
         if date in self.__attendances:
             return Ok(self.__attendances[date])
         return Err("Date not found.")
 
     def get_absence_reason(self, date: datetime) -> Result[str, str]:
+        date = self.strip(date)
         if date in self.__absences:
             return Ok(self.__absences[date])
         return Err("Date not found.")
@@ -54,6 +60,7 @@ class Attendance:
         return Ok(None)
 
     def add_absence_day(self, date: datetime, reason: str) -> Result[None, str]:
+        date = self.strip(date)
         if not reason:
             return Err("Reason cannot be empty.")
         self.__absences[date] = reason
