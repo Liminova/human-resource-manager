@@ -60,7 +60,7 @@ class Employee:
         return self.__department
 
     @property
-    def benefits(self) -> list:
+    def benefits(self) -> list[BenefitPlan]:
         return self.__benefits
 
     @property
