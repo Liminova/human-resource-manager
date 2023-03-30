@@ -56,9 +56,9 @@ class Payroll:
         self.calculate_total()
         return Ok(self) if punish >= 0 else Err("Punish cannot be negative.")
 
-    def calculate_total(self) -> Self:
+    def calculate_total(self) -> None:
         self.__total = self.__salary + self.__bonus - self.__tax - self.__punish
-        return self
+        return None
 
     def __str__(self) -> str:
         return textwrap.dedent(f"""\
