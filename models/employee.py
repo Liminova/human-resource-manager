@@ -30,7 +30,7 @@ class Employee:
         self.__benefits = []
         self.__payroll = None
         self.__attendance = Attendance() # inside contains lists of attendance
-        self.__performance = None
+        self.__performance = Performance() # inside contains lists of sales
 
     @property
     def name(self) -> str:
@@ -69,7 +69,7 @@ class Employee:
         return self.__attendance
 
     @property
-    def performance(self) -> Performance | None:
+    def performance(self) -> Performance:
         return self.__performance
 
     def set_name(self, name: str) -> Result[Self, str]:
