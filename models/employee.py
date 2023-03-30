@@ -37,7 +37,7 @@ class Employee:
         return self.__name
 
     @property
-    def dob(self) -> str:
+    def dob(self) -> datetime:
         return self.__dob
 
     @property
