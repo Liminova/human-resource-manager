@@ -1,4 +1,5 @@
 import sys
+from option import Result, Ok, Err
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -43,40 +44,36 @@ class Sale:
     def client_comment(self) -> str:
         return self.__client_comment
 
-    @sale_id.setter
-    def sale_id(self, sale_id: str) -> Self:
+    def set_sale_id(self, sale_id: str) -> Result[Self, str]:
         self.__sale_id = sale_id
-        return self
+        return Ok(self) if sale_id != "" else Err("Sale ID cannot be empty.")
 
-    @revenue.setter
-    def revenue(self, revenue: float) -> Self:
+    def set_date(self, date: datetime) -> Result[Self, str]:
+        self.__date = date
+        return Ok(self) if date != "" else Err("Date cannot be empty.")
+
+    def set_revenue(self, revenue: float) -> Result[Self, str]:
         self.__revenue = revenue
-        return self
+        return Ok(self) if revenue >= 0 else Err("Revenue cannot be negative.")
 
-    @cost.setter
-    def cost(self, cost: float) -> Self:
+    def set_cost(self, cost: float) -> Result[Self, str]:
         self.__cost = cost
-        return self
+        return Ok(self) if cost >= 0 else Err("Cost cannot be negative.")
 
-    @profit.setter
-    def profit(self, profit: float) -> Self:
+    def set_profit(self, profit: float) -> Result[Self, str]:
         self.__profit = profit
-        return self
+        return Ok(self) if profit >= 0 else Err("Profit cannot be negative.")
 
-    @client_id.setter
-    def client_id(self, client_id: str) -> Self:
-        self.__client_id = client_id
-        return self
+    def set_client_id(self, client_id: str) -> Result[Self, str]:
+        return Ok(self) if client_id != "" else Err("Client ID cannot be empty.")
 
-    @client_rating.setter
-    def client_rating(self, client_rating: float) -> Self:
+    def set_client_rating(self, client_rating: float) -> Result[Self, str]:
         self.__client_rating = client_rating
-        return self
+        return Ok(self) if client_rating >= 1 and client_rating <= 5 else Err("Client rating must be between 1 and 5.")
 
-    @client_comment.setter
-    def client_comment(self, client_comment: str) -> Self:
+    def set_client_comment(self, client_comment: str) -> Result[Self, str]:
         self.__client_comment = client_comment
-        return self
+        return Ok(self) if client_comment != "" else Err("Client comment cannot be empty.")
 
 class Performance:
     """Monitoring an employee's performance."""
