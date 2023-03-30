@@ -31,7 +31,7 @@ class BenefitPlan:
         return self.__cost
 
     @property
-    def enrolled_employees(self) -> list:
+    def enrolled_employees(self) -> list[Employee]:
         return self.__enrolled_employees
 
     def set_name(self, name: str = "") -> Result[Self, str]:
