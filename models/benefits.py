@@ -17,6 +17,7 @@ class BenefitPlan:
         self.__description = ""
         self.__cost = 0.0
         self.__enrolled_employees = []
+        self.__pending_requests = []
 
     @property
     def name(self) -> str:
@@ -34,6 +35,10 @@ class BenefitPlan:
     def enrolled_employees(self) -> list[Employee]:
         return self.__enrolled_employees
 
+    @property
+    def pending_requests(self) -> list[Employee]:
+        return self.__pending_requests
+
     def set_name(self, name: str = "") -> Result[Self, str]:
         self.__name = name
         return Ok(self) if name else Err("Name cannot be empty.")
@@ -45,6 +50,12 @@ class BenefitPlan:
     def set_cost(self, cost: float = 0.0) -> Result[Self, str]:
         self.__cost = cost
         return Ok(self) if cost else Err("Cost cannot be empty.")
+
+    def add_pending_enrollment_request(self, employee: Employee) -> Result[Self, str]:
+        if employee in self.__pending_requests:
+            return Err("Employee is already pending enrollment.")
+        self.__pending_requests.append(employee)
+        return Ok(self)
 
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\
