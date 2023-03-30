@@ -36,7 +36,7 @@ class Attendance:
 
     # NOTE: true = present, false = absent
     def add_attendance(self, date: dt.datetime, status: bool) -> Self:
-        if date == None:
+        if date is None:
             return Err("Date or status cannot be empty.")
         self.__attendance[date] = status
         return Ok(self)
