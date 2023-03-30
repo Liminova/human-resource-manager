@@ -1,3 +1,4 @@
+from __future__ import annotations
 import sys
 from threading import Lock
 from option import Result, Ok, Err
