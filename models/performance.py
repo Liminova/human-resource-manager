@@ -1,14 +1,17 @@
-import sys
+import sys, textwrap
 from option import Result, Ok, Err
+from datetime import datetime
 
 if sys.version_info >= (3, 11):
     from typing import Self
 else:
     from typing_extensions import Self
 
+
 class Sale:
     def __init__(self) -> None:
         self.__sale_id = ""
+        self.__date: datetime = datetime.now()
         self.__revenue = 0.0
         self.__cost = 0.0
         self.__profit = 0.0
@@ -19,6 +22,10 @@ class Sale:
     @property
     def sale_id(self) -> str:
         return self.__sale_id
+
+    @property
+    def date(self) -> datetime:
+        return self.__date
 
     @property
     def revenue(self) -> float:
@@ -74,6 +81,19 @@ class Sale:
     def set_client_comment(self, client_comment: str) -> Result[Self, str]:
         self.__client_comment = client_comment
         return Ok(self) if client_comment != "" else Err("Client comment cannot be empty.")
+
+    def __str__(self) -> str:
+        data = textwrap.dedent(f"""\
+            - Sale ID: {self.sale_id}
+            - Revenue: {self.revenue}
+            - Cost: {self.cost}
+            - Profit: {self.profit}
+            - Client ID: {self.client_id}
+            - Client rating: {self.client_rating}
+            - Client comment: {self.client_comment}\
+            """)
+        return data
+
 
 class Performance:
     """Monitoring an employee's performance."""
