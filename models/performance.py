@@ -8,12 +8,12 @@ else:
 
 class Sale:
     def __init__(self) -> None:
-        self.__sale_id = "" # YYYYMMDDHHMM_CLIENT_ID
+        self.__sale_id = ""
         self.__revenue = 0.0
         self.__cost = 0.0
         self.__profit = 0.0
         self.__client_id = ""
-        self.__client_rating = 0.0 # float, from 1-5
+        self.__client_rating = 0.0  # float, from 1-5
         self.__client_comment = ""
 
     @property
