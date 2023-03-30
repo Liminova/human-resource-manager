@@ -113,10 +113,6 @@ class Employee:
         self.__payroll = payroll
         return Ok(self)
 
-    def set_attendance(self, attendance: Attendance) -> Result[Self, str]:
-        self.__attendance = attendance
-        return Ok(self)
-
     def set_performance(self, performance: Performance) -> Result[Self, str]:
         self.__performance = performance
         return Ok(self)
