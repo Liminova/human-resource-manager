@@ -26,14 +26,11 @@ class Employee:
         self.__email = ""
         self.__id = ""
         self.__phone = ""
-        # TODO: think of some way to decouple department members list and
-        # members being a part of departments, it's kinda a circle dependency
-        # rn. - Rylie
-        self.__department = Department()
+        self.__department = None
         self.__benefits = []
-        self.__payroll = Payroll()
-        self.__attendance = Attendance()
-        self.__performance = Performance()
+        self.__payroll = None
+        self.__attendance = Attendance() # inside contains lists of attendance
+        self.__performance = None
 
     @property
     def name(self) -> str:
@@ -56,7 +53,7 @@ class Employee:
         return self.__phone
 
     @property
-    def department(self) -> Department:
+    def department(self) -> Department | None:
         return self.__department
 
     @property
@@ -64,7 +61,7 @@ class Employee:
         return self.__benefits
 
     @property
-    def payroll(self) -> Payroll:
+    def payroll(self) -> Payroll | None:
         return self.__payroll
 
     @property
@@ -72,7 +69,7 @@ class Employee:
         return self.__attendance
 
     @property
-    def performance(self) -> Performance:
+    def performance(self) -> Performance | None:
         return self.__performance
 
     def set_name(self, name: str) -> Result[Self, str]:
