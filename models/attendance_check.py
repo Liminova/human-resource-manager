@@ -25,8 +25,8 @@ class Attendance:
         return self.__start_date
 
     @property
-    def attendance(self) -> list:
-        return self.__attendance
+    def attendances(self) -> list:
+        return self.__attendances
 
     @property
     def absences(self) -> list:
