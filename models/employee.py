@@ -146,7 +146,7 @@ class Employee:
         # request enrollment
         benefit.add_pending_enrollment(self)
         return Ok(self)
-        
+
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\
             - Name: {self.__name}
