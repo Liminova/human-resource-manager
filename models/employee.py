@@ -120,6 +120,13 @@ class Employee:
     def is_enrolled_in_plan(self, benefit: BenefitPlan) -> bool:
         return benefit in self.__benefits
 
+    def request_enrollment(self, benefit: BenefitPlan) -> Result[Self, str]:
+        if self.is_enrolled_in_plan(benefit):
+            return Err("Employee is already enrolled in this plan!")
+        # request enrollment
+        benefit.add_pending_enrollment(self)
+        return Ok(self)
+
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\
             - Name: {self.__name}
