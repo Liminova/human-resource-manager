@@ -6,6 +6,9 @@ name = "pypi"
 [packages]
 typing-extensions = "*"
 option = "*"
+pymongo = "*"
+pydantic = "*"
+orjson = "*"
 
 [dev-packages]
 ruff = "*"
