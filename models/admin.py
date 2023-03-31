@@ -1,5 +1,8 @@
-from .employee import Employee
+from .company import Company
 from .benefits import BenefitPlan
+from .employee import Employee
+
+company = Company()
 
 class Admin(Employee):
     def __init__(self) -> None:
@@ -7,13 +10,13 @@ class Admin(Employee):
 
     def add_benefit_plan(self, benefit: BenefitPlan) -> str:
         # add benefit plan to company
-        Company().benefits.append(benefit)
+        company.benefits.append(benefit)
         # return success message
         return "Benefit plan added successfully."
 
     def remove_benefit_plan(self, benefit: BenefitPlan) -> str:
         # remove benefit plan from company
-        Company().benefits.remove(benefit)
+        company.benefits.remove(benefit)
         # return success message
         return "Benefit plan removed successfully."
 
