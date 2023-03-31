@@ -432,6 +432,14 @@ class Manager:
                     for (field, setter) in fields_data:
                         loop_til_valid_input(field, setter)
 
+                    # Sale date has a default value, can't use the loop_til_valid_input function
+                    sale_date = input("Enter sale date (YYYY-MM-DD, leave blank for today): ")
+                    try:
+                        sale_date = datetime.strptime(sale_date, "%Y-%m-%d") if sale_date else datetime.now()
+                        sale.set_sale_date(sale_date).unwrap()
+                    except (ValueError, TypeError) as e:
+                        last_msg = str(e)
+
                     # --- Add sale to employee ---
                     performance.sale_list.append(sale)
                     last_msg = f"Sale for employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} added successfully!"
