@@ -17,7 +17,8 @@ class Admin(Employee):
         # return success message
         return "Benefit plan removed successfully."
 
-    # NOTE: this is a function to view requests for a specific benefit plan only, tell me if you want a function to view all requests for all benefit plans - Pechy
+    # NOTE: this is a function to view requests for a specific benefit plan only
+    # tell me if you want a function to view all requests for all benefit plans - Pechy
     def view_requests(self, benefit: BenefitPlan) -> list[Employee]:
         return benefit.pending_requests
 
