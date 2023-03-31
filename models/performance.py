@@ -8,7 +8,6 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import Self
 
-
 class Sale:
     def __init__(self) -> None:
         self.__sale_id = ""
