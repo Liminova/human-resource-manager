@@ -33,12 +33,12 @@ class Manager:
                 print(last_msg)
                 last_msg = ""
             employee_menu = [
-                f"[1] Add employee",
-                f"[2] Remove employee",
-                f"[3] Update employee",
-                f"[4] View employee",
-                f"[5] View all employees",
-                f"[6] Back",
+                "[1] Add employee",
+                "[2] Remove employee",
+                "[3] Update employee",
+                "[4] View employee",
+                "[5] View all employees",
+                "[6] Back",
             ]
             choice = get_user_option_from_menu("Employee management", employee_menu)
 
@@ -119,12 +119,12 @@ class Manager:
                 print(last_msg)
                 last_msg = ""
             benefit_plan_menu = [
-                f"[1] Add benefit plan",
-                f"[2] Apply benefit plan to employee",
-                f"[3] Remove benefit plan",
-                f"[4] Update benefit plan",
-                f"[5] View benefit plan",
-                f"[6] Exit",
+                "[1] Add benefit plan",
+                "[2] Apply benefit plan to employee",
+                "[3] Remove benefit plan",
+                "[4] Update benefit plan",
+                "[5] View benefit plan",
+                "[6] Exit",
             ]
             choice = get_user_option_from_menu("Benefit plan management", benefit_plan_menu)
 
@@ -222,10 +222,10 @@ class Manager:
                 last_msg = ""
             print(f"=== Attendance management for {employee.name} ===")
             attendance_menu = [
-                f"[1] Check attendance",
-                f"[2] Update attendance",
-                f"[3] Get attendance report",
-                f"[4] Exit",
+                "[1] Check attendance",
+                "[2] Update attendance",
+                "[3] Get attendance report",
+                "[4] Exit",
             ]
             choice = get_user_option_from_menu("Attendance management", attendance_menu)
             match choice:
@@ -284,9 +284,9 @@ class Manager:
                 print(last_msg)
                 last_msg = ""
             payroll_menu = [
-                f"[1] Create payroll",
-                f"[2] Update payroll",
-                f"[3] Exit"
+                "[1] Create payroll",
+                "[2] Update payroll",
+                "[3] Exit"
             ]
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:
@@ -326,12 +326,12 @@ class Manager:
                 print(last_msg)
                 last_msg = ""
             department_menu = [
-                f"[1] Add department",
-                f"[2] Remove department",
-                f"[3] Update department",
-                f"[4] View department",
-                f"[5] View all departments",
-                f"[6] Back",
+                "[1] Add department",
+                "[2] Remove department",
+                "[3] Update department",
+                "[4] View department",
+                "[5] View all departments",
+                "[6] Back",
             ]
 
             choice = get_user_option_from_menu("Department management", department_menu)
@@ -408,12 +408,12 @@ class Manager:
                 print(last_msg)
                 last_msg = ""
             performance_menu = [
-                f"[1] Add sale"
-                f"[2] View sales performance",
-                f"[3] Remove sale",
-                f"[4] Get sale info",
-                f"[5] Find sale(s) by...",
-                f"[6] Back",
+                "[1] Add sale"
+                "[2] View sales performance",
+                "[3] Remove sale",
+                "[4] Get sale info",
+                "[5] Find sale(s) by...",
+                "[6] Back",
             ]
             choice = get_user_option_from_menu("Performance management", performance_menu)
             match choice:
@@ -532,12 +532,12 @@ def main():
             print(last_msg)
             last_msg = ""
         main_menu = [
-            f"[1] Employee management",
-            f"[2] Benefit plan management",
-            f"[3] Attendance management",
-            f"[4] Payroll management",
-            f"[5] Department management",
-            f"[6] Exit",
+            "[1] Employee management",
+            "[2] Benefit plan management",
+            "[3] Attendance management",
+            "[4] Payroll management",
+            "[5] Department management",
+            "[6] Exit",
         ]
         user_choice = get_user_option_from_menu("Main menu", main_menu)
 
