@@ -464,28 +464,28 @@ class Manager:
                 case 5:  # Find sales by...
                     # --- Select a field to search by ---
                     search_fields = [
-                        "Sale ID",
-                        "Client ID",
-                        "Client rating",
-                        "Date"
+                        "[1] Sale ID",
+                        "[2] Client ID",
+                        "[3] Client rating",
+                        "[4] Date"
                     ]
-                    search_selection = get_user_option_from_list("Find all sales by...", search_fields)
+                    search_selection = get_user_option_from_menu("Find all sales by...", search_fields)
                     match search_selection:
-                        case 0:  # Sale ID
+                        case 1:  # Sale ID
                             sale = performance.get_sale_by_id(input("Enter sale ID: "))
                             if sale:
                                 print(sale)
                                 input("Press enter to continue...")
                             else:
                                 last_msg = "No sales found!"
-                        case 1:  # Client ID
+                        case 2:  # Client ID
                             sales = performance.get_sales_by_client_id(input("Enter client ID: "))
                             if not sales:
                                 last_msg = "No sales found!"
                                 continue
                             for sale in sales:
                                 print(sale)
-                        case 2:  # Client rating
+                        case 3:  # Client rating
                             rating = input("Enter client rating: ")
                             try:
                                 rating = int(rating)
@@ -498,7 +498,7 @@ class Manager:
                                 continue
                             for sale in sales:
                                 print(sale, end="\n\n")
-                        case 3:  # Date
+                        case 4:  # Date
                             date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
                             try:
                                 date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
