@@ -1,4 +1,4 @@
-from models import BenefitPlan, Department, Employee, Payroll
+from models import BenefitPlan, Employee
 import unittest
 
 class TestBenefit(unittest.TestCase):

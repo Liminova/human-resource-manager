@@ -1,4 +1,7 @@
 import sys
+import textwrap
+from option import Result, Ok, Err
+from datetime import datetime
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -7,17 +10,22 @@ else:
 
 class Sale:
     def __init__(self) -> None:
-        self.__sale_id = "" # YYYYMMDDHHMM_CLIENT_ID
+        self.__sale_id = ""
+        self.__date: datetime = datetime.now()
         self.__revenue = 0.0
         self.__cost = 0.0
         self.__profit = 0.0
         self.__client_id = ""
-        self.__client_rating = 0.0 # float, from 1-5
+        self.__client_rating = 0.0  # float, from 1-5
         self.__client_comment = ""
 
     @property
     def sale_id(self) -> str:
         return self.__sale_id
+
+    @property
+    def date(self) -> datetime:
+        return self.__date
 
     @property
     def revenue(self) -> float:
@@ -43,43 +51,53 @@ class Sale:
     def client_comment(self) -> str:
         return self.__client_comment
 
-    @sale_id.setter
-    def sale_id(self, sale_id: str) -> Self:
+    def set_sale_id(self, sale_id: str) -> Result[Self, str]:
         self.__sale_id = sale_id
-        return self
+        return Ok(self) if sale_id != "" else Err("Sale ID cannot be empty.")
 
-    @revenue.setter
-    def revenue(self, revenue: float) -> Self:
+    def set_date(self, date: datetime) -> Result[Self, str]:
+        self.__date = date
+        return Ok(self) if date != "" else Err("Date cannot be empty.")
+
+    def set_revenue(self, revenue: float) -> Result[Self, str]:
         self.__revenue = revenue
-        return self
+        return Ok(self) if revenue >= 0 else Err("Revenue cannot be negative.")
 
-    @cost.setter
-    def cost(self, cost: float) -> Self:
+    def set_cost(self, cost: float) -> Result[Self, str]:
         self.__cost = cost
-        return self
+        return Ok(self) if cost >= 0 else Err("Cost cannot be negative.")
 
-    @profit.setter
-    def profit(self, profit: float) -> Self:
+    def set_profit(self, profit: float) -> Result[Self, str]:
         self.__profit = profit
-        return self
+        return Ok(self) if profit >= 0 else Err("Profit cannot be negative.")
 
-    @client_id.setter
-    def client_id(self, client_id: str) -> Self:
-        self.__client_id = client_id
-        return self
+    def set_client_id(self, client_id: str) -> Result[Self, str]:
+        return Ok(self) if client_id != "" else Err("Client ID cannot be empty.")
 
-    @client_rating.setter
-    def client_rating(self, client_rating: float) -> Self:
+    def set_client_rating(self, client_rating: float) -> Result[Self, str]:
         self.__client_rating = client_rating
-        return self
+        return Ok(self) if client_rating >= 1 and client_rating <= 5 else Err("Client rating must be between 1 and 5.")
 
-    @client_comment.setter
-    def client_comment(self, client_comment: str) -> Self:
+    def set_client_comment(self, client_comment: str) -> Result[Self, str]:
         self.__client_comment = client_comment
-        return self
+        return Ok(self) if client_comment != "" else Err("Client comment cannot be empty.")
+
+    def __str__(self) -> str:
+        data = textwrap.dedent(f"""\
+            - Sale ID: {self.sale_id}
+            - Revenue: {self.revenue}
+            - Cost: {self.cost}
+            - Profit: {self.profit}
+            - Client ID: {self.client_id}
+            - Client rating: {self.client_rating}
+            - Client comment: {self.client_comment}\
+            """)
+        return data
+
 
 class Performance:
     """Monitoring an employee's performance."""
+
     def __init__(self) -> None:
         self.__sale_list = []
         self.__sales_count = 0
@@ -135,14 +153,14 @@ class Performance:
                 return sale
         return None
 
-    def get_sales_by_client_id(self, client_id: str) -> list:
+    def get_sales_by_client_id(self, client_id: str) -> list[Sale]:
         sales = []
         for sale in self.__sale_list:
             if sale.client_id == client_id:
                 sales.append(sale)
         return sales
 
-    def get_sales_by_rating(self, rating: int) -> list:
+    def get_sales_by_rating(self, rating: int) -> list[Sale]:
         sales = []
         if rating == 0:
             return self.__sale_list
@@ -152,9 +170,19 @@ class Performance:
                     sales.append(sale)
             return sales
 
-    def get_sales_by_date(self, date: str) -> list:
+    def get_sales_by_date(self, date: str) -> list[Sale]:
         sales = []
         for sale in self.__sale_list:
-            if sale.sale_id.startswith(date):
+            if sale.sale_id.date() == date:
                 sales.append(sale)
         return sales
+
+    def __str__(self) -> str:
+        data = textwrap.dedent(f"""\
+            - Sales count: {self.sales_count}
+            - Total revenue: {self.total_revenue}
+            - Total cost: {self.total_cost}
+            - Total profit: {self.total_profit}
+            - Average rating: {self.average_rating}\
+            """)
+        return data
