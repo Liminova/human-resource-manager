@@ -14,18 +14,14 @@ class Attendance(BaseModel):
     attendances: dict[str, bool] = {}
     absences: dict[str, str] = {}
 
-    def strip(self, date: datetime) -> datetime:
-        """Strip the time part of the datetime object."""
-        return datetime(date.year, date.month, date.day)
-
     def get_attendance(self, date: datetime) -> Result[bool, str]:
-        date_str = self.strip(date).strftime("%Y-%m-%d")
+        date_str = date.strftime("%Y-%m-%d")
         if date_str in self.attendances:
             return Ok(self.attendances[date_str])
         return Err("Date not found.")
 
     def get_absence_reason(self, date: datetime) -> Result[str, str]:
-        date_str = self.strip(date).strftime("%Y-%m-%d")
+        date_str = date.strftime("%Y-%m-%d")
         if date_str in self.absences:
             return Ok(self.absences[date_str])
         return Err("Date not found.")
@@ -40,7 +36,7 @@ class Attendance(BaseModel):
         return Ok(self)
 
     def add_attendance(self, date: datetime, is_present: bool) -> Result[Self, str]:
-        date_str = self.strip(date).strftime("%Y-%m-%d")
+        date_str = date.strftime("%Y-%m-%d")
         # Check the "allowed_absence_days" first, if it doesn't contain current year, add it and set to 3
         if date.year not in self.allowed_absence_days:
             self.allowed_absence_days[date.year] = 3
@@ -48,7 +44,7 @@ class Attendance(BaseModel):
         return Ok(self)
 
     def add_absence_day(self, date: datetime, reason: str) -> Result[Self, str]:
-        date_str = self.strip(date)
+        date_str = date
         if not reason:
             return Err("Reason cannot be empty.")
         self.absences[date_str] = reason
