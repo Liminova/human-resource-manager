@@ -1,4 +1,5 @@
-import sys, textwrap
+import sys
+import textwrap
 from option import Result, Ok, Err
 from datetime import datetime
 
