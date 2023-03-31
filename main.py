@@ -230,9 +230,9 @@ class Manager:
             choice = get_user_option_from_menu("Attendance management", attendance_menu)
             match choice:
                 case 1:  # Check
-                    date = input("Enter date (YYYY-MM-DD): ")
+                    date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
                     try:
-                        date = datetime.strptime(date, "%Y-%m-%d")
+                        date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
                         is_presence = input("Is employee present? (y/n): ")
                         attendances.add_attendance(date, is_presence).unwrap()
                         if not is_presence:
@@ -242,9 +242,9 @@ class Manager:
                         last_msg = str(e)
 
                 case 2:  # Update
-                    date = input("Enter date (YYYY-MM-DD): ")
+                    date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
                     try:
-                        date = datetime.strptime(date, "%Y-%m-%d")
+                        date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
                         if date not in attendances:
                             print("No attendance found for that date!")
                             break
@@ -432,6 +432,14 @@ class Manager:
                     for (field, setter) in fields_data:
                         loop_til_valid_input(field, setter)
 
+                    # Sale date has a default value, can't use the loop_til_valid_input function
+                    sale_date = input("Enter sale date (YYYY-MM-DD, leave blank for today): ")
+                    try:
+                        sale_date = datetime.strptime(sale_date, "%Y-%m-%d") if sale_date else datetime.now()
+                        sale.set_sale_date(sale_date).unwrap()
+                    except (ValueError, TypeError) as e:
+                        last_msg = str(e)
+
                     # --- Add sale to employee ---
                     performance.sale_list.append(sale)
                     last_msg = f"Sale for employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} added successfully!"
@@ -456,28 +464,28 @@ class Manager:
                 case 5:  # Find sales by...
                     # --- Select a field to search by ---
                     search_fields = [
-                        "Sale ID",
-                        "Client ID",
-                        "Client rating",
-                        "Date"
+                        "[1] Sale ID",
+                        "[2] Client ID",
+                        "[3] Client rating",
+                        "[4] Date"
                     ]
-                    search_selection = get_user_option_from_list("Find all sales by...", search_fields)
+                    search_selection = get_user_option_from_menu("Find all sales by...", search_fields)
                     match search_selection:
-                        case 0:  # Sale ID
+                        case 1:  # Sale ID
                             sale = performance.get_sale_by_id(input("Enter sale ID: "))
                             if sale:
                                 print(sale)
                                 input("Press enter to continue...")
                             else:
                                 last_msg = "No sales found!"
-                        case 1:  # Client ID
+                        case 2:  # Client ID
                             sales = performance.get_sales_by_client_id(input("Enter client ID: "))
                             if not sales:
                                 last_msg = "No sales found!"
                                 continue
                             for sale in sales:
                                 print(sale)
-                        case 2:  # Client rating
+                        case 3:  # Client rating
                             rating = input("Enter client rating: ")
                             try:
                                 rating = int(rating)
@@ -490,10 +498,10 @@ class Manager:
                                 continue
                             for sale in sales:
                                 print(sale, end="\n\n")
-                        case 3:  # Date
-                            date = input("Enter date (YYYY-MM-DD): ")
+                        case 4:  # Date
+                            date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
                             try:
-                                date = datetime.strptime(date, "%Y-%m-%d")
+                                date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
                             except:
                                 last_msg = "Invalid date!"
                                 continue
