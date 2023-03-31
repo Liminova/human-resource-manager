@@ -57,12 +57,12 @@ class Attendance:
         self.__start_date = start_date
         return Ok(None)
 
-    def add_attendance(self, date: datetime, is_presence: bool) -> Result[None, str]:
+    def add_attendance(self, date: datetime, is_present: bool) -> Result[None, str]:
         date = self.strip(date)
         # Check the "allowed_absence_days" first, if it doesn't contain current year, add it and set to 3
         if date.year not in self.__allowed_absence_days:
             self.__allowed_absence_days[date.year] = 3
-        self.__attendances[date] = is_presence
+        self.__attendances[date] = is_present
         return Ok(None)
 
     def add_absence_day(self, date: datetime, reason: str) -> Result[None, str]:
@@ -77,8 +77,8 @@ class Attendance:
         if not self.__attendances:
             return Err("No attendance record found.")
         report = {}
-        for date, is_presence in self.__attendances.items():
-            if is_presence:
+        for date, is_present in self.__attendances.items():
+            if is_present:
                 report[date] = "Present"
             else:
                 report[date] = "Absent"
