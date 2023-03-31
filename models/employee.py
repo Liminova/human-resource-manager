@@ -6,9 +6,9 @@ from datetime import datetime
 from option import Result, Ok, Err
 
 if sys.version_info >= (3, 11):
-    from typing import Self, TYPE_CHECKING
+    from typing import Self
 else:
-    from typing_extensions import Self, TYPE_CHECKING
+    from typing_extensions import Self
 
 from .attendance_check import Attendance
 from .benefits import BenefitPlan
