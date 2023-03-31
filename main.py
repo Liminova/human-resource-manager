@@ -230,9 +230,9 @@ class Manager:
             choice = get_user_option_from_menu("Attendance management", attendance_menu)
             match choice:
                 case 1:  # Check
-                    date = input("Enter date (YYYY-MM-DD): ")
+                    date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
                     try:
-                        date = datetime.strptime(date, "%Y-%m-%d")
+                        date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
                         is_presence = input("Is employee present? (y/n): ")
                         attendances.add_attendance(date, is_presence).unwrap()
                         if not is_presence:
@@ -242,9 +242,9 @@ class Manager:
                         last_msg = str(e)
 
                 case 2:  # Update
-                    date = input("Enter date (YYYY-MM-DD): ")
+                    date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
                     try:
-                        date = datetime.strptime(date, "%Y-%m-%d")
+                        date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
                         if date not in attendances:
                             print("No attendance found for that date!")
                             break
@@ -491,9 +491,9 @@ class Manager:
                             for sale in sales:
                                 print(sale, end="\n\n")
                         case 3:  # Date
-                            date = input("Enter date (YYYY-MM-DD): ")
+                            date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
                             try:
-                                date = datetime.strptime(date, "%Y-%m-%d")
+                                date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
                             except:
                                 last_msg = "Invalid date!"
                                 continue
