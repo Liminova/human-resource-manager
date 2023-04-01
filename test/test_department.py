@@ -1,4 +1,4 @@
-from models import Department, Employee, Payroll
+from models import Department, Employee
 import unittest
 
 class TestDepartment(unittest.TestCase):

@@ -6,9 +6,9 @@ from datetime import datetime
 from option import Result, Ok, Err
 
 if sys.version_info >= (3, 11):
-    from typing import Self, TYPE_CHECKING
+    from typing import Self
 else:
-    from typing_extensions import Self, TYPE_CHECKING
+    from typing_extensions import Self
 
 from .attendance_check import Attendance
 from .benefits import BenefitPlan
@@ -22,25 +22,22 @@ from .performance import Performance
 class Employee:
     def __init__(self) -> None:
         self.__name = ""
-        self.__dob = ""
+        self.__dob: datetime = None
         self.__email = ""
         self.__id = ""
         self.__phone = ""
-        # TODO: think of some way to decouple department members list and
-        # members being a part of departments, it's kinda a circle dependency
-        # rn. - Rylie
-        self.__department = Department()
+        self.__department = None
         self.__benefits = []
-        self.__payroll = Payroll()
-        self.__attendance = Attendance()
-        self.__performance = Performance()
+        self.__payroll = None
+        self.__attendance = Attendance() # inside contains lists of attendance
+        self.__performance = Performance() # inside contains lists of sales
 
     @property
     def name(self) -> str:
         return self.__name
 
     @property
-    def dob(self) -> str:
+    def dob(self) -> datetime:
         return self.__dob
 
     @property
@@ -56,7 +53,7 @@ class Employee:
         return self.__phone
 
     @property
-    def department(self) -> Department:
+    def department(self) -> Department | None:
         return self.__department
 
     @property
@@ -64,7 +61,7 @@ class Employee:
         return self.__benefits
 
     @property
-    def payroll(self) -> Payroll:
+    def payroll(self) -> Payroll | None:
         return self.__payroll
 
     @property
@@ -84,23 +81,10 @@ class Employee:
         return Ok(self)
 
     def set_dob(self, dob: str) -> Result[Self, str]:
-        if (len(dob) != 10) or (dob[4] != "-" or dob[7] != "-"):
+        try:
+            dob = datetime.strptime(dob, "%Y-%m-%d")
+        except ValueError:
             return Err("Invalid date of birth format!")
-
-        year, month, day = dob.split("-")
-        year, month, day = int(year), int(month), int(day)
-
-        is_leap_year = (year % 4 == 0 and year % 100 != 0) or year % 400 == 0
-        valid_day = month in (1, 3, 5, 7, 8, 10, 12) and 1 <= day <= 31 or \
-            month in (4, 6, 9, 11) and 1 <= day <= 30 or \
-            month == 2 and 1 <= day <= 29 and is_leap_year or \
-            month == 2 and 1 <= day <= 28 and not is_leap_year
-        valid_month = 1 <= month <= 12
-        valid_year = 1900 <= year <= datetime.now().year
-
-        if not valid_day or not valid_month or not valid_year:
-            return Err("Invalid date of birth format!")
-
         self.__dob = dob
         return Ok(self)
 
@@ -127,10 +111,6 @@ class Employee:
 
     def set_payroll(self, payroll: Payroll) -> Result[Self, str]:
         self.__payroll = payroll
-        return Ok(self)
-
-    def set_attendance(self, attendance: Attendance) -> Result[Self, str]:
-        self.__attendance = attendance
         return Ok(self)
 
     def set_performance(self, performance: Performance) -> Result[Self, str]:
