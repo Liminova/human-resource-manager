@@ -6,9 +6,13 @@ name = "pypi"
 [packages]
 typing-extensions = "*"
 option = "*"
+pymongo = "*"
+pydantic = "*"
+orjson = "*"
 
 [dev-packages]
 ruff = "*"
+autopep8 = "*"
 
 [requires]
 python_version = "3"

@@ -1,18 +1,27 @@
-from models import Department, Employee, Payroll
+from models import Department, Employee
 import unittest
 
 class TestDepartment(unittest.TestCase):
     def test_create_department(self):
-        department = Department("Sleep", "SLP", [])
+        department = Department() \
+            .set_name("Sleep").unwrap() \
+            .set_id("SLP").unwrap()
 
         self.assertEqual(department.name, "Sleep")
         self.assertEqual(department.id, "SLP")
         self.assertEqual(department.members, [])
 
     def test_mutate_department(self):
-        department = Department("Sleep", "SLP", [])
-        payroll = Payroll(5000, 500)
-        rylie = Employee("Rylie", "2003-08-22", "727", "0123456727", department, [], payroll)
+        department = Department() \
+            .set_name("Sleep").unwrap() \
+            .set_id("SLP").unwrap()
+
+        rylie = Employee() \
+            .set_name("Rylie").unwrap() \
+            .set_dob("2003-08-22").unwrap() \
+            .set_id("727").unwrap() \
+            .set_phone("0123456727").unwrap()
+
         department.members.append(rylie)
 
         self.assertEqual(department.members, [rylie])

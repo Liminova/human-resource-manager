@@ -1,54 +1,66 @@
-import datetime as dt
 import sys
+from option import Result, Ok, Err
+from datetime import datetime
+from pydantic import BaseModel
 
 if sys.version_info >= (3, 11):
     from typing import Self
 else:
     from typing_extensions import Self
 
-DEFAULT_LEAVE_BALANCE = 3
+class Attendance(BaseModel):
+    start_date: datetime = datetime.now()
+    allowed_absence_days: dict[int, int] = {}
+    attendances: dict[str, bool] = {}
+    absences: dict[str, str] = {}
 
-class Attendance:
-    def __init__(self):
-        self.__start_date = dt.datetime.now()
-        self.__leave_balance = DEFAULT_LEAVE_BALANCE
-        self.__attendance = {}
-        self.__time_off = {}
+    def get_attendance(self, date: datetime) -> Result[bool, str]:
+        date_str = date.strftime("%Y-%m-%d")
+        if date_str in self.attendances:
+            return Ok(self.attendances[date_str])
+        return Err("Date not found.")
 
-    @property
-    def leave_balance(self) -> int:
-        return self.__leave_balance
+    def get_absence_reason(self, date: datetime) -> Result[str, str]:
+        date_str = date.strftime("%Y-%m-%d")
+        if date_str in self.absences:
+            return Ok(self.absences[date_str])
+        return Err("Date not found.")
 
-    @property
-    def start_date(self) -> dt.datetime:
-        return self.__start_date
+    def get_allowed_absence_days(self, year: int) -> Result[int, str]:
+        if year in self.allowed_absence_days:
+            return Ok(self.allowed_absence_days[year])
+        return Err("Year not found.")
 
-    @leave_balance.setter
-    def leave_balance(self, leave_balance: int) -> Self:
-        self.__leave_balance = leave_balance
-        return self
+    def set_start_date(self, start_date: datetime) -> Result[Self, str]:
+        self.start_date = start_date.strftime("%Y-%m-%d")
+        return Ok(self)
 
-    @start_date.setter
-    def start_date(self, start_date) -> Self:
-        self.__start_date = start_date
-        return self
+    def add_attendance(self, date: datetime, is_present: bool) -> Result[Self, str]:
+        date_str = date.strftime("%Y-%m-%d")
+        # Check the "allowed_absence_days" first, if it doesn't contain current year, add it and set to 3
+        if date.year not in self.allowed_absence_days:
+            self.allowed_absence_days[date.year] = 3
+        self.attendances[date_str] = is_present
+        return Ok(self)
 
-    # NOTE: do we really need all the abstractions below?
+    def add_absence_day(self, date: datetime, reason: str) -> Result[Self, str]:
+        date_str = date
+        if not reason:
+            return Err("Reason cannot be empty.")
+        self.absences[date_str] = reason
+        self.allowed_absence_days[date.year] -= 1
+        return Ok(Self)
 
-    # NOTE: true = present, false = absent
-    def add_attendance(self, date: dt.datetime, status: bool) -> Self:
-        self.__attendance[date] = status
-        return self
+    def get_report(self) -> Result[dict, str]:
+        if not self.attendances:
+            return Err("No attendance record found.")
+        report = {}
+        for date, is_present in self.attendances.items():
+            if is_present:
+                report[date] = "Present"
+            else:
+                report[date] = "Absent"
+        return Ok(report)
 
-    # TODO: what is type?
-    # add a type hint for type here later. - Rylie
-    def add_time_off(self, date: dt.datetime, type):
-        self.__time_off[type].append(date)
-
-    def get_attendance(self, date: dt.datetime):
-        return self.__attendance[date]
-
-    def get_time_off(self, date: dt.datetime):
-        for type in self.__time_off:
-            if date in self.__time_off[type]:
-                return type
+    class Config:
+        arbitrary_types_allowed = True

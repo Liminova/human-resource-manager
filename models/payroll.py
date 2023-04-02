@@ -9,75 +9,45 @@ else:
 
 class Payroll:
     """Monthly payroll for an employee."""
-    def __init__(self) -> None:
-        self.__salary = 0
-        self.__bonus = 0
-        self.__tax = 0
-        self.__punish = 0
-        self.__total = 0
+    salary = 0
+    bonus = 0
+    tax = 0
+    punish = 0
+    total = 0
 
-    @property
-    def salary(self) -> int:
-        return self.__salary
-
-    @property
-    def bonus(self) -> int:
-        return self.__bonus
-
-    @property
-    def tax(self) -> int:
-        return self.__tax
-
-    @property
-    def punish(self) -> int:
-        return self.__punish
-
-    @property
-    def total(self) -> int:
-        return self.__total
-
-    def salary(self, salary: int) -> Result[Self, str]:
-        if not self.verify(salary):
-            return Err("Salary cannot be negative.")
-        self.__salary = salary
+    def set_salary(self, salary: int) -> Result[Self, str]:
+        self.salary = salary
         self.calculate_total()
-        return Ok(self)
+        return Ok(self) if salary >= 0 else Err("Salary cannot be negative.")
 
-    def bonus(self, bonus: int) -> Result[Self, str]:
-        if not self.verify(bonus):
-            return Err("Bonus cannot be negative.")
-        self.__bonus = bonus
+    def set_bonus(self, bonus: int) -> Result[Self, str]:
+        self.bonus = bonus
         self.calculate_total()
-        return Ok(self)
+        return Ok(self) if bonus >= 0 else Err("Bonus cannot be negative.")
 
-    def tax(self, tax: int) -> Result[Self, str]:
-        if not self.verify(tax):
-            return Err("Tax cannot be negative.")
-        self.__tax = tax
+    def set_tax(self, tax: int) -> Result[Self, str]:
+        self.tax = tax
         self.calculate_total()
-        return Ok(self)
+        return Ok(self) if tax >= 0 else Err("Tax cannot be negative.")
 
-    def punish(self, punish: int) -> Result[Self, str]:
-        if not self.verify(punish):
-            return Err("Punishment cannot be negative.")
-        self.__punish = punish
+    def set_punish(self, punish: int) -> Result[Self, str]:
+        self.punish = punish
         self.calculate_total()
-        return Ok(self)
+        return Ok(self) if punish >= 0 else Err("Punish cannot be negative.")
 
-    def verify(self, value: int) -> bool:
-        if value < 0:
-            return False
-        return True
-
-    def calculate_total(self) -> Self:
-        self.__total = self.__salary + self.__bonus - self.__tax - self.__punish
-        return self
+    def calculate_total(self) -> None:
+        self.total = self.salary + self.bonus - self.tax - self.punish
+        return None
 
     def __str__(self) -> str:
+        self.calculate_total()
         return textwrap.dedent(f"""\
-            - Salary: {self.__salary}
-            - Bonus: {self.__bonus}
-            - Tax: {self.__tax}
-            - Punish: {self.__punish}
-            - Total: {self.__total}
+            - Salary: {self.salary}
+            - Bonus: {self.bonus}
+            - Tax: {self.tax}
+            - Punish: {self.punish}
+            - Total: {self.total}\
         """)
+
+    class Config:
+        arbitrary_types_allowed = True

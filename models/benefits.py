@@ -1,5 +1,8 @@
 from __future__ import annotations
 import sys
+import textwrap
+from option import Result, Ok, Err
+from pydantic import BaseModel
 
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
@@ -9,58 +12,41 @@ else:
 if TYPE_CHECKING:
     from .employee import Employee
 
-class BenefitPlan:
-    def __init__(
-            self, name: str, description: str,
-            cost: float, enrolled_employees: list[Employee]) -> None:
-        self.__name = name
-        self.__description = description
-        self.__cost = cost
-        self.__enrolled_employees = enrolled_employees
+class BenefitPlan(BaseModel):
+    name = ""
+    description = ""
+    cost = 0.0
+    enrolled_employees: list[Employee] = []
+    pending_requests: list[Employee] = []
 
-    @property
-    def name(self) -> str:
-        return self.__name
+    def set_name(self, name: str = "") -> Result[Self, str]:
+        self.name = name
+        return Ok(self) if name else Err("Name cannot be empty.")
 
-    @property
-    def description(self) -> str:
-        return self.__description
+    def set_description(self, description: str = "") -> Result[Self, str]:
+        self.description = description
+        return Ok(self) if description else Err("Description cannot be empty.")
 
-    @property
-    def cost(self) -> float:
-        return self.__cost
+    def set_cost(self, cost: float = 0.0) -> Result[Self, str]:
+        self.cost = cost
+        return Ok(self) if cost else Err("Cost cannot be empty.")
 
-    @property
-    def enrolled_employees(self) -> list:
-        return self.__enrolled_employees
+    def add_pending_enrollment_request(self, employee: Employee) -> Result[Self, str]:
+        if employee in self.pending_requests:
+            return Err("Employee is already pending enrollment.")
+        self.pending_requests.append(employee)
+        return Ok(self)
 
-    @name.setter
-    def name(self, name: str) -> Self:
-        self.__name = name
-        return self
-
-    @description.setter
-    def description(self, description: str) -> Self:
-        self.__description = description
-        return self
-
-    @cost.setter
-    def cost(self, cost: float) -> Self:
-        self.__cost = cost
-        return self
-
-    @enrolled_employees.setter
-    def enrolled_employees(self, enrolled_employees: list) -> Self:
-        self.__enrolled_employees = enrolled_employees
-        return self
-
-    # NOTE: same note as department's display method. - Rylie
-    def display(self) -> None:
-        print(f"- Name: {self.__name}")
-        print(f"- Description: {self.__description}")
-        print(f"- Cost: {self.__cost}")
-        print("- Enrolled employees:")
+    def __str__(self) -> str:
+        data = textwrap.dedent(f"""\
+            - Name: {self.__name}
+            - Description: {self.__description}
+            - Cost: {self.__cost}
+            - Enrolled employees:
+        """)
         for (i, employee) in enumerate(self.__enrolled_employees, 1):
-            print(f"Employee {i}:")
-            employee.display()
-            print()
+            data += f"{i}: {employee}\n"
+        return data
+
+    class Config:
+        arbitrary_types_allowed = True
