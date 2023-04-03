@@ -25,7 +25,7 @@ class Sale(BaseModel):
 
     def set_date(self, date: datetime) -> Result[Self, str]:
         self.date = date
-        return Ok(self) if date != "" else Err("Date cannot be empty.")
+        return Ok(self)
 
     def set_revenue(self, revenue: float) -> Result[Self, str]:
         self.revenue = revenue
@@ -67,7 +67,7 @@ class Performance(BaseModel):
     """Monitoring an employee's performance."""
 
     sale_list: list[Sale] = []
-    sale_count = 0
+    sales_count = 0
     total_revenue = 0
     total_cost = 0
     total_profit = 0
@@ -113,11 +113,10 @@ class Performance(BaseModel):
                     sales.append(sale)
             return sales
 
-        sales = []
+    def get_sales_by_date(self, date: datetime) -> list[Sale]:
+        sales: list[Sale] = []
         for sale in self.sale_list:
-            if sale.sale_id.date() == date:
-        for sale in self.sale_list:
-            if datetime.strptime(sale.date, "%Y-%m-%d") == datetime.strptime(date, "%Y-%m-%d"):
+            if sale.date == date:
                 sales.append(sale)
         return sales
 
