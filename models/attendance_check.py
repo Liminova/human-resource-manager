@@ -64,3 +64,20 @@ class Attendance(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+    def get_available_years(self) -> list[int]:
+        """For user to choose in the attendance report menu."""
+        return set([date.year for date in self.attendances.keys()])
+
+    def get_report(self, year: datetime) -> str:
+        """Get the attendance report for a specific year."""
+        data = "" # temporary variable to store the report data
+        for date, is_present in self.attendances.items():
+            # only get the attendance data for the specified year
+            if date.year == year:
+                # different message if the employee is present or absent
+                if is_present:
+                    data += f"{datetime.strftime(date, '%d %b %Y')} - Present\n"
+                else:
+                    absent_reason = self.absents.get(date, "No reason")
+                    data += f"{datetime.strftime(date, '%d %b %Y')} - Absent ({absent_reason})\n"
+        return data
