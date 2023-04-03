@@ -39,9 +39,9 @@ class BenefitPlan(BaseModel):
 
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\
-            - Name: {self.__name}
-            - Description: {self.__description}
-            - Cost: {self.__cost}
+            - Name: {self.name}
+            - Description: {self.description}
+            - Cost: {self.cost}
             - Enrolled employees:
         """)
         for (i, employee) in enumerate(self.enrolled_employees, 1):
