@@ -51,7 +51,10 @@ class MenuEmployee:
                     return True, ""
 
     def __add(self) -> str:
+        # create a new, empty employee
         employee = Employee()
+
+        # get user input for employee name, date of birth, ID, phone number, and email
         fields_data = [
             ("Enter employee name: ", employee.set_name),
             ("Enter employee date of birth (YYYY-MM-DD): ", employee.set_dob),
@@ -61,6 +64,22 @@ class MenuEmployee:
         ]
         for (field, setter) in fields_data:
             loop_til_valid_input(field, setter)
+
+        # a list containing the string representation of each department
+        dept_items = [f"{dept.name} ({dept.id})" for dept in self.__company.departments]
+
+        # get the index of the department to add the employee to
+        dept_index = get_user_option_from_list("Select a department to add the employee to", dept_items)
+        if dept_index == -1:
+            return ""
+
+        # add the employee to the department's members
+        self.__company.departments[dept_index].members.append(employee)
+
+        # add the department to the employee
+        employee.department = self.__company.departments[dept_index]
+
+        # append the employee to the company's employees
         self.__company.employees.append(employee)
         return f"Employee {employee.name} ({employee.id}) added successfully!"
 
