@@ -117,6 +117,7 @@ class Performance(BaseModel):
         sales = []
         for sale in self.sale_list:
             if sale.sale_id.date() == date:
+        for sale in self.sale_list:
                 sales.append(sale)
         return sales
 

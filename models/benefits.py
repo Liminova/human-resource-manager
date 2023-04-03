@@ -44,7 +44,7 @@ class BenefitPlan(BaseModel):
             - Cost: {self.__cost}
             - Enrolled employees:
         """)
-        for (i, employee) in enumerate(self.__enrolled_employees, 1):
+        for (i, employee) in enumerate(self.enrolled_employees, 1):
             data += f"{i}: {employee}\n"
         return data
 
