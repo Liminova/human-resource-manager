@@ -89,14 +89,14 @@ class Employee(BaseModel):
 
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\
-            - Name: {self.__name}
-            - DoB: {self.__dob}
-            - ID: {self.__id}
-            - Phone: {self.__phone}
-            - Department: {self.__department}
+            - Name: {self.name}
+            - DoB: {self.dob}
+            - ID: {self.id}
+            - Phone: {self.phone}
+            - Department: {self.department}
             - Benefit plans:
         """)
-        for (i, benefit) in enumerate(self.__benefits, 1):
+        for (i, benefit) in enumerate(self.benefits, 1):
             data += f"{i}. {benefit.name}\n"
         return data
 
