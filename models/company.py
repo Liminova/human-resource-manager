@@ -42,3 +42,9 @@ class Company(metaclass=CompanyMeta):
             return Err("Name cannot be empty!")
         self.__name = name
         return Ok(self)
+
+    def is_id_taken(self, id: str) -> bool:
+        for employee in self.employees:
+            if employee.id == id:
+                return True
+        return False
