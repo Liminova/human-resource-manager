@@ -113,11 +113,11 @@ class Performance(BaseModel):
                     sales.append(sale)
             return sales
 
-    def get_sales_by_date(self, date: str) -> list[Sale]:
         sales = []
         for sale in self.sale_list:
             if sale.sale_id.date() == date:
         for sale in self.sale_list:
+            if datetime.strptime(sale.date, "%Y-%m-%d") == datetime.strptime(date, "%Y-%m-%d"):
                 sales.append(sale)
         return sales
 
