@@ -29,25 +29,13 @@ class CompanyMeta(type):
 class Company(metaclass=CompanyMeta):
     def __init__(self) -> None:
         self.__name = ""
-        self.__departments = []
-        self.__employees = []
-        self.__benefits = []
+        self.departments: list[Department] = []
+        self.employees: list[Employee] = []
+        self.benefits: list[BenefitPlan] = []
 
     @property
     def name(self) -> str:
         return self.__name
-
-    @property
-    def departments(self) -> list[Department]:
-        return self.__departments
-
-    @property
-    def employees(self) -> list[Employee]:
-        return self.__employees
-
-    @property
-    def benefits(self) -> list[BenefitPlan]:
-        return self.__benefits
 
     def set_name(self, name: str) -> Result[Self, str]:
         if name == "":

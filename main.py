@@ -1,9 +1,6 @@
 import sys
-import os
-import re
 from datetime import datetime
 from models import Employee, Company, Department, BenefitPlan, Payroll, Sale
-from option import Ok, Err, Result
 from frontend import *
 
 
@@ -11,20 +8,17 @@ class Manager:
     def __init__(self, the_company: Company) -> None:
         self.__company = the_company
 
-        self.__depts = the_company.departments
-        self.__employees = the_company.employees
-        self.__benefits = the_company.benefits
-
     @property
     def company(self) -> Company:
         return self.__company
 
-    def employee(self) -> Result[None, str]:
-        depts = self.__depts
-        employees = self.__employees
-        benefits = self.__benefits
+    def employee(self) -> tuple[bool, str]:
+        depts = self.__company.departments
+        employees = self.__company.employees
+        benefits = self.__company.benefits
+
         if not depts:
-            return Err("No departments available! Please add a department first.")
+            return False, "No departments available! Please add a department first."
 
         last_msg = ""
         while True:
@@ -67,13 +61,13 @@ class Manager:
 
                     # remove from whatever department they're in
                     for dept in depts:
-                        if employees[employee_index] in dept.employees:
-                            dept.employees.remove(employees[employee_index])
+                        if employees[employee_index] in dept.members:
+                            dept.members.remove(employees[employee_index])
 
                     # remove from whatever benefit plan they're in
                     for benefit in benefits:
-                        if employees[employee_index] in benefit.enrolled_employee:
-                            benefit.enrolled_employee.remove(employees[employee_index])
+                        if employees[employee_index] in benefit.enrolled_employees:
+                            benefit.enrolled_employees.remove(employees[employee_index])
 
                     # remove from the company
                     employees.pop(employee_index)
@@ -97,7 +91,7 @@ class Manager:
                 case 4:  # View
                     selected_employee = get_user_option_from_list("Select an employee to view", [f"{employee.name} ({employee.id})" for employee in employees])
                     if selected_employee == -1:
-                        return
+                        continue
                     print(employees[selected_employee])
                     input("\nPress enter to continue...")
 
@@ -106,11 +100,11 @@ class Manager:
                     input("Press enter to continue...")
 
                 case _:
-                    return Ok(None)
+                    return True, ""
 
-    def benefit_plan(self) -> Result[None, str]:
-        benefits = self.__benefits
-        employees = self.__employees
+    def benefit_plan(self) -> tuple[bool, str]:
+        benefits = self.__company.benefits
+        employees = self.__company.employees
 
         last_msg = ""
         while True:
@@ -144,11 +138,11 @@ class Manager:
                 case 2:  # Apply
                     employee_index_selected = get_user_option_from_list("Select an employee to apply benefit plan to", [f"{employee.name} ({employee.id})" for employee in employees])
                     if employee_index_selected == -1:
-                        return
+                        continue
 
                     benefit_index_selected = get_user_option_from_list("Select a benefit plan to apply to employee", [f"{benefit.name} ({benefit.cost})" for benefit in benefits])
                     if benefit_index_selected == -1:
-                        return
+                        continue
 
                     benefit = benefits[benefit_index_selected]
                     employee = employees[employee_index_selected]
@@ -201,16 +195,16 @@ class Manager:
                     print(benefits[selected_benefit_index])
 
                 case _:
-                    return Ok(None)
+                    return True, ""
 
-    def attendance(self) -> Result[None, str]:
-        employees = self.__employees
+    def attendance(self) -> tuple[bool, str]:
+        employees = self.__company.employees
         if not employees:
-            return Err("No employees to manage attendance for!")
+            return False, "No employees to manage attendance for!"
 
         selected_employee_index = get_user_option_from_list("Select an employee to manage attendance for", [f"{employee.name} ({employee.id})" for employee in employees])
         if selected_employee_index == -1:
-            return Ok(None)
+            return False, "No employee selected!"
         employee = employees[selected_employee_index]
         attendances = employee.attendance
 
@@ -237,7 +231,7 @@ class Manager:
                         attendances.add_attendance(date, is_presence).unwrap()
                         if not is_presence:
                             reason = input("Enter reason for absence: ")
-                            attendances.add_absence_day(date, reason).unwrap()
+                            attendances.add_absent_day(date, reason).unwrap()
                     except (ValueError, TypeError) as e:
                         last_msg = str(e)
 
@@ -249,32 +243,37 @@ class Manager:
                             print("No attendance found for that date!")
                             break
                         is_presence = input("Is employee present? (y/n): ")
-                        attendances.update_attendance(date, is_presence).unwrap()
+                        attendances.add_attendance(date, is_presence).unwrap()
                         if not is_presence:
                             reason = input("Enter reason for absence: ")
-                            attendances.add_absence_day(date, reason).unwrap()
+                            attendances.add_absent_day(date, reason).unwrap()
                         break
                     except:
                         date = input("Invalid date format! Try again: ")
                         continue
                 case 3:  # Report
-                    report = attendances.get_report()
-                    try:
-                        items = [f"{k}: {v}" for k, v in report.unwrap().items()]
-                        listing("Attendance report", items)
-                    except:
-                        print("No attendance found for this employee!")
-                case _:
-                    return Ok(None)
+                    available_years = attendances.get_available_years()
+                    if not available_years:
+                        print("No attendance data available!")
+                        break
 
-    def payroll(self) -> Result[None, str]:
-        employees = self.__employees
+                    selected_year_index = get_user_option_from_list("Select a year to view attendance report for", [str(year) for year in available_years])
+                    if selected_year_index == -1:
+                        continue
+                    print(attendances.get_report(available_years[selected_year_index]))
+
+                    input("Press enter to continue...")
+                case _:
+                    return True, ""
+
+    def payroll(self) -> tuple[bool, str]:
+        employees = self.__company.employees
         if not employees:
-            return Err("No employees to manage payroll for!")
+            return False, "No employees to manage payroll for!"
 
         selected_employee_index = get_user_option_from_list("Select an employee to manage payroll for", [f"{employee.name} ({employee.id})" for employee in employees])
         if selected_employee_index == -1:
-            return Ok(None)
+            return False, "No employee selected!"
         employee = employees[selected_employee_index]
 
         last_msg = ""
@@ -313,11 +312,11 @@ class Manager:
                     print(payroll)
 
                 case _:
-                    return Ok(None)
+                    return True, ""
 
-    def department(self) -> Result[None, str]:
-        employees = self.__employees
-        depts = self.__depts
+    def department(self) -> tuple[bool, str]:
+        employees = self.__company.employees
+        depts = self.__company.departments
 
         last_msg = ""
         while True:
@@ -384,20 +383,20 @@ class Manager:
                     listing("Departments", [f"{dept.name} ({dept.id})" for dept in depts])
 
                 case 6:  # Back
-                    return Ok(None)
+                    return True, ""
 
                 case _:
                     continue
 
-    def performance(self) -> Result[None, str]:
-        employees = self.__employees
-        if employees is None:
-            return Err("No employees to manage performance, please add an employee first!")
+    def performance(self) -> tuple[bool, str]:
+        employees = self.__company.employees
+        if len(employees) == 0:
+            return False, "No employees to manage performance, please add an employee first!"
 
         # --- Select an employee to manage performance first ---
         employee_selected_index = get_user_option_from_list("Select an employee to manage performance", [f"{employee.name} ({employee.id})" for employee in employees])
         if employee_selected_index == -1:
-            return
+            return False, "No employee selected!"
         employee = employees[employee_selected_index]
         performance = employee.performance
 
@@ -436,7 +435,7 @@ class Manager:
                     sale_date = input("Enter sale date (YYYY-MM-DD, leave blank for today): ")
                     try:
                         sale_date = datetime.strptime(sale_date, "%Y-%m-%d") if sale_date else datetime.now()
-                        sale.set_sale_date(sale_date).unwrap()
+                        sale.set_date(sale_date).unwrap()
                     except (ValueError, TypeError) as e:
                         last_msg = str(e)
 
@@ -446,7 +445,6 @@ class Manager:
 
                 case 2:  # View
                     print(performance)
-                    input("Press enter to continue...")
 
                 case 3:  # Remove
                     # --- Select sale to remove ---
@@ -459,7 +457,7 @@ class Manager:
                     last_msg = f"Sale for employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} removed successfully!"
 
                 case 4:  # Get info
-                    print(performance.get_info())
+                    print(performance)
 
                 case 5:  # Find sales by...
                     # --- Select a field to search by ---
@@ -516,7 +514,7 @@ class Manager:
                             continue
 
                 case _:  # Back
-                    return Ok(None)
+                    return True, ""
 
 
 def main():
@@ -541,7 +539,7 @@ def main():
         ]
         user_choice = get_user_option_from_menu("Main menu", main_menu)
 
-        respond: Result = Ok(None)
+        respond: tuple[bool, str] = (True, "")
 
         match user_choice:
             case 1: respond = manager.employee()
@@ -554,17 +552,12 @@ def main():
             case _:
                 last_msg = FCOLORS.RED + "Invalid choice!" + FCOLORS.END
 
-        try:
-            respond.unwrap()
-        except (TypeError, ValueError) as e:
-            last_msg = FCOLORS.RED + str(e) + FCOLORS.END
+        if not respond[0]:
+            last_msg = FCOLORS.RED + respond[1] + FCOLORS.END
 
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        try:
-            sys.exit(130)
-        except SystemExit:
-            os._exit(130)
+        sys.exit(0)

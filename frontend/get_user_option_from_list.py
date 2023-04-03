@@ -1,4 +1,4 @@
-from .COLORS import FCOLORS, BCOLORS
+from .COLORS import FCOLORS
 from .clrscr import clrscr
 from .clustering import clustering
 
