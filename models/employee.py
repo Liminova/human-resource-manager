@@ -7,9 +7,12 @@ from option import Result, Ok, Err
 from pydantic import BaseModel
 
 if sys.version_info >= (3, 11):
-    from typing import Self
+    from typing import Self, TYPE_CHECKING
 else:
-    from typing_extensions import Self
+    from typing_extensions import Self, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .company import Company
 
 from .attendance_check import Attendance
 from .benefits import BenefitPlan
@@ -55,9 +58,13 @@ class Employee(BaseModel):
         self.email = email
         return Ok(self) if email else Err("Email cannot be empty!")
 
-    def set_id(self, id: str = "") -> Result[Self, str]:
+    def set_id(self, id: str, company: Company) -> Result[Self, str]:
+        if id == "":
+            return Err("ID cannot be empty!")
+        if company.is_id_taken(id):
+            return Err("ID is already taken!")
         self.id = id
-        return Ok(self) if id else Err("ID cannot be empty!")
+        return Ok(self)
 
     def set_phone(self, phone: str = "") -> Result[Self, str]:
         if any(char.isalpha() for char in phone):
