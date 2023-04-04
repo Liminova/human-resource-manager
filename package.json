@@ -1,9 +1,12 @@
 {
-  "name": "pippi-parser",
+  "name": "python-project",
   "version": "0.1.0",
   "scripts": {
     "postinstall": "husky install",
-    "commit": "cz"
+    "commit": "cz",
+    "test": "pipenv run python -m unittest",
+    "launch": "pipenv run python main.py",
+    "lint": "pipenv run ruff . --fix"
   },
   "config": {
     "commitizen": {

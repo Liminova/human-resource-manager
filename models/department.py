@@ -1,41 +1,39 @@
+from __future__ import annotations
 import sys
+import textwrap
+from option import Result, Ok, Err
+from pydantic import BaseModel
 
 if sys.version_info >= (3, 11):
-    from typing import Self
+    from typing import Self, TYPE_CHECKING
 else:
-    from typing_extensions import Self
+    from typing_extensions import Self, TYPE_CHECKING
 
-class Department:
-    def __init__(self, name: str, id: str, members: list) -> None:
-        self.__name = name
-        # NOTE: maybe we don't need id for departments? food for thoughts.
-        # - Rylie
-        self.__id = id
-        self.__members = members
+if TYPE_CHECKING:
+    from .employee import Employee
 
-    @property
-    def name(self) -> str:
-        return self.__name
+class Department(BaseModel):
+    name = ""
+    id = ""
+    members: list[Employee] = []
 
-    @property
-    def id(self) -> str:
-        return self.__id
+    def set_name(self, name: str) -> Result[Self, str]:
+        self.name = name
+        return Ok(self) if name else Err("Name cannot be empty.")
 
-    @property
-    def members(self) -> list:
-        return self.__members
+    def set_id(self, id: str) -> Result[Self, str]:
+        self.id = id
+        return Ok(self) if id else Err("ID cannot be empty.")
 
-    @name.setter
-    def name(self, name: str) -> Self:
-        self.__name = name
-        return self
+    def __str__(self) -> str:
+        data = textwrap.dedent(f"""\
+                - Name: {self.name}
+                - ID: {self.id}
+                - Members:
+            """)
+        for (i, member) in enumerate(self.members, 1):
+            data += f"{i}. {member.name}\n"
+        return data
 
-    @id.setter
-    def id(self, id: str) -> Self:
-        self.__id = id
-        return self
-
-    @members.setter
-    def members(self, members: list) -> Self:
-        self.__members = members
-        return self
+    class Config:
+        arbitrary_types_allowed = True

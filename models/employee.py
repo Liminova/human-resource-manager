@@ -1,82 +1,108 @@
+from __future__ import annotations
+import re
 import sys
-
-from .benefits import BenefitPlan
+import textwrap
+from datetime import datetime
+from option import Result, Ok, Err
+from pydantic import BaseModel
 
 if sys.version_info >= (3, 11):
-    from typing import Self
+    from typing import Self, TYPE_CHECKING
 else:
-    from typing_extensions import Self
+    from typing_extensions import Self, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .company import Company
+
+from .attendance_check import Attendance
+from .benefits import BenefitPlan
+from .department import Department
+from .payroll import Payroll
+from .performance import Performance
 
 # NOTE: possible abstraction: split name and id into its own Entity class or
 # something, though i don't like that approach very much tbh - Rylie
-class Employee:
-    def __init__(
-        self, name: str, dob: str,
-        id: str, phone: str, department: str, benefits: list
-    ) -> None:
-        self.__name = name
-        self.__dob = dob
-        self.__id = id
-        self.__phone = phone
-        # TODO: think of some way to decouple department members list and
-        # members being a part of departments, it's kinda a circle dependency
-        # rn. - Rylie
-        self.__department = department
-        self.__benefits = benefits
 
-    @property
-    def name(self) -> str:
-        return self.__name
+class Employee(BaseModel):
+    name = ""
+    dob: datetime | None = None
+    email = ""
+    id = ""
+    phone = ""
+    department: Department | None = None
+    benefits: list[BenefitPlan] = []
+    payroll: Payroll | None = None
+    attendance: Attendance = Attendance()
+    performance: Performance = Performance()
 
-    @property
-    def dob(self) -> str:
-        return self.__dob
+    def set_name(self, name: str) -> Result[Self, str]:
+        if name == "":
+            return Err("Name cannot be empty!")
+        if any(char.isdigit() for char in name):
+            return Err("Name cannot contain numbers!")
+        self.name = name
+        return Ok(self)
 
-    @property
-    def id(self) -> str:
-        return self.__id
+    def set_dob(self, dob: str) -> Result[Self, str]:
+        try:
+            dob = datetime.strptime(dob, "%Y-%m-%d")
+        except ValueError:
+            return Err("Invalid date of birth format!")
+        self.dob = dob
+        return Ok(self)
 
-    @property
-    def phone(self) -> str:
-        return self.__phone
+    def set_email(self, email: str = "") -> Result[Self, str]:
+        pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+        if not re.match(pattern, email):
+            return Err("Invalid email format!")
+        self.email = email
+        return Ok(self) if email else Err("Email cannot be empty!")
 
-    @property
-    def department(self) -> str:
-        return self.__department
+    def set_id(self, id: str, company: Company) -> Result[Self, str]:
+        if id == "":
+            return Err("ID cannot be empty!")
+        if company.is_id_taken(id):
+            return Err("ID is already taken!")
+        self.id = id
+        return Ok(self)
 
-    @property
-    def benefits(self) -> list:
-        return self.__benefits
+    def set_phone(self, phone: str = "") -> Result[Self, str]:
+        if any(char.isalpha() for char in phone):
+            return Err("Phone number cannot contain letters!")
+        self.phone = phone
+        return Ok(self) if phone else Err("Phone number cannot be empty!")
 
-    @name.setter
-    def name(self, name: str) -> Self:
-        self.__name = name
-        return self
+    def set_department(self, department: Department) -> Result[Self, str]:
+        self.department = department
+        return Ok(self)
 
-    @dob.setter
-    def dob(self, dob: str) -> Self:
-        self.__dob = dob
-        return self
+    def set_payroll(self, payroll: Payroll) -> Result[Self, str]:
+        self.payroll = payroll
+        return Ok(self)
 
-    @id.setter
-    def id(self, id: str) -> Self:
-        self.__id = id
-        return self
+    def set_performance(self, performance: Performance) -> Result[Self, str]:
+        self.performance = performance
+        return Ok(self)
 
-    @phone.setter
-    def phone(self, phone: str) -> Self:
-        self.__phone = phone
-        return self
+    def request_enrollment(self, benefit: BenefitPlan) -> Result[Self, str]:
+        if benefit in self.benefits:
+            return Err("Employee is already enrolled in this plan!")
+        # request enrollment
+        benefit.add_pending_enrollment_request(self)
+        return Ok(self)
 
-    @department.setter
-    def department(self, department: str) -> Self:
-        self.__department = department
-        return self
+    def __str__(self) -> str:
+        data = textwrap.dedent(f"""\
+            - Name: {self.name}
+            - DoB: {self.dob}
+            - ID: {self.id}
+            - Phone: {self.phone}
+            - Department: {self.department}
+            - Benefit plans:
+        """)
+        for (i, benefit) in enumerate(self.benefits, 1):
+            data += f"{i}. {benefit.name}\n"
+        return data
 
-    @benefits.setter
-    def benefits(self, benefits: list) -> Self:
-        self.__benefits = benefits
-        return self
-
-    def is_enrolled_in_plan(self, benefit: BenefitPlan) -> bool:
-        return benefit in self.__benefits
+    class Config:
+        arbitrary_types_allowed = True
