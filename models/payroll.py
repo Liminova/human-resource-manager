@@ -1,6 +1,7 @@
 import sys
 from option import Result, Ok, Err
 import textwrap
+from attendance_check import Attendance
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -55,8 +56,14 @@ class Payroll:
         
         return Ok(self) if tax >= 0 else Err("Tax cannot be negative.")
 
-    def set_punish(self, punish: str) -> Result[Self, str]:
-        punish = int(punish)
+    def set_punish(self, year: int) -> Result[Self, str]:
+        att = Attendance()
+        allowed_absences = att.get_allowed_absent_days(year)
+        if allowed_absences >= 0:
+            self.punish = 0
+        else:
+            self.punish = -att.allowed_absent_days[year] * 10
+        
         self.punish = punish
         self.calculate_total().unwrap()
         return Ok(self) if punish >= 0 else Err("Punish cannot be negative.")
