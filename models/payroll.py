@@ -31,6 +31,7 @@ class Payroll:
         tax = int(tax)
         self.tax = tax
         self.calculate_total().unwrap()
+        return Ok(self) if tax >= 0 else Err("Tax cannot be negative.")
     
     def calculate_bonus(self, employees: list) -> None:
         """Calculate bonus for each employee based on their sales count."""
