@@ -1,19 +1,19 @@
 import sys
 from option import Result, Ok, Err
 import textwrap
-
+from pydantic import BaseModel, Field
 if sys.version_info >= (3, 11):
     from typing import Self
 else:
     from typing_extensions import Self
 
-class Payroll:
+class Payroll(BaseModel):
     """Monthly payroll for an employee."""
-    salary = 0
-    bonus = 0
-    tax = 0
-    punish = 0
-    total = 0
+    salary: int = Field(default_factory=int)
+    bonus: int = Field(default_factory=int)
+    tax: int = Field(default_factory=int)
+    punish: int = Field(default_factory=int)
+    total: int = Field(default_factory=int)
 
     def set_salary(self, salary: str) -> Result[Self, str]:
         salary = int(salary)
