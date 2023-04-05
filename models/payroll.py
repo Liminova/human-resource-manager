@@ -55,8 +55,7 @@ class Payroll:
         
         return Ok(self) if tax >= 0 else Err("Tax cannot be negative.")
 
-    def set_punish(self, punish: str) -> Result[Self, str]:
-        punish = int(punish)
+    def set_punish(self, punish: int, year: int) -> Result[Self, str]:
         self.punish = punish
         self.calculate_total().unwrap()
         return Ok(self) if punish >= 0 else Err("Punish cannot be negative.")
