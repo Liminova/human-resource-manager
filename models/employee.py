@@ -4,7 +4,7 @@ import sys
 import textwrap
 from datetime import datetime
 from option import Result, Ok, Err
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
@@ -24,16 +24,16 @@ from .performance import Performance
 # something, though i don't like that approach very much tbh - Rylie
 
 class Employee(BaseModel):
-    name = ""
-    dob: datetime | None = None
-    email = ""
-    id = ""
-    phone = ""
-    department: Department | None = None
-    benefits: list[BenefitPlan] = []
-    payroll: Payroll | None = None
-    attendance: Attendance = Attendance()
-    performance: Performance = Performance()
+    name: str = Field(default_factory=str)
+    dob: datetime | None = Field(default_factory=datetime | None)
+    email: str = Field(default_factory=str)
+    id: str = Field(default_factory=str)
+    phone: str = Field(default_factory=str)
+    department_id: str = Field(default_factory=str)
+    benefits: list[BenefitPlan] = Field(default_factory=list)
+    payroll: Payroll = Field(default_factory=Payroll)
+    attendance: Attendance = Field(default_factory=Attendance)
+    performance: Performance = Field(default_factory=Performance)
 
     def set_name(self, name: str) -> Result[Self, str]:
         if name == "":

@@ -1,7 +1,7 @@
 import sys
 from option import Result, Ok, Err
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -9,10 +9,10 @@ else:
     from typing_extensions import Self
 
 class Attendance(BaseModel):
-    start_date: datetime = datetime.now()
-    allowed_absent_days: dict[int, int] = {}
-    attendances: dict[str, bool] = {}
-    absents: dict[str, str] = {}
+    start_date: datetime = Field(default_factory=datetime.now)
+    allowed_absent_days: dict[int, int] = Field(default_factory=dict)
+    attendances: dict[str, bool] = Field(default_factory=dict)
+    absents: dict[str, str] = Field(default_factory=dict)
 
     def get_attendance(self, date: datetime) -> Result[bool, str]:
         date_str = date.strftime("%Y-%m-%d")
