@@ -1,3 +1,4 @@
 {
   "reportGeneralTypeIssues": false,
+  "reportImportCycles": "none",
 }

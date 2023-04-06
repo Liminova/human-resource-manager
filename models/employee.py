@@ -77,26 +77,23 @@ class Employee(BaseModel):
         self.performance = performance
         return Ok(self)
 
-    def is_enrolled_in_plan(self, benefit: BenefitPlan) -> bool:
-        return benefit in self.__benefits
-
     def request_enrollment(self, benefit: BenefitPlan) -> Result[Self, str]:
-        if self.is_enrolled_in_plan(benefit):
+        if benefit in self.benefits:
             return Err("Employee is already enrolled in this plan!")
         # request enrollment
-        benefit.add_pending_enrollment(self)
+        benefit.add_pending_enrollment_request(self)
         return Ok(self)
 
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\
-            - Name: {self.__name}
-            - DoB: {self.__dob}
-            - ID: {self.__id}
-            - Phone: {self.__phone}
-            - Department: {self.__department}
+            - Name: {self.name}
+            - DoB: {self.dob}
+            - ID: {self.id}
+            - Phone: {self.phone}
+            - Department: {self.department}
             - Benefit plans:
         """)
-        for (i, benefit) in enumerate(self.__benefits, 1):
+        for (i, benefit) in enumerate(self.benefits, 1):
             data += f"{i}. {benefit.name}\n"
         return data
 

@@ -7,5 +7,7 @@ from .employee import Employee
 from .payroll import Payroll
 from .performance import Performance, Sale
 
-__all__ = ["Admin", "Attendance", "BenefitPlan", "Company", "Department",
-           "Employee", "Payroll", "Performance", "Sale"]
+__all__ = [
+    "Admin", "Attendance", "BenefitPlan", "Company", "Department", "Employee",
+    "Payroll", "Performance", "Sale"
+]

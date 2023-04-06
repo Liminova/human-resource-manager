@@ -1,4 +1,4 @@
-from .COLORS import FCOLORS, BCOLORS
+from .COLORS import FCOLORS
 
 
 def print_menu(title: str, entries: list[str]) -> None:

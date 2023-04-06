@@ -12,7 +12,7 @@ orjson = "*"
 
 [dev-packages]
 ruff = "*"
-autopep8 = "*"
+yapf = "*"
 
 [requires]
 python_version = "3"
