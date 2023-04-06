@@ -4,12 +4,15 @@ import sys
 import textwrap
 from datetime import datetime
 from option import Result, Ok, Err
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 if sys.version_info >= (3, 11):
-    from typing import Self
+    from typing import Self, TYPE_CHECKING
 else:
-    from typing_extensions import Self
+    from typing_extensions import Self, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .company import Company
 
 from .attendance_check import Attendance
 from .benefits import BenefitPlan
@@ -21,16 +24,16 @@ from .performance import Performance
 # something, though i don't like that approach very much tbh - Rylie
 
 class Employee(BaseModel):
-    name = ""
-    dob: datetime | None = None
-    email = ""
-    id = ""
-    phone = ""
-    department: Department | None = None
-    benefits: list[BenefitPlan] = []
-    payroll: Payroll | None = None
-    attendance: Attendance = Attendance()
-    performance: Performance = Performance()
+    name: str = Field(default_factory=str)
+    dob: datetime | None = Field(default_factory=datetime | None)
+    email: str = Field(default_factory=str)
+    id: str = Field(default_factory=str)
+    phone: str = Field(default_factory=str)
+    department_id: str = Field(default_factory=str)
+    benefits: list[BenefitPlan] = Field(default_factory=list)
+    payroll: Payroll = Field(default_factory=Payroll)
+    attendance: Attendance = Field(default_factory=Attendance)
+    performance: Performance = Field(default_factory=Performance)
 
     def set_name(self, name: str) -> Result[Self, str]:
         if name == "":
@@ -55,9 +58,13 @@ class Employee(BaseModel):
         self.email = email
         return Ok(self) if email else Err("Email cannot be empty!")
 
-    def set_id(self, id: str = "") -> Result[Self, str]:
+    def set_id(self, id: str, company: Company) -> Result[Self, str]:
+        if id == "":
+            return Err("ID cannot be empty!")
+        if company.is_id_taken(id):
+            return Err("ID is already taken!")
         self.id = id
-        return Ok(self) if id else Err("ID cannot be empty!")
+        return Ok(self)
 
     def set_phone(self, phone: str = "") -> Result[Self, str]:
         if any(char.isalpha() for char in phone):

@@ -2,7 +2,7 @@ from __future__ import annotations
 import sys
 import textwrap
 from option import Result, Ok, Err
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
@@ -13,11 +13,11 @@ if TYPE_CHECKING:
     from .employee import Employee
 
 class BenefitPlan(BaseModel):
-    name = ""
-    description = ""
-    cost = 0.0
-    enrolled_employees: list[Employee] = []
-    pending_requests: list[Employee] = []
+    name: str = Field(default_factory=str)
+    description: str = Field(default_factory=str)
+    cost: float = Field(default_factory=float)
+    enrolled_employees: list[Employee] = Field(default_factory=list)
+    pending_requests: list[Employee] = Field(default_factory=list)
 
     def set_name(self, name: str = "") -> Result[Self, str]:
         self.name = name
