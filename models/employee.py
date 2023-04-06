@@ -76,7 +76,13 @@ class Employee(BaseModel):
         self.department = department
         return Ok(self)
 
-    def set_payroll(self, payroll: Payroll) -> Result[Self, str]:
+    def set_payroll(self, payroll: Payroll, year: str) -> Result[Self, str]:
+        year = int(year)
+        absent_days = self.attendance.allowed_absent_days[year]
+        # set punishment if an employee is absent more than allowed absent days
+        if absent_days < 0:
+            payroll.set_punish(-absent_days*5) # -5$ with each more absent day
+            
         self.payroll = payroll
         return Ok(self)
 
