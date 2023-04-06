@@ -34,7 +34,7 @@ class Login:
         self.admins.append(admin)
         return Ok(self)
 
-    def login(self, username: str, password: str) -> Result[Union[Employee, Admin], str]:
+    def login(self, username: str, password: str) -> Result[Employee | Admin, str]:
         hashed_password = hashlib.sha256(password.encode()).hexdigest()
         for employee in self.employees:
             if employee.username == username and employee.password == hashed_password:
