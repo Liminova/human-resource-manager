@@ -2,7 +2,7 @@ import sys
 import textwrap
 from option import Result, Ok, Err
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -10,14 +10,14 @@ else:
     from typing_extensions import Self
 
 class Sale(BaseModel):
-    sale_id = ""
-    date: datetime = datetime.now()
-    revenue = 0.0
-    cost = 0.0
-    profit = 0.0
-    client_id = ""
-    client_rating = 0.0
-    client_comment = ""
+    sale_id: str = Field(default_factory=str)
+    date: datetime = Field(default_factory=datetime.now)
+    revenue: float = Field(default_factory=float)
+    cost: float = Field(default_factory=float)
+    profit: float = Field(default_factory=float)
+    client_id: str = Field(default_factory=str)
+    client_rating: float = Field(default_factory=float)
+    client_comment: str = Field(default_factory=str)
 
     def set_sale_id(self, sale_id: str) -> Result[Self, str]:
         self.sale_id = sale_id
@@ -65,13 +65,12 @@ class Sale(BaseModel):
 
 class Performance(BaseModel):
     """Monitoring an employee's performance."""
-
-    sale_list: list[Sale] = []
-    sales_count = 0
-    total_revenue = 0
-    total_cost = 0
-    total_profit = 0
-    average_rating = 0
+    sale_list = Field(default_factory=list)
+    sales_count = Field(default_factory=int)
+    total_revenue = Field(default_factory=float)
+    total_cost = Field(default_factory=float)
+    total_profit = Field(default_factory=float)
+    average_rating = Field(default_factory=float)
 
     def add_sale(self, sale: Sale) -> None:
         self.sales_count += 1
