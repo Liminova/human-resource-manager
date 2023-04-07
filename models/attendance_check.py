@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
 else:
-    from typing_extensions import Self, TYPE_CEHCKING
+    from typing_extensions import Self, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .payroll import Payroll
