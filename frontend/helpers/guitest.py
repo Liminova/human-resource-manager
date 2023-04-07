@@ -1,37 +1,49 @@
 import customtkinter
+import tkinter
+from tkinter import messagebox
 
 customtkinter.set_appearance_mode("dark")
-customtkinter.set_default_color_theme("blue")
+customtkinter.set_default_color_theme("green")
 
-root = customtkinter.CTk()
-root.geometry("825x500+300+200")
-root.configure(bg="black")
-root.resizable(False, False)
-root.title("Login System")
+app = customtkinter.CTk()
+app.geometry("925x600")
+app.resizable(True, True)
+app.title('Human Resources System Management')
 
-def login():
-    print("Test")
+def button_function():
+    username = entry1.get()
+    password = entry2.get()
+    if username == "admin" and password == "1234":    
+        w = customtkinter.CTk()  
+        w.geometry("1024x768")
+        w.title('Welcome')
+        l1=customtkinter.CTkLabel(master=w, text="Home Page",font=('Century Gothic',60))
+        l1.place(relx=0.5, rely=0.5,  anchor=tkinter.CENTER)
+        w.mainloop()
+    elif username == "admin" and password != "1234":
+        messagebox.showerror("Login", "Password is incorrect") 
+    else:
+        messagebox.showerror("Login", "Login Failed")
 
+frame=customtkinter.CTkFrame(master=app, width=320, height=360, corner_radius=15)
+frame.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
 
-frame = customtkinter.CTkFrame(master=root)
-frame.pack(pady=20, padx=60, fill="both", expand=True)
+l2=customtkinter.CTkLabel(master=frame, text="Sign In",font=('Century Gothic',30))
+l2.place(relx=0.5, rely=0.15, anchor=tkinter.CENTER)
 
-label = customtkinter.CTkLabel(master=frame, text="Login System", text_font=("Roboto", 24))
-label.pack(pady=12, padx=10)
+entry1=customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Username', font=('Century Gothic', 14))
+entry1.place(x=50, y=110)
 
-entry1 = customtkinter.CTkEntry(master=frame, placeholder_text="Username")
-entry1.pack(pady=12, padx=10)
+entry2=customtkinter.CTkEntry(master=frame, width=220, placeholder_text='Password', show="*", font=('Century Gothic', 14))
+entry2.place(x=50, y=165)
 
-entry2 = customtkinter.CTkEntry(master=frame, placeholder_text="Password", show="*")
-entry2.pack(pady=12, padx=10)
+l3=customtkinter.CTkLabel(master=frame, text="Forget password?",font=('Century Gothic',12))
+l3.place(x=155,y=195)
 
-button = customtkinter.CTkButton(master=frame, fg_color=("purple"), text="Sign in", command=login)
-button.pack(pady=12, padx=10)
+button1 = customtkinter.CTkButton(master=frame, width=220, text="Login", command=button_function, corner_radius=6, font=('Century Gothic', 14))
+button1.place(x=50, y=240)
 
-checkbox = customtkinter.CTkCheckBox(master=frame, text="Remember Me")
-checkbox.pack(pady=12, padx=10)
+l4 = customtkinter.CTkLabel(master=frame, text="Don't have an account? Sign up", font=('Century Gothic', 12))
+l4.place(x=50, y=300)
 
-label2 = customtkinter.CTkLabel(master=frame, text="Don't have an account? Sign up", text_font=("Roboto", 10))
-label2.pack(pady=12, padx=10)
-
-root.mainloop()
+app.mainloop()
