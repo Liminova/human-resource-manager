@@ -17,20 +17,17 @@ class Payroll(BaseModel):
     punish: int = Field(default_factory=int)
     total: int = Field(default_factory=int)
 
-    def set_salary(self, salary: str) -> Result[Self, str]:
-        salary = int(salary)
+    def set_salary(self, salary: int) -> Result[Self, str]:
         self.salary = salary
         self.calculate_total().unwrap()
         return Ok(self) if salary >= 0 else Err("Salary cannot be negative.")
 
-    def set_bonus(self, bonus: str) -> Result[Self, str]:
-        bonus = int(bonus)
+    def set_bonus(self, bonus: int) -> Result[Self, str]:
         self.bonus = bonus
         self.calculate_total().unwrap()
         return Ok(self) if bonus >= 0 else Err("Bonus cannot be negative.")
 
-    def set_tax(self, tax: str) -> Result[Self, str]:
-        tax = int(tax)
+    def set_tax(self, tax: int) -> Result[Self, str]:
         self.tax = tax
         self.calculate_total().unwrap()
         return Ok(self) if tax >= 0 else Err("Tax cannot be negative.")
@@ -53,8 +50,7 @@ class Payroll(BaseModel):
             employees[i].payroll.set_bonus(0)
         return None
 
-    def set_punish(self, punish: str) -> Result[Self, str]:
-        punish = int(punish)
+    def set_punish(self, punish: int) -> Result[Self, str]:
         self.punish = punish
         self.calculate_total().unwrap()
         return Ok(self) if punish >= 0 else Err("Punish cannot be negative.")
