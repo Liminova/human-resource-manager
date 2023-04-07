@@ -55,9 +55,9 @@ class Payroll(BaseModel):
         self.calculate_total()
         return Ok(self) if punish >= 0 else Err("Punish cannot be negative.")
 
-    def calculate_total(self) -> None:
+    def calculate_total(self) -> Self:
         self.total = self.salary + self.bonus - self.tax - self.punish
-        return None
+        return self
 
     def __str__(self) -> str:
         self.calculate_total()
