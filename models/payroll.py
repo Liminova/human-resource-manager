@@ -3,10 +3,12 @@ from option import Result, Ok, Err
 import textwrap
 from pydantic import BaseModel, Field
 if sys.version_info >= (3, 11):
-    from typing import Self
+    from typing import Self, TYPE_CHECKING
 else:
-    from typing_extensions import Self
+    from typing_extensions import Self, TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from .employee import Employee
 class Payroll(BaseModel):
     """Monthly payroll for an employee."""
     salary: int = Field(default_factory=int)
@@ -32,8 +34,8 @@ class Payroll(BaseModel):
         self.tax = tax
         self.calculate_total().unwrap()
         return Ok(self) if tax >= 0 else Err("Tax cannot be negative.")
-    
-    def calculate_bonus(self, employees: list) -> None:
+
+    def calculate_bonus(self, employees: list["Employee"]) -> None:
         """Calculate bonus for each employee based on their sales count."""
         bonus_budget = 100 # temporary value for now
         num_employees = len(employees)
