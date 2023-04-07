@@ -32,7 +32,7 @@ class Payroll(BaseModel):
         self.calculate_total().unwrap()
         return Ok(self) if tax >= 0 else Err("Tax cannot be negative.")
 
-    def calculate_bonus(self, employees: list["Employee"]) -> None:
+    def calculate_bonus(self, employees: list[Employee]) -> None:
         """Calculate bonus for each employee based on their sales count."""
         bonus_budget = 100 # temporary value for now
         num_employees = len(employees)
