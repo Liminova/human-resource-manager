@@ -76,8 +76,8 @@ class MenuEmployee:
         # add the employee to the department's members
         self.__company.departments[dept_index].members.append(employee)
 
-        # add the department to the employee
-        employee.department = self.__company.departments[dept_index]
+        # add the department id to the employee's department_id
+        employee.department_id = self.__company.departments[dept_index].id
 
         # append the employee to the company's employees
         self.__company.employees.append(employee)
