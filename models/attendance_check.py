@@ -4,9 +4,12 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 if sys.version_info >= (3, 11):
-    from typing import Self
+    from typing import Self, TYPE_CHECKING
 else:
     from typing_extensions import Self
+
+if TYPE.CHECKING:
+    from .payroll import Payroll
 
 class Attendance(BaseModel):
     start_date: datetime = Field(default_factory=datetime.now)
@@ -35,12 +38,20 @@ class Attendance(BaseModel):
         self.start_date = start_date.strftime("%Y-%m-%d")
         return Ok(self)
 
-    def add_attendance(self, date: datetime, is_present: bool) -> Result[Self, str]:
+    def add_attendance(self, date: datetime, is_present: bool, payroll: Payroll) -> Result[Self, str]:
         date_str = date.strftime("%Y-%m-%d")
         # Check the "allowed_absent_days" first, if it doesn't contain current year, add it and set to 3
         if date.year not in self.allowed_absent_days:
             self.allowed_absent_days[date.year] = 3
         self.attendances[date_str] = is_present
+
+        # If the employee is absent then set the punishment
+        if not is_present:
+            self.allowed_absent_days[date.year] -= 1
+            if self.allowed_absent_days[date.year] < 0:
+                punishment = str('10') # -10 dollars with each day absent more than allowed
+                payroll.set_punishment(date.year, punishment)
+
         return Ok(self)
 
     def add_absent_day(self, date: datetime, reason: str) -> Result[Self, str]:
@@ -74,4 +85,6 @@ class Attendance(BaseModel):
                 else:
                     absent_reason = self.absents.get(date, "No reason")
                     data += f"{datetime.strftime(date, '%d %b %Y')} - Absent ({absent_reason})\n"
+
+        
         return data
