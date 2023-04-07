@@ -49,8 +49,7 @@ class Attendance(BaseModel):
         if not is_present:
             self.allowed_absent_days[date.year] -= 1
             if self.allowed_absent_days[date.year] < 0:
-                punishment = str('10') # -10 dollars with each day absent more than allowed
-                payroll.set_punishment(date.year, punishment)
+                payroll.set_punish(10) # -10$ for each absent day if the employee is absent more than 3 days
 
         return Ok(self)
 
