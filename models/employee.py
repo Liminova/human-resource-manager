@@ -21,7 +21,7 @@ from .performance import Performance
 
 class Employee(BaseModel):
     name: str = Field(default_factory=str)
-    dob: datetime | None = Field(default_factory=datetime | None)
+    dob: datetime = Field(default_factory=datetime.now)
     email: str = Field(default_factory=str)
     id: str = Field(default_factory=str)
     phone: str = Field(default_factory=str)
