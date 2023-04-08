@@ -64,6 +64,7 @@ class MenuDepartment:
         # a list containing the string representation of each department
         dept_items = [f"{dept.name} ({dept.id})" for dept in self.__company.departments]
         dept_selected_index = get_user_option_from_list("Select a department to remove", dept_items)
+        dept = depts[dept_selected_index - 1]
         if dept_selected_index == -1:
             return ""
 
@@ -87,7 +88,9 @@ class MenuDepartment:
             return ""
 
         # get the department object to update
-        dept = depts[dept_selected_index]
+        dept = depts[dept_selected_index - 1]
+        
+        department_repo.update_one({ "_id": dept.id }, dept.dict(exclude={"id"}, by_alias=True))
 
         # re-assign the department name and ID
         loop_til_valid_input("Enter department name: ", dept.set_name)
