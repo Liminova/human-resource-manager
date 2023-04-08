@@ -87,7 +87,7 @@ class MenuEmployee:
         self.__company.employees.append(employee)
 
         # add employee to mongodb database
-        employee_repo.insert_one(employee.dict())
+        employee_repo.insert_one(employee.dict(by_alias=True))
 
         return f"Employee {employee.name} ({employee.employee_id}) added successfully!"
 
