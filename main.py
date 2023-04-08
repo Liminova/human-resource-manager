@@ -1,12 +1,42 @@
 import sys
+import os
+
+from pymongo.database import Database
 from frontend.helpers import *
 from frontend.menu import *
-from models import Company
+from models import Company, BenefitPlan, Department, Employee
+from database import mongo
+from pymongo import MongoClient
+from dotenv import load_dotenv
+from database.mongo import employee_repo, department_repo, benefit_repo
+
+load_dotenv()
 # from option import Result, Ok, Err
+
+the_company = Company()
+
+def initialize_data():
+    if not employee_repo.find({}):
+        pass
+    else:
+        for employee in employee_repo.find({}):
+            the_company.employees.append(Employee.parse_obj(employee))
+
+    if not department_repo.find({}):
+        pass
+    else:
+        for department in department_repo.find({}):
+            the_company.departments.append(Department.parse_obj(department))
+
+    if not benefit_repo.find({}):
+        pass
+    else:
+        for benefit in benefit_repo.find({}):
+            the_company.benefits.append(BenefitPlan.parse_obj(benefit))
 
 def main():
     last_msg = ""
-    the_company = Company()
+    initialize_data()
 
     while True:
         clrscr()
