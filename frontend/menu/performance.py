@@ -22,7 +22,7 @@ class MenuPerformance:
             return False, "No employees to manage performance, please add an employee first!"
 
         # a list containing the string representation of each employee
-        employee_items = [f"{employee.name} ({employee.id})" for employee in employees]
+        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in employees]
 
         # get the index of the employee to manage performance for
         employee_selected_index = get_user_option_from_list("Select an employee to manage performance", employee_items)
