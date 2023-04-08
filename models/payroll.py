@@ -1,7 +1,9 @@
+from __future__ import annotations
 import sys
 from option import Result, Ok, Err
 import textwrap
 from pydantic import BaseModel, Field
+
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
 else:
