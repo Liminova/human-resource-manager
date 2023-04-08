@@ -2,16 +2,15 @@ from __future__ import annotations
 import sys
 from ..helpers import *
 from models import Employee
-from database import mongo
+from database.mongo import employee_repo
 
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
 else:
     from typing_extensions import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from ...models.company import Company
-
-employee_repo = mongo.init_employee_repo()
 
 class MenuEmployee:
     def __init__(self, company: Company):
@@ -148,6 +147,7 @@ class MenuEmployee:
             loop_til_valid_input(field, setter)
 
         employee_repo.update_one(employee.id, employee.dict(exclude="id", by_alias=True))
+
         return f"Employee {employee.name} ({employee.employee_id}) updated successfully!"
 
     def __view(self) -> str:
