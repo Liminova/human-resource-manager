@@ -2,6 +2,7 @@ from __future__ import annotations
 import sys
 from ..helpers import *
 from models import Department
+from database.mongo import department_repo
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
 else:
@@ -53,6 +54,8 @@ class MenuDepartment:
         loop_til_valid_input("Enter department name: ", dept.set_name)
         loop_til_valid_input("Enter department ID: ", dept.set_id)
 
+        department_repo.insert_one(dept.dict(by_alias=True))
+
         # add the department to the company
         self.__company.departments.append(dept)
         return f"Department {FCOLORS.GREEN}{dept.name}{FCOLORS.END} added successfully!"
@@ -73,6 +76,7 @@ class MenuDepartment:
             if employee.department == depts[dept_selected_index]:
                 employee.set_department(None)
 
+        department_repo.delete_one({ "_id": dept.id })
         depts.pop(dept_selected_index)
         return "Department removed successfully!"
 
@@ -101,7 +105,7 @@ class MenuDepartment:
         depts = self.__company.departments
 
         # a list containing the string representation of each department
-        dept_items = [f"{dept.name} ({dept.id})" for dept in self.__company.departments]
+        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments]
 
         # get the index of the department to update
         dept_selected_index = get_user_option_from_list("Select a department to view info", dept_items)
