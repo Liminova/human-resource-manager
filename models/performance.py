@@ -65,12 +65,12 @@ class Sale(BaseModel):
 
 class Performance(BaseModel):
     """Monitoring an employee's performance."""
-    sale_list = Field(default_factory=list)
-    sales_count = Field(default_factory=int)
-    total_revenue = Field(default_factory=float)
-    total_cost = Field(default_factory=float)
-    total_profit = Field(default_factory=float)
-    average_rating = Field(default_factory=float)
+    sale_list: list[Sale] = Field(default_factory=list)
+    sales_count: int = Field(default_factory=int)
+    total_revenue: float = Field(default_factory=float)
+    total_cost: float = Field(default_factory=float)
+    total_profit: float = Field(default_factory=float)
+    average_rating: float = Field(default_factory=float)
 
     def add_sale(self, sale: Sale) -> None:
         self.sales_count += 1
