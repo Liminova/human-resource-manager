@@ -19,9 +19,6 @@ from .benefits import BenefitPlan
 from .payroll import Payroll
 from .performance import Performance
 
-# NOTE: possible abstraction: split name and id into its own Entity class or
-# something, though i don't like that approach very much tbh - Rylie
-
 class Employee(BaseModel):
     name: str = Field(default_factory=str)
     dob: datetime | None = Field(default_factory=datetime | None)
