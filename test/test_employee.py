@@ -13,13 +13,13 @@ class TestEmployee(unittest.TestCase):
             .set_dob("2003-08-22").unwrap() \
             .set_id("727").unwrap() \
             .set_phone("0123456727").unwrap() \
-            .set_department(department).unwrap()
+            .set_department(department.dept_id).unwrap()
 
         self.assertEqual(employee.name, "Rylie")
         self.assertEqual(employee.dob, dt.datetime(2003, 8, 22))
-        self.assertEqual(employee.id, "727")
+        self.assertEqual(employee.employee_id, "727")
         self.assertEqual(employee.phone, "0123456727")
-        self.assertEqual(employee.department.name, "Sleep")
+        self.assertEqual(employee.department_id, "SLP")
 
     def test_mutate_employee(self):
         employee = Employee() \
@@ -28,11 +28,11 @@ class TestEmployee(unittest.TestCase):
             .set_id("727").unwrap() \
             .set_phone("0123456727").unwrap() \
 
-        self.assertEqual(employee.id, "727")
+        self.assertEqual(employee.employee_id, "727")
 
         employee.set_id("420").unwrap()
 
-        self.assertEqual(employee.id, "420")
+        self.assertEqual(employee.employee_id, "420")
 
 if __name__ == "__main__":
     unittest.main()
