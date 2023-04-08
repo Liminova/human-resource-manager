@@ -2,12 +2,16 @@ from __future__ import annotations
 import sys
 from ..helpers import *
 from models import Employee
+from database import mongo
+
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
 else:
     from typing_extensions import TYPE_CHECKING
 if TYPE_CHECKING:
     from ...models.company import Company
+
+employee_repo = mongo.init_employee_repo()
 
 class MenuEmployee:
     def __init__(self, company: Company):
@@ -81,7 +85,11 @@ class MenuEmployee:
 
         # append the employee to the company's employees
         self.__company.employees.append(employee)
-        return f"Employee {employee.name} ({employee.id}) added successfully!"
+
+        # add employee to mongodb database
+        employee_repo.insert_one(employee.dict())
+
+        return f"Employee {employee.name} ({employee.employee_id}) added successfully!"
 
     def __remove(self) -> str:
         employees = self.__company.employees
@@ -89,7 +97,7 @@ class MenuEmployee:
         benefits = self.__company.benefits
 
         # a list containing the string representation of each employee
-        employee_items = [f"{employee.name} ({employee.id})" for employee in employees]
+        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in employees]
 
         # get the index of the employee to remove
         employee_index = get_user_option_from_list("Select an employee to remove", employee_items)
@@ -109,13 +117,13 @@ class MenuEmployee:
         # remove from the company
         del employees[employee_index]
 
-        return f"Employee {employees[employee_index].name} ({employees[employee_index].id}) removed successfully!"
+        return f"Employee {employees[employee_index].name} ({employees[employee_index].employee_id}) removed successfully!"
 
     def __update(self) -> str:
         employees = self.__company.employees
 
         # a list containing the string representation of each employee
-        employee_items = [f"{employee.name} ({employee.id})" for employee in employees]
+        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in employees]
 
         # get the employee to update
         selected_employee_index = get_user_option_from_list("Select an employee to update", employee_items)
@@ -136,13 +144,13 @@ class MenuEmployee:
         for (field, setter) in fields_data:
             loop_til_valid_input(field, setter)
 
-        return f"Employee {employee.name} ({employee.id}) updated successfully!"
+        return f"Employee {employee.name} ({employee.employee_id}) updated successfully!"
 
     def __view(self) -> str:
         employees = self.__company.employees
 
         # a list containing the string representation of each employee
-        employee_items = [f"{employee.name} ({employee.id})" for employee in employees]
+        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in employees]
 
         # get the employee to view
         selected_employee_index = get_user_option_from_list("Select an employee to view", employee_items)
@@ -158,7 +166,7 @@ class MenuEmployee:
         employees = self.__company.employees
 
         # a list containing the string representation of each employee
-        employee_items = [f"{employee.name} ({employee.id})" for employee in employees]
+        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in employees]
 
         # print the list
         listing("Employees", employee_items)
