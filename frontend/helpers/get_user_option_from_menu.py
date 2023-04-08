@@ -1,6 +1,5 @@
 from .COLORS import FCOLORS
 
-
 def print_menu(title: str, entries: list[str]) -> None:
     longest_entry = len(max(entries, key=len)) + 9
 
@@ -28,7 +27,6 @@ def print_menu(title: str, entries: list[str]) -> None:
 
     print(border + " " * (longest_entry - 1) + border)
     print(FCOLORS.GREEN + "╚" + "═" * (longest_entry - 1) + "╝" + FCOLORS.END)
-
 
 def get_user_option_from_menu(
         title: str,
