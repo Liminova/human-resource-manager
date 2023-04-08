@@ -54,11 +54,9 @@ class Employee(BaseModel):
         self.email = email
         return Ok(self) if email else Err("Email cannot be empty!")
 
-    def set_id(self, id: str, company: Company) -> Result[Self, str]:
+    def set_id(self, id: str) -> Result[Self, str]:
         if id == "":
             return Err("ID cannot be empty!")
-        if company.is_id_taken(id):
-            return Err("ID is already taken!")
         self.id = id
         return Ok(self)
 
