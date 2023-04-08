@@ -16,7 +16,6 @@ if TYPE_CHECKING:
 
 from .attendance_check import Attendance
 from .benefits import BenefitPlan
-from .department import Department
 from .payroll import Payroll
 from .performance import Performance
 
@@ -72,8 +71,8 @@ class Employee(BaseModel):
         self.phone = phone
         return Ok(self) if phone else Err("Phone number cannot be empty!")
 
-    def set_department(self, department: Department) -> Result[Self, str]:
-        self.department = department
+    def set_department(self, department: str) -> Result[Self, str]:
+        self.department_id = department
         return Ok(self)
 
     def set_payroll(self, payroll: Payroll) -> Result[Self, str]:
@@ -97,7 +96,7 @@ class Employee(BaseModel):
             - DoB: {self.dob}
             - ID: {self.id}
             - Phone: {self.phone}
-            - Department: {self.department}
+            - Department ID: {self.department_id}
             - Benefit plans:
         """)
         for (i, benefit) in enumerate(self.benefits, 1):
