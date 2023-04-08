@@ -60,7 +60,7 @@ class Employee(BaseModel):
         self.id = id
         return Ok(self)
 
-    def set_phone(self, phone: str = "") -> Result[Self, str]:
+    def set_phone(self, phone: str) -> Result[Self, str]:
         if any(char.isalpha() for char in phone):
             return Err("Phone number cannot contain letters!")
         self.phone = phone
