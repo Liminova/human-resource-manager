@@ -147,6 +147,7 @@ class MenuEmployee:
         for (field, setter) in fields_data:
             loop_til_valid_input(field, setter)
 
+        employee_repo.update_one(employee.id, employee.dict(exclude="id", by_alias=True))
         return f"Employee {employee.name} ({employee.employee_id}) updated successfully!"
 
     def __view(self) -> str:
