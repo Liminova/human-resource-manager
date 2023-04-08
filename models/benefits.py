@@ -3,6 +3,9 @@ import sys
 import textwrap
 from option import Result, Ok, Err
 from pydantic import BaseModel, Field
+from bson.objectid import ObjectId
+
+from database.pyobjectid import PyObjectId
 
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
@@ -13,6 +16,7 @@ if TYPE_CHECKING:
     from .employee import Employee
 
 class BenefitPlan(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(default_factory=str)
     description: str = Field(default_factory=str)
     cost: float = Field(default_factory=float)
@@ -50,3 +54,7 @@ class BenefitPlan(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+        allow_population_by_field_name = True
+        json_encoders = {
+            ObjectId: str
+        }
