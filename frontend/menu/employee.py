@@ -104,20 +104,22 @@ class MenuEmployee:
         if employee_index == -1:
             return ""
 
+        employee = employees[employee_index - 1]
+
         # remove from whatever department they're in
         for dept in depts:
-            if employees[employee_index] in dept.members:
+            if employee in dept.members:
                 dept.members.remove(employees[employee_index])
 
         # remove from whatever benefit plan they're in
         for benefit in benefits:
-            if employees[employee_index] in benefit.enrolled_employees:
+            if employee in benefit.enrolled_employees:
                 benefit.enrolled_employees.remove(employees[employee_index])
 
         # remove from the company
         del employees[employee_index]
 
-        return f"Employee {employees[employee_index].name} ({employees[employee_index].employee_id}) removed successfully!"
+        return f"Employee {employee.name} ({employee.employee_id}) removed successfully!"
 
     def __update(self) -> str:
         employees = self.__company.employees
