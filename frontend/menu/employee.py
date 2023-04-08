@@ -117,7 +117,7 @@ class MenuEmployee:
                 benefit.enrolled_employees.remove(employees[employee_index])
 
         # remove from the company
-        del employees[employee_index]
+        del employees[employee_index - 1]
 
         return f"Employee {employee.name} ({employee.employee_id}) removed successfully!"
 
