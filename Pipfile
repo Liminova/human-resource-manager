@@ -8,7 +8,6 @@ typing-extensions = "*"
 option = "*"
 pymongo = "*"
 pydantic = "*"
-orjson = "*"
 python-dotenv = "*"
 
 [dev-packages]
