@@ -1,12 +1,48 @@
 import sys
+import os
+import textwrap
+
 from frontend.helpers import *
 from frontend.menu import *
-from models import Company
-# from option import Result, Ok, Err
+from models import Company, BenefitPlan, Department, Employee
+from dotenv import load_dotenv
+from database.mongo import employee_repo, department_repo, benefit_repo
+
+load_dotenv()
+
+the_company = Company()
+
+def initialize_data():
+    os.environ["HRMGR_DB"] = "TRUE"
+
+    if not employee_repo.find({}):
+        pass
+    else:
+        for employee in employee_repo.find({}):
+            the_company.employees.append(Employee.parse_obj(employee))
+
+    if not department_repo.find({}):
+        pass
+    else:
+        for department in department_repo.find({}):
+            the_company.departments.append(Department.parse_obj(department))
+
+    if not benefit_repo.find({}):
+        pass
+    else:
+        for benefit in benefit_repo.find({}):
+            the_company.benefits.append(BenefitPlan.parse_obj(benefit))
 
 def main():
     last_msg = ""
-    the_company = Company()
+    if not os.getenv("MONGO_USER") or not os.getenv("MONGO_PASS") or not os.getenv("MONGO_URI"):
+        os.environ["HRMGR_DB"] = "FALSE"
+        input(textwrap.dedent("""\
+            It seems like your environment variables are not set up.
+            The program will now run in memory-only mode.
+            Press any key to continue."""))
+    else:
+        initialize_data()
 
     while True:
         clrscr()

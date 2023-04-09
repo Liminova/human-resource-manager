@@ -5,14 +5,13 @@ import textwrap
 from datetime import datetime
 from option import Result, Ok, Err
 from pydantic import BaseModel, Field
+from database import PyObjectId
+from bson.objectid import ObjectId
 
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
 else:
     from typing_extensions import Self, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from .company import Company
 
 from .attendance_check import Attendance
 from .benefits import BenefitPlan
@@ -20,10 +19,11 @@ from .payroll import Payroll
 from .performance import Performance
 
 class Employee(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(default_factory=str)
     dob: datetime = Field(default_factory=datetime.now)
     email: str = Field(default_factory=str)
-    id: str = Field(default_factory=str)
+    employee_id: str = Field(default_factory=str)
     phone: str = Field(default_factory=str)
     department_id: str = Field(default_factory=str)
     benefits: list[BenefitPlan] = Field(default_factory=list)
@@ -57,7 +57,7 @@ class Employee(BaseModel):
     def set_id(self, id: str) -> Result[Self, str]:
         if id == "":
             return Err("ID cannot be empty!")
-        self.id = id
+        self.employee_id = id
         return Ok(self)
 
     def set_phone(self, phone: str) -> Result[Self, str]:
@@ -89,7 +89,7 @@ class Employee(BaseModel):
         data = textwrap.dedent(f"""\
             - Name: {self.name}
             - DoB: {self.dob}
-            - ID: {self.id}
+            - ID: {self.employee_id}
             - Phone: {self.phone}
             - Department ID: {self.department_id}
             - Benefit plans:
@@ -100,3 +100,7 @@ class Employee(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+        allow_population_by_field_name = True
+        json_encoders = {
+            ObjectId: str
+        }

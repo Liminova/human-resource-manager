@@ -33,6 +33,22 @@ Everything else can be ran under the environment managed by `pipenv` by:
 $ pipenv run <command>
 ```
 
+Fill out `.env` using `.env.example` as a base.
+
+Afterwards, either use:
+
+```shell
+$ pipenv run python main.py
+```
+
+or:
+
+```shell
+$ pnpm launch
+```
+
+to start the program.
+
 ## Contributing
 
 Check out the [Contributing Guide](CONTRIBUTING.md) to get started.

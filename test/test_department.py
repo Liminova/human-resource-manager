@@ -8,7 +8,7 @@ class TestDepartment(unittest.TestCase):
             .set_id("SLP").unwrap()
 
         self.assertEqual(department.name, "Sleep")
-        self.assertEqual(department.id, "SLP")
+        self.assertEqual(department.dept_id, "SLP")
         self.assertEqual(department.members, [])
 
     def test_mutate_department(self):

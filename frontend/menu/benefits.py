@@ -1,11 +1,16 @@
 from __future__ import annotations
 import sys
+import os
+
 from ..helpers import *
 from models import BenefitPlan
+from database.mongo import benefit_repo, employee_repo
+
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
 else:
     from typing_extensions import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from ...models.company import Company
 
@@ -61,6 +66,8 @@ class MenuBenefits:
 
         # add the benefit plan to the company
         benefits.append(benefit)
+        if os.getenv("HRMGR_DB") == "TRUE":
+            benefit_repo.insert_one(benefit.dict(by_alias=True))
 
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} added successfully!"
 
@@ -69,7 +76,7 @@ class MenuBenefits:
         benefits = self.__company.benefits
 
         # a list containing the string representation of each employee
-        employee_items = [f"{employee.name} ({employee.id})" for employee in employees]
+        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in employees]
 
         # get the index of the employee selected by the user
         employee_index_selected = get_user_option_from_list("Select an employee to apply benefit plan to", employee_items)
@@ -94,7 +101,19 @@ class MenuBenefits:
 
         # apply the benefit to the employee
         employee.benefits.append(benefit)
+        if os.getenv("HRMGR_DB") == "TRUE":
+            employee_repo.update_one(
+                { "_id": employee.id },
+                { "$set": employee.dict(include={"benefits"}) },
+                upsert=True,
+            )
         benefit.enrolled_employees.append(employee)
+        if os.getenv("HRMGR_DB") == "TRUE":
+            benefit_repo.update_one(
+                { "_id": benefit.id },
+                { "$set": benefit.dict(include={"enrolled_employees"}) },
+                upsert=True,
+            )
 
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} applied to employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} successfully!"
 
@@ -117,10 +136,18 @@ class MenuBenefits:
         for employee in employees:
             if benefit in employee.benefits:
                 employee.benefits.remove(benefit)
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one(
+                        { "_id": employee.id },
+                        { "$set": employee.dict(include={"benefits"}) },
+                        upsert=True,
+                    )
 
         # remove the benefit from the company's list of benefits
         # benefits.pop(benefit_index_selected)
         benefits.remove(benefit)
+        if os.getenv("HRMGR_DB") == "TRUE":
+            benefit_repo.delete_one({ "_id": benefit.id })
 
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} removed successfully!"
 
@@ -146,6 +173,13 @@ class MenuBenefits:
         ]
         for (field, setter) in fields_data:
             loop_til_valid_input(field, setter)
+
+        if os.getenv("HRMGR_DB") == "TRUE":
+            benefit_repo.update_one(
+                { "_id": benefit.id },
+                { "$set": benefit.dict(exclude={"id"}, by_alias=True) },
+                upsert=True,
+            )
 
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} updated successfully!"
 

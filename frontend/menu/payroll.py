@@ -41,7 +41,8 @@ class MenuPayroll:
                 case _: return True, ""
 
     def __create(self) -> str:
-        if self.__employee.payroll != None:
+        payroll = self.__employee.payroll
+        if payroll.salary != 0 or payroll.bonus != 0 or payroll.tax != 0 or payroll.punish != 0:
             return f"Employee {FCOLORS.GREEN}{self.__employee.name}{FCOLORS.END} already has a payroll!"
 
         clrscr()
@@ -66,7 +67,7 @@ class MenuPayroll:
 
     def __update(self) -> str:
         payroll = self.__employee.payroll
-        if payroll is None:
+        if payroll.salary == 0 and payroll.bonus == 0 and payroll.tax == 0 and payroll.punish == 0:
             return f"Employee {FCOLORS.GREEN}{self.__employee.name}{FCOLORS.END} has no payroll!"
 
         clrscr()

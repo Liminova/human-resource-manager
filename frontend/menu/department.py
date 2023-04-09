@@ -1,11 +1,16 @@
 from __future__ import annotations
 import sys
+import os
+
 from ..helpers import *
 from models import Department
+from database.mongo import department_repo, employee_repo
+
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
 else:
     from typing_extensions import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from ...models.company import Company
 
@@ -41,7 +46,7 @@ class MenuDepartment:
                 case 2: last_msg = self.__remove()
                 case 3: last_msg = self.__update()
                 case 4: last_msg = self.__view()
-                case 5: listing("Departments", [f"{dept.name} ({dept.id})" for dept in depts])
+                case 5: listing("Departments", [f"{dept.name} ({dept.dept_id})" for dept in depts])
                 case 6: return True, ""
                 case _: continue
 
@@ -53,6 +58,9 @@ class MenuDepartment:
         loop_til_valid_input("Enter department name: ", dept.set_name)
         loop_til_valid_input("Enter department ID: ", dept.set_id)
 
+        if os.getenv("HRMGR_DB") == "TRUE":
+            department_repo.insert_one(dept.dict(by_alias=True))
+
         # add the department to the company
         self.__company.departments.append(dept)
         return f"Department {FCOLORS.GREEN}{dept.name}{FCOLORS.END} added successfully!"
@@ -62,15 +70,25 @@ class MenuDepartment:
         employees = self.__company.employees
 
         # a list containing the string representation of each department
-        dept_items = [f"{dept.name} ({dept.id})" for dept in self.__company.departments]
+        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments]
         dept_selected_index = get_user_option_from_list("Select a department to remove", dept_items)
+        dept = depts[dept_selected_index - 1]
         if dept_selected_index == -1:
             return ""
 
         # remove the department from whatever employee it's applied to
         for employee in employees:
-            if employee.department == depts[dept_selected_index]:
-                employee.set_department(None)
+            if employee.department_id == depts[dept_selected_index].id:
+                employee.department_id = ""
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one(
+                        { "_id": employee.id },
+                        { "$set": employee.dict(exclude={"id"}, by_alias=True) },
+                        upsert=True,
+                    )
+
+        if os.getenv("HRMGR_DB") == "TRUE":
+            department_repo.delete_one({ "_id": dept.id })
 
         depts.pop(dept_selected_index)
         return "Department removed successfully!"
@@ -79,7 +97,7 @@ class MenuDepartment:
         depts = self.__company.departments
 
         # a list containing the string representation of each department
-        dept_items = [f"{dept.name} ({dept.id})" for dept in self.__company.departments]
+        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments]
 
         # get the index of the department to update
         dept_selected_index = get_user_option_from_list("Select a department to update", dept_items)
@@ -87,18 +105,26 @@ class MenuDepartment:
             return ""
 
         # get the department object to update
-        dept = depts[dept_selected_index]
+        dept = depts[dept_selected_index - 1]
 
         # re-assign the department name and ID
         loop_til_valid_input("Enter department name: ", dept.set_name)
         loop_til_valid_input("Enter department ID: ", dept.set_id)
+
+        if os.getenv("HRMGR_DB") == "TRUE":
+            department_repo.update_one(
+                { "_id": dept.id },
+                { "$set": dept.dict(exclude={"id"}, by_alias=True) },
+                upsert=True
+            )
+
         return f"Department {FCOLORS.GREEN}{dept.name}{FCOLORS.END} updated successfully!"
 
     def __view(self) -> str:
         depts = self.__company.departments
 
         # a list containing the string representation of each department
-        dept_items = [f"{dept.name} ({dept.id})" for dept in self.__company.departments]
+        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments]
 
         # get the index of the department to update
         dept_selected_index = get_user_option_from_list("Select a department to view info", dept_items)
