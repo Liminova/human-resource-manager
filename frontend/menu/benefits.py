@@ -76,7 +76,7 @@ class MenuBenefits:
         benefits = self.__company.benefits
 
         # a list containing the string representation of each employee
-        employee_items = [f"{employee.name} ({employee.id})" for employee in employees]
+        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in employees]
 
         # get the index of the employee selected by the user
         employee_index_selected = get_user_option_from_list("Select an employee to apply benefit plan to", employee_items)

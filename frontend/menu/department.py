@@ -46,7 +46,7 @@ class MenuDepartment:
                 case 2: last_msg = self.__remove()
                 case 3: last_msg = self.__update()
                 case 4: last_msg = self.__view()
-                case 5: listing("Departments", [f"{dept.name} ({dept.id})" for dept in depts])
+                case 5: listing("Departments", [f"{dept.name} ({dept.dept_id})" for dept in depts])
                 case 6: return True, ""
                 case _: continue
 
@@ -70,7 +70,7 @@ class MenuDepartment:
         employees = self.__company.employees
 
         # a list containing the string representation of each department
-        dept_items = [f"{dept.name} ({dept.id})" for dept in self.__company.departments]
+        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments]
         dept_selected_index = get_user_option_from_list("Select a department to remove", dept_items)
         dept = depts[dept_selected_index - 1]
         if dept_selected_index == -1:
@@ -97,7 +97,7 @@ class MenuDepartment:
         depts = self.__company.departments
 
         # a list containing the string representation of each department
-        dept_items = [f"{dept.name} ({dept.id})" for dept in self.__company.departments]
+        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments]
 
         # get the index of the department to update
         dept_selected_index = get_user_option_from_list("Select a department to update", dept_items)

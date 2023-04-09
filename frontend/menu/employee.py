@@ -71,7 +71,7 @@ class MenuEmployee:
             loop_til_valid_input(field, setter)
 
         # a list containing the string representation of each department
-        dept_items = [f"{dept.name} ({dept.id})" for dept in self.__company.departments]
+        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments]
 
         # get the index of the department to add the employee to
         dept_index = get_user_option_from_list("Select a department to add the employee to", dept_items)
