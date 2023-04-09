@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 from database.mongo import employee_repo, department_repo, benefit_repo
 
 load_dotenv()
-# from option import Result, Ok, Err
 
 the_company = Company()
 
