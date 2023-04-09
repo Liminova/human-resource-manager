@@ -1,8 +1,10 @@
 from __future__ import annotations
 import sys
+import os
+
 from ..helpers import *
 from models import Employee
-from database.mongo import employee_repo
+from database.mongo import employee_repo, benefit_repo, department_repo
 
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
@@ -86,7 +88,8 @@ class MenuEmployee:
         self.__company.employees.append(employee)
 
         # add employee to mongodb database
-        employee_repo.insert_one(employee.dict(by_alias=True))
+        if os.getenv("HRMGR_DB") == "TRUE":
+            employee_repo.insert_one(employee.dict(by_alias=True))
 
         return f"Employee {employee.name} ({employee.employee_id}) added successfully!"
 
@@ -109,14 +112,27 @@ class MenuEmployee:
         for dept in depts:
             if employee in dept.members:
                 dept.members.remove(employees[employee_index])
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    department_repo.update_one(
+                        { "_id": dept.id },
+                        { "$set": dept.dict(exclude={"id"}, by_alias=True) },
+                        upsert=True
+                    )
 
         # remove from whatever benefit plan they're in
         for benefit in benefits:
             if employee in benefit.enrolled_employees:
                 benefit.enrolled_employees.remove(employees[employee_index])
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    benefit_repo.update_one(
+                        { "_id": benefit.id },
+                        { "$set": benefit.dict(exclude={"id"}, by_alias=True) },
+                        upsert=True
+                    )
 
         # remove from the company
-        employee_repo.delete_one({ "_id": employee.id })
+        if os.getenv("HRMGR_DB") == "TRUE":
+            employee_repo.delete_one({ "_id": employee.id })
         del employees[employee_index - 1]
 
         return f"Employee {employee.name} ({employee.employee_id}) removed successfully!"
@@ -146,11 +162,12 @@ class MenuEmployee:
         for (field, setter) in fields_data:
             loop_til_valid_input(field, setter)
 
-        employee_repo.update_one(
-            { "_id": employee.id },
-            { "$set": employee.dict(exclude={"id"}, by_alias=True) },
-            upsert=True,
-        )
+        if os.getenv("HRMGR_DB") == "TRUE":
+            employee_repo.update_one(
+                { "_id": employee.id },
+                { "$set": employee.dict(exclude={"id"}, by_alias=True) },
+                upsert=True,
+            )
 
         return f"Employee {employee.name} ({employee.employee_id}) updated successfully!"
 

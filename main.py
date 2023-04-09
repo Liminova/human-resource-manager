@@ -1,5 +1,6 @@
 import sys
 import os
+import textwrap
 
 from pymongo.database import Database
 from frontend.helpers import *
@@ -16,6 +17,8 @@ load_dotenv()
 the_company = Company()
 
 def initialize_data():
+    os.environ["HRMGR_DB"] = "TRUE"
+
     if not employee_repo.find({}):
         pass
     else:
@@ -36,7 +39,14 @@ def initialize_data():
 
 def main():
     last_msg = ""
-    initialize_data()
+    if not os.getenv("MONGO_USER") or not os.getenv("MONGO_PASS") or not os.getenv("MONGO_URI"):
+        os.environ["HRMGR_DB"] = "FALSE"
+        input(textwrap.dedent("""\
+            It seems like your environment variables are not set up.
+            The program will now run in memory-only mode.
+            Press any key to continue."""))
+    else:
+        initialize_data()
 
     while True:
         clrscr()

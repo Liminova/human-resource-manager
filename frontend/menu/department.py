@@ -1,12 +1,16 @@
 from __future__ import annotations
 import sys
+import os
+
 from ..helpers import *
 from models import Department
-from database.mongo import department_repo
+from database.mongo import department_repo, employee_repo
+
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
 else:
     from typing_extensions import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from ...models.company import Company
 
@@ -54,7 +58,8 @@ class MenuDepartment:
         loop_til_valid_input("Enter department name: ", dept.set_name)
         loop_til_valid_input("Enter department ID: ", dept.set_id)
 
-        department_repo.insert_one(dept.dict(by_alias=True))
+        if os.getenv("HRMGR_DB") == "TRUE":
+            department_repo.insert_one(dept.dict(by_alias=True))
 
         # add the department to the company
         self.__company.departments.append(dept)
@@ -75,13 +80,16 @@ class MenuDepartment:
         for employee in employees:
             if employee.department_id == depts[dept_selected_index].id:
                 employee.department_id = ""
-                employee_repo.update_one(
-                    { "_id": employee.id },
-                    { "$set": employee.dict(exclude={"id"}, by_alias=True) },
-                    upsert=True,
-                )
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one(
+                        { "_id": employee.id },
+                        { "$set": employee.dict(exclude={"id"}, by_alias=True) },
+                        upsert=True,
+                    )
 
-        department_repo.delete_one({ "_id": dept.id })
+        if os.getenv("HRMGR_DB") == "TRUE":
+            department_repo.delete_one({ "_id": dept.id })
+
         depts.pop(dept_selected_index)
         return "Department removed successfully!"
 
@@ -103,11 +111,12 @@ class MenuDepartment:
         loop_til_valid_input("Enter department name: ", dept.set_name)
         loop_til_valid_input("Enter department ID: ", dept.set_id)
 
-        department_repo.update_one(
-            { "_id": dept.id },
-            { "$set": dept.dict(exclude={"id"}, by_alias=True) },
-            upsert=True
-        )
+        if os.getenv("HRMGR_DB") == "TRUE":
+            department_repo.update_one(
+                { "_id": dept.id },
+                { "$set": dept.dict(exclude={"id"}, by_alias=True) },
+                upsert=True
+            )
 
         return f"Department {FCOLORS.GREEN}{dept.name}{FCOLORS.END} updated successfully!"
 
