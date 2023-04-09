@@ -68,7 +68,7 @@ class MenuPayroll:
     def __update(self) -> str:
         payroll = self.__employee.payroll
         if payroll.salary == 0 and payroll.bonus == 0 and payroll.tax == 0 and payroll.punish == 0:
-                return f"Employee {FCOLORS.GREEN}{self.__employee.name}{FCOLORS.END} has no payroll!"
+            return f"Employee {FCOLORS.GREEN}{self.__employee.name}{FCOLORS.END} has no payroll!"
 
         clrscr()
         print(f"== Updating payroll for employee {FCOLORS.GREEN}{self.__employee.name}{FCOLORS.END} ==")
