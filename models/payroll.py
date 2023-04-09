@@ -1,7 +1,9 @@
+from __future__ import annotations
 import sys
 from option import Result, Ok, Err
 import textwrap
 from pydantic import BaseModel, Field
+
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
 else:
@@ -17,17 +19,20 @@ class Payroll(BaseModel):
     punish: int = Field(default_factory=int)
     total: int = Field(default_factory=int)
 
-    def set_salary(self, salary: int) -> Result[Self, str]:
+    def set_salary(self, salary: str) -> Result[Self, str]:
+        salary = int(salary)
         self.salary = salary
         self.calculate_total()
         return Ok(self) if salary >= 0 else Err("Salary cannot be negative.")
 
-    def set_bonus(self, bonus: int) -> Result[Self, str]:
+    def set_bonus(self, bonus: str) -> Result[Self, str]:
+        bonus = int(bonus)
         self.bonus = bonus
         self.calculate_total()
         return Ok(self) if bonus >= 0 else Err("Bonus cannot be negative.")
 
-    def set_tax(self, tax: int) -> Result[Self, str]:
+    def set_tax(self, tax: str) -> Result[Self, str]:
+        tax = int(tax)
         self.tax = tax
         self.calculate_total()
         return Ok(self) if tax >= 0 else Err("Tax cannot be negative.")
@@ -50,7 +55,8 @@ class Payroll(BaseModel):
             employees[i].payroll.set_bonus(0)
         return None
 
-    def set_punish(self, punish: int) -> Result[Self, str]:
+    def set_punish(self, punish: str) -> Result[Self, str]:
+        punish = int(punish)
         self.punish = punish
         self.calculate_total()
         return Ok(self) if punish >= 0 else Err("Punish cannot be negative.")
