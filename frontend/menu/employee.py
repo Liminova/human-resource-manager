@@ -146,7 +146,11 @@ class MenuEmployee:
         for (field, setter) in fields_data:
             loop_til_valid_input(field, setter)
 
-        employee_repo.update_one({ "_id": employee.id }, employee.dict(exclude={"id"}, by_alias=True))
+        employee_repo.update_one(
+            { "_id": employee.id },
+            { "$set": employee.dict(exclude={"id"}, by_alias=True) },
+            upsert=True,
+        )
 
         return f"Employee {employee.name} ({employee.employee_id}) updated successfully!"
 

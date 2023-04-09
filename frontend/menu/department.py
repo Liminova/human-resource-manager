@@ -93,12 +93,17 @@ class MenuDepartment:
 
         # get the department object to update
         dept = depts[dept_selected_index - 1]
-        
-        department_repo.update_one({ "_id": dept.id }, dept.dict(exclude={"id"}, by_alias=True))
 
         # re-assign the department name and ID
         loop_til_valid_input("Enter department name: ", dept.set_name)
         loop_til_valid_input("Enter department ID: ", dept.set_id)
+
+        department_repo.update_one(
+            { "_id": dept.id },
+            { "$set": dept.dict(exclude={"id"}, by_alias=True) },
+            upsert=True
+        )
+
         return f"Department {FCOLORS.GREEN}{dept.name}{FCOLORS.END} updated successfully!"
 
     def __view(self) -> str:

@@ -96,9 +96,17 @@ class MenuBenefits:
 
         # apply the benefit to the employee
         employee.benefits.append(benefit)
-        employee_repo.update_one({ "_id": employee.id }, employee.dict(include={"benefits"}))
+        employee_repo.update_one(
+            { "_id": employee.id },
+            { "$set": employee.dict(include={"benefits"}) },
+            upsert=True,
+        )
         benefit.enrolled_employees.append(employee)
-        benefit_repo.update_one({ "_id": benefit.id }, benefit.dict(include={"enrolled_employees"}))
+        benefit_repo.update_one(
+            { "_id": benefit.id },
+            { "$set": benefit.dict(include={"enrolled_employees"}) },
+            upsert=True,
+        )
 
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} applied to employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} successfully!"
 
@@ -121,7 +129,11 @@ class MenuBenefits:
         for employee in employees:
             if benefit in employee.benefits:
                 employee.benefits.remove(benefit)
-                employee_repo.update_one({ "_id": employee.id }, employee.dict(include={"benefits"}))
+                employee_repo.update_one(
+                    { "_id": employee.id },
+                    { "$set": employee.dict(include={"benefits"}) },
+                    upsert=True,
+                )
 
         # remove the benefit from the company's list of benefits
         # benefits.pop(benefit_index_selected)
@@ -153,7 +165,11 @@ class MenuBenefits:
         for (field, setter) in fields_data:
             loop_til_valid_input(field, setter)
 
-        benefit_repo.update_one({ "_id": benefit.id }, benefit.dict(exclude={"id"}, by_alias=True))
+        benefit_repo.update_one(
+            { "_id": benefit.id },
+            { "$set": benefit.dict(exclude={"id"}, by_alias=True) },
+            upsert=True,
+        )
 
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} updated successfully!"
 
