@@ -73,8 +73,8 @@ class MenuDepartment:
 
         # remove the department from whatever employee it's applied to
         for employee in employees:
-            if employee.department == depts[dept_selected_index]:
-                employee.set_department(None)
+            if employee.department_id == depts[dept_selected_index].id:
+                employee.department_id = ""
 
         department_repo.delete_one({ "_id": dept.id })
         depts.pop(dept_selected_index)
