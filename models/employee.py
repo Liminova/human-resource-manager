@@ -13,9 +13,6 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import Self, TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from .company import Company
-
 from .attendance_check import Attendance
 from .benefits import BenefitPlan
 from .payroll import Payroll

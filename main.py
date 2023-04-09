@@ -2,12 +2,9 @@ import sys
 import os
 import textwrap
 
-from pymongo.database import Database
 from frontend.helpers import *
 from frontend.menu import *
 from models import Company, BenefitPlan, Department, Employee
-from database import mongo
-from pymongo import MongoClient
 from dotenv import load_dotenv
 from database.mongo import employee_repo, department_repo, benefit_repo
 
