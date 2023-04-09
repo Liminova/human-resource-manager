@@ -75,6 +75,11 @@ class MenuDepartment:
         for employee in employees:
             if employee.department_id == depts[dept_selected_index].id:
                 employee.department_id = ""
+                employee_repo.update_one(
+                    { "_id": employee.id },
+                    { "$set": employee.dict(exclude={"id"}, by_alias=True) },
+                    upsert=True,
+                )
 
         department_repo.delete_one({ "_id": dept.id })
         depts.pop(dept_selected_index)
