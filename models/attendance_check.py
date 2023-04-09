@@ -71,6 +71,7 @@ class Attendance(BaseModel):
             date = datetime.strptime(date, "%Y-%m-%d")
             if date.year not in years:
                 years.append(date.year)
+        return years
 
     def get_report(self, year: datetime) -> str:
         """Get the attendance report for a specific year."""
