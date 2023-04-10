@@ -9,9 +9,9 @@ from database import PyObjectId
 from bson.objectid import ObjectId
 
 if sys.version_info >= (3, 11):
-    from typing import Self, TYPE_CHECKING
+    from typing import Self
 else:
-    from typing_extensions import Self, TYPE_CHECKING
+    from typing_extensions import Self
 
 from .attendance_check import Attendance
 from .benefits import BenefitPlan
