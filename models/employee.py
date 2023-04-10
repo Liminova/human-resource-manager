@@ -66,10 +66,6 @@ class Employee(BaseModel):
         self.phone = phone
         return Ok(self) if phone else Err("Phone number cannot be empty!")
 
-    def set_department(self, department: str) -> Result[Self, str]:
-        self.department_id = department
-        return Ok(self)
-
     def set_payroll(self, payroll: Payroll) -> Result[Self, str]:
         self.payroll = payroll
         return Ok(self)
