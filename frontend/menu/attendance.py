@@ -33,6 +33,7 @@ class MenuAttendance:
         # get the employee object from the index
         self.__employee = employees[selected_employee_index]
         self.__attendances = self.__employee.attendance
+        self.__payroll = self.__employee.payroll
 
         last_msg = ""
         while True:
@@ -63,6 +64,8 @@ class MenuAttendance:
             if not is_presence:
                 reason = input("Enter reason for absent: ")
                 self.__attendances.add_absent_day(date, reason).unwrap()
+                self.__payroll.set_punish(10)
+
         except (ValueError, TypeError) as e:
             return str(e)
         return ""
@@ -87,6 +90,7 @@ class MenuAttendance:
             if not is_presence:
                 reason = input("Enter reason for absent: ")
                 self.__attendances.add_absent_day(date, reason).unwrap()
+                self.__payroll.set_punish(10)
         except (ValueError, TypeError) as e:
             return str(e)
         return ""
