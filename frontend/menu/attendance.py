@@ -73,7 +73,7 @@ class MenuAttendance:
     def __update(self) -> str:
         date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
         try:
-            # try to parse the date, if it fails, use today's date
+            # parse the date, if the date is empty, use today's date
             date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
 
             # check if attendance exists for that date
