@@ -15,8 +15,6 @@ class MenuPayroll:
 
     def start(self) -> tuple[bool, str]:
         employees = self.__company.employees
-        if not employees:
-            return False, "No employees to manage payroll for!"
 
         selected_employee_index = get_user_option_from_list("Select an employee to manage payroll for", [f"{employee.name} ({employee.id})" for employee in employees])
         if selected_employee_index == -1:

@@ -18,10 +18,6 @@ class MenuAttendance:
     def start(self) -> tuple[bool, str]:
         employees = self.__company.employees
 
-        # check if there are any employees to manage attendance for
-        if not employees:
-            return False, "No employees to manage attendance for!"
-
         # a list containing the string representation of each employee
         employee_items = [f"{employee.name} ({employee.id})" for employee in employees]
 
