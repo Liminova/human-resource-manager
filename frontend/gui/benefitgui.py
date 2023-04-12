@@ -3,119 +3,165 @@ from customtkinter import *
 from models import BenefitPlan
 from typing import List, Tuple, Callable, Any
 
-class BenefitGUI:
-    def __init__(self, company: Company):
-        self.__company = company
-        self.__benefits = company.benefits
+class BenefitGUI(ctk.CTk):
+    def __init__(self, master = None):
+        super().__init__()
 
-    def start(self) -> Tuple[bool, str]:
-        self.__root = Tk()
-        self.__root.title("Benefit Plan Management")
-        self.__root.geometry("500x500")
-        self.__root.resizable(False, False)
+        self.title("Benefit Plan Management")
+        self.geometry(f"{Width}x{Height}")
+        self.resizable(True, True)
 
-        self.__frame = Frame(self.__root)
-        self.__frame.pack(fill=BOTH, expand=True)
+        self.frame1 = ctk.CTkFrame(master=self, width=325, height=700, corner_radius=10)
+        self.frame1.pack(padx = 10, pady = 10, side = tkinter.LEFT)
 
-        self.__main_menu = [
-            ("Add benefit plan", self.__add),
-            ("Apply benefit plan to employee", self.__apply),
-            ("Remove benefit plan", self.__remove),
-            ("Update benefit plan", self.__update),
-            ("View benefit plan", self.__view),
-            ("Exit", self.__exit),
-        ]
+        self.label = ctk.CTkLabel(master=self.frame1, text="Index", font=("Century Gothic", 25, "bold"))
+        self.label.place(relx=0.5, rely=0.085, anchor=tkinter.CENTER)
 
-        self.__last_msg = ""
-        self.__last_msg_label = Label(self.__frame, text=self.__last_msg)
-        self.__last_msg_label.pack()
+        def button_size(button):
+            button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
 
-        self.__buttons = []
-        for text, command in self.__main_menu:
-            button = Button(self.__frame, text=text, command=command)
-            button.pack(fill=X, expand=True)
-            self.__buttons.append(button)
+        # Bind the button1 to frame3
+        self.button1 = ctk.CTkButton(master=self.frame1, text="Add Benefit Plan", command=self.add_benefit_plan)
+        button_size(self.button1)
+        self.button1.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
 
-        self.__root.mainloop()
+        self.button2 = ctk.CTkButton(master=self.frame1, text="Remove Benefit Plan")
+        button_size(self.button2)
+        self.button2.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
 
-    def __add(self) -> None:
-        self.__root.destroy()
-        self.__root = Tk()
-        self.__root.title("Add Benefit Plan")
-        self.__root.geometry("500x500")
-        self.__root.resizable(False, False)
+        self.button3 = ctk.CTkButton(master=self.frame1, text="Update Benefit Plan")
+        button_size(self.button3)
+        self.button3.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
 
-        self.__frame = Frame(self.__root)
-        self.__frame.pack(fill=BOTH, expand=True)
+        self.button4 = ctk.CTkButton(master=self.frame1, text="View Benefit Plan")
+        button_size(self.button4)
+        self.button4.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
 
-        self.__last_msg = ""
-        self.__last_msg_label = Label(self.__frame, text=self.__last_msg)
-        self.__last_msg_label.pack()
+        self.button5 = ctk.CTkButton(master=self.frame1, text="Apply benefit plan to employee")
+        button_size(self.button5)
+        self.button5.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
 
-        self.__input_fields = [
-            ("Enter benefit plan name: ", self.__set_name),
-            ("Enter benefit plan description: ", self.__set_description),
-            ("Enter benefit plan cost: ", self.__set_cost),
-        ]
+        self.button6 = ctk.CTkButton(master=self.frame1, text="Exit")
+        button_size(self.button6)
+        self.button6.place(relx=0.5, rely=0.7, anchor=tkinter.CENTER)
 
-        self.__input_entries = []
-        for prompt, _ in self.__input_fields:
-            entry = Entry(self.__frame)
-            entry.pack(fill=X, expand=True)
-            self.__input_entries.append(entry)
+        # Create second frame
+        self.frame2 = ctk.CTkFrame(master=self, width=900, height=700, corner_radius=10)
+        self.frame2.pack(padx = 10, pady = 10, side = tkinter.RIGHT)
 
-        self.__buttons = []
-        for text, command in [
-            ("Add", self.__add_benefit),
-            ("Back", self.__back),
-        ]:
-            button = Button(self.__frame, text=text, command=command)
-            button.pack(fill=X, expand=True)
-            self.__buttons.append(button)
+        # Display on the second frame
+        self.label = ctk.CTkLabel(master=self.frame2, text="Benefit Plan Management", font=("Century Gothic", 25, "bold"))
+        self.label.place(relx=0.5, rely=0.045, anchor=tkinter.CENTER)
 
-    def __set_name(self, name: str) -> None:
-        self.__name = name
+        # add benefit plan
+        def add_benefit_plan(self):
+            self.frame3 = ctk.CTkFrame(master=self.frame2, width=900, height=700, corner_radius=10)
+            self.frame3.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
 
-    def __set_description(self, description: str) -> None:
-        self.__description = description
+            self.label = ctk.CTkLabel(master=self.frame3, text="Add Benefit Plan", font=("Century Gothic", 25, "bold"))
+            self.label.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
 
-    def __set_cost(self, cost: str) -> None:
-        self.__cost = cost
+            self.label = ctk.CTkLabel(master=self.frame3, text="Benefit Plan Name", font=("Century Gothic", 20, "bold"))
+            self.label.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
 
-    def __add_benefit(self) -> None:
-        for entry, (prompt, setter) in zip(self.__input_entries, self.__input_fields):
-            try:
-                setter(entry.get())
-            except ValueError:
-                self.__last_msg = f"Invalid input for {prompt}"
-                self.__last_msg_label["text"] = self.__last_msg
-                return
+            self.entry = ctk.CTkEntry(master=self.frame3, width=30, font=("Century Gothic", 20))
+            self.entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
 
-        benefit = BenefitPlan()
-        benefit.set_name(self.__name)
-        benefit.set_description(self.__description)
-        benefit.set_cost(self.__cost)
-        self.__benefits.append(benefit)
+            self.label = ctk.CTkLabel(master=self.frame3, text="Benefit Plan Description", font=("Century Gothic", 20, "bold"))
+            self.label.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
 
-        self.__last_msg = "Benefit plan added!"
-        self.__last_msg_label["text"] = self.__last_msg
+            self.entry = ctk.CTkEntry(master=self.frame3, width=30, font=("Century Gothic", 20))
+            self.entry.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
 
-    def __apply(self) -> None:
-        pass
+            self.button = ctk.CTkButton(master=self.frame3, text="Add", command=self.add)
+            self.button.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
 
-    def __remove(self) -> None:
-        pass
+            self.button = ctk.CTkButton(master=self.frame3, text="Back", command=self.back)
+            self.button.place(relx=0.5, rely=0.7, anchor=tkinter.CENTER)
 
-    def __update(self) -> None:
-        pass
+        # remove benefit plan
+        def remove_benefit_plan(self):
+            self.frame3 = ctk.CTkFrame(master=self.frame2, width=900, height=700, corner_radius=10)
+            self.frame3.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
 
-    def __view(self) -> None:
-        pass
+            self.label = ctk.CTkLabel(master=self.frame3, text="Remove Benefit Plan", font=("Century Gothic", 25, "bold"))
+            self.label.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
 
-    def __exit(self) -> None:
-        self.__root.destroy()
+            self.label = ctk.CTkLabel(master=self.frame3, text="Benefit Plan Name", font=("Century Gothic", 20, "bold"))
+            self.label.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
 
-    def __back(self) -> None:
-        self.__root.destroy()
-        self.start()
+            self.entry = ctk.CTkEntry(master=self.frame3, width=30, font=("Century Gothic", 20))
+            self.entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Remove", command=self.remove)
+            self.button.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Back", command=self.back)
+            self.button.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+        # update benefit plan
+        def update_benefit_plan(self):
+            self.frame3 = ctk.CTkFrame(master=self.frame2, width=900, height=700, corner_radius=10)
+            self.frame3.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="Update Benefit Plan", font=("Century Gothic", 25, "bold"))
+            self.label.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="Benefit Plan Name", font=("Century Gothic", 20, "bold"))
+            self.label.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
+
+            self.entry = ctk.CTkEntry(master=self.frame3, width=30, font=("Century Gothic", 20))
+            self.entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Update", command=self.update)
+            self.button.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Back", command=self.back)
+            self.button.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+        # view benefit plan
+        def view_benefit_plan(self):
+            self.frame3 = ctk.CTkFrame(master=self.frame2, width=900, height=700, corner_radius=10)
+            self.frame3.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="View Benefit Plan", font=("Century Gothic", 25, "bold"))
+            self.label.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="Benefit Plan Name", font=("Century Gothic", 20, "bold"))
+            self.label.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
+
+            self.entry = ctk.CTkEntry(master=self.frame3, width=30, font=("Century Gothic", 20))
+            self.entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="View", command=self.view)
+            self.button.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Back", command=self.back)
+            self.button.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+        # add benefit plan
+        def add(self):
+            pass
+
+        # remove benefit plan
+        def remove(self):
+            pass
+
+        # update benefit plan
+        def update(self):
+            pass
+
+        # view benefit plan
+        def view(self):
+            pass
+
+        # back
+        def back(self):
+            self.frame3.destroy()
+
+if __name__ == "__main__":
+    app = BenefitGUI()
+    app.mainloop()
+
+
 
