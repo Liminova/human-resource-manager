@@ -28,9 +28,9 @@ class MenuPayroll:
                 print(last_msg)
                 last_msg = ""
             payroll_menu = [
-                "[1] Create payroll",
-                "[2] Update payroll",
-                "[else] Exit"
+                "[1] Create",
+                "[2] Update",
+                "[else] Back"
             ]
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:
@@ -39,8 +39,7 @@ class MenuPayroll:
                 case _: return True, ""
 
     def __create(self) -> str:
-        payroll = self.__employee.payroll
-        if payroll.salary != 0:
+        if self.__employee.payroll.total != 0:
             return f"Employee {FCOLORS.GREEN}{self.__employee.name}{FCOLORS.END} already has a payroll!"
 
         clrscr()
@@ -51,13 +50,14 @@ class MenuPayroll:
 
         # assigning values to the payroll object
         fields_data = [
-            ("Enter payroll salary: ", payroll.set_salary),
-            ("Enter payroll bonus: ", payroll.set_bonus),
-            ("Enter payroll tax: ", payroll.set_tax),
-            ("Enter payroll punishment: ", payroll.set_punish)
+            ("Enter payroll salary", payroll.set_salary),
+            ("Enter payroll bonus", payroll.set_bonus),
+            ("Enter payroll tax", payroll.set_tax),
+            ("Enter payroll punishment", payroll.set_punish)
         ]
         for (field, setter) in fields_data:
-            loop_til_valid_input(field, setter)
+            if (msg := loop_til_valid_input(field, setter)) != "":
+                return msg
 
         # add the payroll object to the employee
         self.__employee.payroll = payroll
@@ -73,12 +73,13 @@ class MenuPayroll:
 
         # assigning values to the payroll object
         fields_data = [
-            ("Enter payroll salary: ", payroll.set_salary),
-            ("Enter payroll bonus: ", payroll.set_bonus),
-            ("Enter payroll tax: ", payroll.set_tax),
-            ("Enter payroll punishment: ", payroll.set_punish)
+            ("Enter payroll salary", payroll.set_salary),
+            ("Enter payroll bonus", payroll.set_bonus),
+            ("Enter payroll tax", payroll.set_tax),
+            ("Enter payroll punishment", payroll.set_punish)
         ]
         for (field, setter) in fields_data:
-            loop_til_valid_input(field, setter)
+            if (msg := loop_til_valid_input(field, setter)) != "":
+                return msg
 
         return f"Payroll for employee {FCOLORS.GREEN}{self.__employee.name}{FCOLORS.END} updated successfully!"

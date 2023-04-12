@@ -4,7 +4,7 @@ import os
 
 from ..helpers import *
 from models import Employee
-from database.mongo import employee_repo, benefit_repo, department_repo
+from database.mongo import employee_repo, benefit_repo, department_repo # type: ignore
 
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
@@ -33,11 +33,11 @@ class MenuEmployee:
                 last_msg = ""
 
             employee_menu = [
-                "[1] Add employee",
-                "[2] Remove employee",
-                "[3] Update employee",
-                "[4] View employee",
-                "[5] View all employees",
+                "[1] Add",
+                "[2] Remove",
+                "[3] Update information",
+                "[4] View details of one",
+                "[5] List all",
                 "[6] Back",
             ]
             choice = get_user_option_from_menu("Employee management", employee_menu)
@@ -61,14 +61,15 @@ class MenuEmployee:
 
         # get user input for employee name, date of birth, ID, phone number, and email
         fields_data = [
-            ("Enter employee name: ", employee.set_name),
-            ("Enter employee date of birth (YYYY-MM-DD): ", employee.set_dob),
-            ("Enter employee ID: ", employee.set_id),
-            ("Enter employee phone number: ", employee.set_phone),
-            ("Enter employee email: ", employee.set_email),
+            ("Enter employee name", employee.set_name),
+            ("Enter employee date of birth (YYYY-MM-DD)", employee.set_dob),
+            ("Enter employee ID", employee.set_id),
+            ("Enter employee phone number", employee.set_phone),
+            ("Enter employee email", employee.set_email),
         ]
         for (field, setter) in fields_data:
-            loop_til_valid_input(field, setter)
+            if (msg := loop_til_valid_input(field, setter)) != "":
+                return msg
 
         # a list containing the string representation of each department
         dept_items = [f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments]
@@ -96,7 +97,7 @@ class MenuEmployee:
 
         # add employee to mongodb database
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.insert_one(employee.dict(by_alias=True))
+            employee_repo.insert_one(employee.dict(by_alias=True)) # type: ignore
 
         return f"Employee {employee.name} ({employee.employee_id}) added successfully!"
 
@@ -160,14 +161,15 @@ class MenuEmployee:
 
         # get the new data
         fields_data = [
-            ("Enter employee name: ", employee.set_name),
-            ("Enter employee date of birth (YYYY-MM-DD): ", employee.set_dob),
-            ("Enter employee ID: ", employee.set_id),
-            ("Enter employee phone number: ", employee.set_phone),
-            ("Enter employee email: ", employee.set_email),
+            ("Enter employee name", employee.set_name),
+            ("Enter employee date of birth (YYYY-MM-DD)", employee.set_dob),
+            ("Enter employee ID", employee.set_id),
+            ("Enter employee phone number", employee.set_phone),
+            ("Enter employee email", employee.set_email),
         ]
         for (field, setter) in fields_data:
-            loop_til_valid_input(field, setter)
+            if (msg := loop_til_valid_input(field, setter)) != "":
+                return msg
 
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one(

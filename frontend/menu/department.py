@@ -4,7 +4,7 @@ import os
 
 from ..helpers import *
 from models import Department
-from database.mongo import department_repo, employee_repo
+from database.mongo import department_repo, employee_repo # type: ignore
 
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
@@ -28,11 +28,11 @@ class MenuDepartment:
                 print(last_msg)
                 last_msg = ""
             department_menu = [
-                "[1] Add department",
-                "[2] Remove department",
-                "[3] Update department",
-                "[4] View department",
-                "[5] View all departments",
+                "[1] Add",
+                "[2] Remove",
+                "[3] Update information for one",
+                "[4] View details of one",
+                "[5] List all",
                 "[6] Back",
             ]
 
@@ -55,11 +55,13 @@ class MenuDepartment:
         dept = Department()
 
         # get user input for department name and ID
-        loop_til_valid_input("Enter department name: ", dept.set_name)
-        loop_til_valid_input("Enter department ID: ", dept.set_id)
+        if (msg := loop_til_valid_input("Enter department name", dept.set_name)) != "":
+            return msg
+        if (msg := loop_til_valid_input("Enter department ID", dept.set_id)) != "":
+            return msg
 
         if os.getenv("HRMGR_DB") == "TRUE":
-            department_repo.insert_one(dept.dict(by_alias=True))
+            department_repo.insert_one(dept.dict(by_alias=True)) # type: ignore
 
         # add the department to the company
         self.__company.departments.append(dept)
@@ -108,8 +110,10 @@ class MenuDepartment:
         dept = depts[dept_selected_index - 1]
 
         # re-assign the department name and ID
-        loop_til_valid_input("Enter department name: ", dept.set_name)
-        loop_til_valid_input("Enter department ID: ", dept.set_id)
+        if (msg := loop_til_valid_input("Enter department name", dept.set_name)) != "":
+            return msg
+        if (msg := loop_til_valid_input("Enter department ID", dept.set_id)) != "":
+            return msg
 
         if os.getenv("HRMGR_DB") == "TRUE":
             department_repo.update_one(

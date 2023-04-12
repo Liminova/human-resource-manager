@@ -6,7 +6,7 @@ from frontend.helpers import *
 from frontend.menu import *
 from models import Company, BenefitPlan, Department, Employee
 from dotenv import load_dotenv
-from database.mongo import employee_repo, department_repo, benefit_repo
+from database.mongo import employee_repo, department_repo, benefit_repo # type: ignore
 
 load_dotenv()
 
@@ -18,22 +18,22 @@ def initialize_data():
     if not employee_repo.find({}):
         pass
     else:
-        for employee in employee_repo.find({}):
+        for employee in employee_repo.find({}): # type: ignore
             the_company.employees.append(Employee.parse_obj(employee))
 
     if not department_repo.find({}):
         pass
     else:
-        for department in department_repo.find({}):
+        for department in department_repo.find({}): # type: ignore
             the_company.departments.append(Department.parse_obj(department))
 
     if not benefit_repo.find({}):
         pass
     else:
-        for benefit in benefit_repo.find({}):
+        for benefit in benefit_repo.find({}): # type: ignore
             the_company.benefits.append(BenefitPlan.parse_obj(benefit))
 
-def main():
+def main_tui():
     last_msg = ""
     if not os.getenv("MONGO_USER") or not os.getenv("MONGO_PASS") or not os.getenv("MONGO_URI"):
         os.environ["HRMGR_DB"] = "FALSE"
@@ -80,6 +80,6 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        main_tui()
     except KeyboardInterrupt:
         sys.exit(0)

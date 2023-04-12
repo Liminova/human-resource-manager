@@ -4,7 +4,7 @@ import os
 
 from ..helpers import *
 from models import BenefitPlan
-from database.mongo import benefit_repo, employee_repo
+from database.mongo import benefit_repo, employee_repo # type: ignore
 
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
@@ -28,17 +28,18 @@ class MenuBenefits:
                 print(last_msg)
                 last_msg = ""
             benefit_plan_menu = [
-                "[1] Add benefit plan",
-                "[2] Apply benefit plan to employee",
-                "[3] Remove benefit plan",
-                "[4] Update benefit plan",
-                "[5] View benefit plan",
-                "[6] Exit",
+                "[1] Add",
+                "[2] Apply one to employee",
+                "[3] Remove",
+                "[4] Update",
+                "[5] View details of one",
+                "[6] List all",
+                "[7] Back",
             ]
             choice = get_user_option_from_menu("Benefit plan management", benefit_plan_menu)
 
             if (choice not in [1, 6]) and (not benefits):
-                last_msg = "No benefits available! Please add a benefit plan first."
+                last_msg = "No benefit plan available! Please add a benefit plan first."
                 continue
 
             match choice:
@@ -57,17 +58,18 @@ class MenuBenefits:
 
         # assign values to the benefit plan object
         input_fields = [
-            ("Enter benefit plan name: ", benefit.set_name),
-            ("Enter benefit plan description: ", benefit.set_description),
-            ("Enter benefit plan cost: ", benefit.set_cost),
+            ("Enter benefit plan name", benefit.set_name),
+            ("Enter benefit plan description", benefit.set_description),
+            ("Enter benefit plan cost", benefit.set_cost),
         ]
         for prompt, setter in input_fields:
-            loop_til_valid_input(prompt, setter)
+            if (msg := loop_til_valid_input(prompt, setter)) != "":
+                return msg
 
         # add the benefit plan to the company
         benefits.append(benefit)
         if os.getenv("HRMGR_DB") == "TRUE":
-            benefit_repo.insert_one(benefit.dict(by_alias=True))
+            benefit_repo.insert_one(benefit.dict(by_alias=True)) # type: ignore
 
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} added successfully!"
 
@@ -167,12 +169,13 @@ class MenuBenefits:
 
         # assigning the new values to the benefit object
         fields_data = [
-            ("Enter benefit plan name: ", benefit.set_name),
-            ("Enter benefit plan description: ", benefit.set_description),
-            ("Enter benefit plan cost: ", benefit.set_cost),
+            ("Enter benefit plan name", benefit.set_name),
+            ("Enter benefit plan description", benefit.set_description),
+            ("Enter benefit plan cost", benefit.set_cost),
         ]
         for (field, setter) in fields_data:
-            loop_til_valid_input(field, setter)
+            if (msg := loop_til_valid_input(field, setter)) != "":
+                return msg
 
         if os.getenv("HRMGR_DB") == "TRUE":
             benefit_repo.update_one(
