@@ -69,23 +69,26 @@ class MenuEmployee:
         # a list containing the string representation of each department
         dept_items = [f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments]
 
-        # get the index of the department to add the employee to
-        dept_index = get_user_option_from_list("Select a department to add the employee to", dept_items)
-        dept = self.__company.departments[dept_index]
-        if dept_index == -1:
-            return ""
+        if len(dept_items) > 0:
+            # get the index of the department to add the employee to
+            dept_index = get_user_option_from_list("Select a department to add the employee to", dept_items)
+            dept = self.__company.departments[dept_index]
+            if dept_index == -1:
+                return NO_DEPARTMENT_MSG
+            elif dept_index == -2:
+                return ""
 
-        # add the employee to the department's members
-        dept.members.append(employee)
-        if os.getenv("HRMGR_DB") == "TRUE":
-            department_repo.update_one(
-                { "_id": dept.id },
-                { "$set": dept.dict(exclude={"id"}, by_alias=True) },
-                upsert=True,
-            )
+            # add the employee to the department's members
+            dept.members.append(employee)
+            if os.getenv("HRMGR_DB") == "TRUE":
+                department_repo.update_one(
+                    { "_id": dept.id },
+                    { "$set": dept.dict(exclude={"id"}, by_alias=True) },
+                    upsert=True,
+                )
 
-        # add the department id to the employee's department_id
-        employee.department_id = self.__company.departments[dept_index].dept_id
+            # add the department id to the employee's department_id
+            employee.department_id = self.__company.departments[dept_index].dept_id
 
         # append the employee to the company's employees
         self.__company.employees.append(employee)
