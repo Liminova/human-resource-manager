@@ -4,7 +4,7 @@ import os
 
 from ..helpers import *
 from models import Department
-from database.mongo import department_repo, employee_repo
+from database.mongo import department_repo, employee_repo # type: ignore
 
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
@@ -59,7 +59,7 @@ class MenuDepartment:
         loop_til_valid_input("Enter department ID: ", dept.set_id)
 
         if os.getenv("HRMGR_DB") == "TRUE":
-            department_repo.insert_one(dept.dict(by_alias=True))
+            department_repo.insert_one(dept.dict(by_alias=True)) # type: ignore
 
         # add the department to the company
         self.__company.departments.append(dept)
