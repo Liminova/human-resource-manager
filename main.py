@@ -33,7 +33,7 @@ def initialize_data():
         for benefit in benefit_repo.find({}): # type: ignore
             the_company.benefits.append(BenefitPlan.parse_obj(benefit))
 
-def main():
+def main_tui():
     last_msg = ""
     if not os.getenv("MONGO_USER") or not os.getenv("MONGO_PASS") or not os.getenv("MONGO_URI"):
         os.environ["HRMGR_DB"] = "FALSE"
@@ -80,6 +80,6 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        main_tui()
     except KeyboardInterrupt:
         sys.exit(0)
