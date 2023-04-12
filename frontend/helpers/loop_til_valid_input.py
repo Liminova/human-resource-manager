@@ -12,5 +12,5 @@ def loop_til_valid_input(prompt: str, validator: callable) -> str: # type: ignor
             validator(user_input).unwrap() # type: ignore
             break
         except (ValueError, TypeError) as e:
-            user_input = input(f"{FCOLORS.RED}{str(e)} Try again:{FCOLORS.END} {prompt}")
+            user_input = input(f"{FCOLORS.RED}{str(e)} Try again: {FCOLORS.END}")
     return ""
