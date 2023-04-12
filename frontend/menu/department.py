@@ -71,6 +71,8 @@ class MenuDepartment:
         dept_items = [f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments]
         dept_selected_index = get_user_option_from_list("Select a department to remove", dept_items)
         if dept_selected_index == -1:
+            return NO_DEPARTMENT_MSG
+        elif dept_selected_index == -2:
             return ""
 
         # remove the department from whatever employee it's applied to
@@ -99,6 +101,8 @@ class MenuDepartment:
         # get the index of the department to update
         dept_selected_index = get_user_option_from_list("Select a department to update", dept_items)
         if dept_selected_index == -1:
+            return NO_DEPARTMENT_MSG
+        elif dept_selected_index == -2:
             return ""
 
         # get the department object to update
@@ -128,6 +132,8 @@ class MenuDepartment:
         # get the index of the department to update
         dept_selected_index = get_user_option_from_list("Select a department to view info", dept_items)
         if dept_selected_index == -1:
+            return NO_DEPARTMENT_MSG
+        elif dept_selected_index == -2:
             return ""
 
         # print the department info

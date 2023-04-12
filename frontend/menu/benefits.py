@@ -81,6 +81,8 @@ class MenuBenefits:
         # get the index of the employee selected by the user
         employee_index_selected = get_user_option_from_list("Select an employee to apply benefit plan to", employee_items)
         if employee_index_selected == -1:
+            return NO_EMPLOYEE_MSG
+        elif employee_index_selected == -2:
             return ""
 
         # a list containing the string representation of each benefit
@@ -89,6 +91,8 @@ class MenuBenefits:
         # get the index of the benefit selected by the user
         benefit_index_selected = get_user_option_from_list("Select a benefit plan to apply to employee", benefit_items)
         if benefit_index_selected == -1:
+            return NO_BENEFIT_MSG
+        elif benefit_index_selected == -2:
             return ""
 
         # get the actual employee and benefit objects
@@ -124,6 +128,8 @@ class MenuBenefits:
         # get the index of the benefit selected by the user
         benefit_index_selected = get_user_option_from_list("Select a benefit plan to remove", benefit_items)
         if benefit_index_selected == -1:
+            return NO_BENEFIT_MSG
+        elif benefit_index_selected == -2:
             return ""
 
         # get the actual benefit object
@@ -155,6 +161,8 @@ class MenuBenefits:
         # get the index of the benefit selected by the user
         selected_benefit_index = get_user_option_from_list("Select a benefit plan to update", benefit_items)
         if selected_benefit_index == -1:
+            return NO_BENEFIT_MSG
+        elif selected_benefit_index == -2:
             return ""
 
         # get the actual benefit object
@@ -186,6 +194,8 @@ class MenuBenefits:
         # get the index of the benefit selected by the user
         selected_benefit_index = get_user_option_from_list("Select a benefit plan to view", benefit_items)
         if selected_benefit_index == -1:
+            return NO_BENEFIT_MSG
+        elif selected_benefit_index == -2:
             return ""
 
         # print the benefit

@@ -21,6 +21,8 @@ class MenuPayroll:
         selected_employee_index = get_user_option_from_list("Select an employee to manage payroll for", [f"{employee.name} ({employee.id})" for employee in employees])
         if selected_employee_index == -1:
             return Err(NO_EMPLOYEE_MSG)
+        elif selected_employee_index == -2:
+            return Ok(None)
         self.__employee = employees[selected_employee_index]
 
         last_msg = ""

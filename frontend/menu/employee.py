@@ -106,6 +106,8 @@ class MenuEmployee:
         # get the index of the employee to remove
         employee_index = get_user_option_from_list("Select an employee to remove", employee_items)
         if employee_index == -1:
+            return NO_EMPLOYEE_MSG
+        elif employee_index == -2:
             return ""
 
         # get the actual employee
@@ -149,6 +151,8 @@ class MenuEmployee:
         # get the employee to update
         selected_employee_index = get_user_option_from_list("Select an employee to update", employee_items)
         if selected_employee_index == -1:
+            return NO_EMPLOYEE_MSG
+        elif selected_employee_index == -2:
             return ""
 
         # get the actual employee object
@@ -184,6 +188,8 @@ class MenuEmployee:
         # get the employee to view
         selected_employee_index = get_user_option_from_list("Select an employee to view", employee_items)
         if selected_employee_index == -1:
+            return NO_EMPLOYEE_MSG
+        elif selected_employee_index == -2:
             return ""
 
         # print the employee

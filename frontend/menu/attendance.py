@@ -24,6 +24,8 @@ class MenuAttendance:
         selected_employee_index = get_user_option_from_list("Select an employee to manage attendance for", employee_items)
         if selected_employee_index == -1:
             return Err(NO_EMPLOYEE_MSG)
+        elif selected_employee_index == -2:
+            return Ok(None)
 
         # get the employee object from the index
         self.__employee = self.__company.employees[selected_employee_index]
@@ -106,6 +108,8 @@ class MenuAttendance:
         selected_year_index = get_user_option_from_list("Select a year to view attendance report for", year_items)
         if selected_year_index == -1:
             return NO_ATTENDANCE_MSG
+        elif selected_year_index == -2:
+            return ""
 
         # print the attendance report
         print(self.__attendances.get_report(available_years[selected_year_index]))
