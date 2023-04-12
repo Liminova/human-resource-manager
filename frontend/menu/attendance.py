@@ -16,11 +16,9 @@ class MenuAttendance:
     def __init__(self, company: Company) -> None:
         self.__company = company
 
-        employees = self.__company.employees
-
     def start(self) -> Result[None, str]:
         # a list containing the string representation of each employee
-        employee_items = [f"{employee.name} ({employee.id})" for employee in employees]
+        employee_items = [f"{employee.name} ({employee.id})" for employee in self.__company.employees]
 
         # get the index of the selected employee
         selected_employee_index = get_user_option_from_list("Select an employee to manage attendance for", employee_items)
@@ -28,7 +26,7 @@ class MenuAttendance:
             return Err(NO_EMPLOYEE_MSG)
 
         # get the employee object from the index
-        self.__employee = employees[selected_employee_index]
+        self.__employee = self.__company.employees[selected_employee_index]
         self.__attendances = self.__employee.attendance
         self.__payroll = self.__employee.payroll
 

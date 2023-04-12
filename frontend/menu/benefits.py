@@ -53,7 +53,6 @@ class MenuBenefits:
                 case _: last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
-        benefits = self.__company.benefits
 
         # create a blank benefit plan object
         benefit = BenefitPlan()
@@ -69,18 +68,15 @@ class MenuBenefits:
                 return msg
 
         # add the benefit plan to the company
-        benefits.append(benefit)
+        self.__company.benefits.append(benefit)
         if os.getenv("HRMGR_DB") == "TRUE":
             benefit_repo.insert_one(benefit.dict(by_alias=True)) # type: ignore
 
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} added successfully!"
 
     def __apply(self) -> str:
-        employees = self.__company.employees
-        benefits = self.__company.benefits
-
         # a list containing the string representation of each employee
-        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in employees]
+        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in self.__company.employees]
 
         # get the index of the employee selected by the user
         employee_index_selected = get_user_option_from_list("Select an employee to apply benefit plan to", employee_items)
@@ -88,7 +84,7 @@ class MenuBenefits:
             return ""
 
         # a list containing the string representation of each benefit
-        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in self.__company.benefits]
 
         # get the index of the benefit selected by the user
         benefit_index_selected = get_user_option_from_list("Select a benefit plan to apply to employee", benefit_items)
@@ -96,8 +92,8 @@ class MenuBenefits:
             return ""
 
         # get the actual employee and benefit objects
-        benefit = benefits[benefit_index_selected]
-        employee = employees[employee_index_selected]
+        employee = self.__company.employees[employee_index_selected]
+        benefit = self.__company.benefits[benefit_index_selected]
 
         # check if the employee already has the benefit applied to them
         if benefit in employee.benefits:
@@ -122,11 +118,8 @@ class MenuBenefits:
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} applied to employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} successfully!"
 
     def __remove(self) -> str:
-        employees = self.__company.employees
-        benefits = self.__company.benefits
-
         # a list containing the string representation of each benefit
-        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in self.__company.benefits]
 
         # get the index of the benefit selected by the user
         benefit_index_selected = get_user_option_from_list("Select a benefit plan to remove", benefit_items)
@@ -134,10 +127,10 @@ class MenuBenefits:
             return ""
 
         # get the actual benefit object
-        benefit = benefits[benefit_index_selected]
+        benefit = self.__company.benefits[benefit_index_selected]
 
-        # remove the benefit from whatever employee it's applied to
-        for employee in employees:
+        # remove the benefit plan from all employees that have it applied to them
+        for employee in self.__company.employees:
             if benefit in employee.benefits:
                 employee.benefits.remove(benefit)
                 if os.getenv("HRMGR_DB") == "TRUE":
@@ -156,10 +149,8 @@ class MenuBenefits:
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} removed successfully!"
 
     def __update(self) -> str:
-        benefits = self.__company.benefits
-
         # a list containing the string representation of each benefit
-        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in self.__company.benefits]
 
         # get the index of the benefit selected by the user
         selected_benefit_index = get_user_option_from_list("Select a benefit plan to update", benefit_items)
@@ -167,7 +158,7 @@ class MenuBenefits:
             return ""
 
         # get the actual benefit object
-        benefit = benefits[selected_benefit_index]
+        benefit = self.__company.benefits[selected_benefit_index]
 
         # assigning the new values to the benefit object
         fields_data = [
@@ -189,10 +180,8 @@ class MenuBenefits:
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} updated successfully!"
 
     def __view(self) -> str:
-        benefits = self.__company.benefits
-
         # a list containing the string representation of each benefit
-        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in self.__company.benefits]
 
         # get the index of the benefit selected by the user
         selected_benefit_index = get_user_option_from_list("Select a benefit plan to view", benefit_items)
@@ -200,7 +189,7 @@ class MenuBenefits:
             return ""
 
         # print the benefit
-        print(benefits[selected_benefit_index])
+        print(self.__company.benefits[selected_benefit_index])
         input(ENTER_TO_CONTINUE_MSG)
 
         return ""

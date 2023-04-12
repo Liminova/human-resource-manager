@@ -36,7 +36,7 @@ class MenuDepartment:
             ]
 
             choice = get_user_option_from_menu("Department management", department_menu)
-            if (choice in range(2, 6)) and (not depts):
+            if (choice in range(2, 6)) and (not self.__company.departments):
                 last_msg = NO_DEPARTMENT_MSG
                 continue
 
@@ -67,13 +67,9 @@ class MenuDepartment:
         return f"Department {FCOLORS.GREEN}{dept.name}{FCOLORS.END} added successfully!"
 
     def __remove(self) -> str:
-        depts = self.__company.departments
-        employees = self.__company.employees
-
         # a list containing the string representation of each department
         dept_items = [f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments]
         dept_selected_index = get_user_option_from_list("Select a department to remove", dept_items)
-        dept = depts[dept_selected_index - 1]
         if dept_selected_index == -1:
             return ""
 
@@ -89,7 +85,7 @@ class MenuDepartment:
                     )
 
         if os.getenv("HRMGR_DB") == "TRUE":
-            department_repo.delete_one({ "_id": dept.id })
+            department_repo.delete_one({ "_id": self.__company.departments[dept_selected_index].id })
 
         depts.pop(dept_selected_index)
         return "Department removed successfully!"
@@ -106,7 +102,7 @@ class MenuDepartment:
             return ""
 
         # get the department object to update
-        dept = depts[dept_selected_index - 1]
+        dept = self.__company.departments[dept_selected_index]
 
         # re-assign the department name and ID
         if (msg := loop_til_valid_input("Enter department name", dept.set_name)) != "":
@@ -135,5 +131,5 @@ class MenuDepartment:
             return ""
 
         # print the department info
-        print(depts[dept_selected_index])
+        print(self.__company.departments[dept_selected_index])
         input(ENTER_TO_CONTINUE_MSG)

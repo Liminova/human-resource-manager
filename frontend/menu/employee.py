@@ -97,27 +97,24 @@ class MenuEmployee:
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.insert_one(employee.dict(by_alias=True)) # type: ignore
 
-        return f"Employee {employee.name} ({employee.employee_id}) added successfully!"
+        return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.employee_id}{FCOLORS.END}) added successfully!"
 
     def __remove(self) -> str:
-        employees = self.__company.employees
-        depts = self.__company.departments
-        benefits = self.__company.benefits
-
         # a list containing the string representation of each employee
-        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in employees]
+        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in self.__company.employees]
 
         # get the index of the employee to remove
         employee_index = get_user_option_from_list("Select an employee to remove", employee_items)
         if employee_index == -1:
             return ""
 
-        employee = employees[employee_index - 1]
+        # get the actual employee
+        employee = self.__company.employees[employee_index]
 
-        # remove from whatever department they're in
-        for dept in depts:
+        # remove employee from the department they're in
+        for dept in self.__company.departments:
             if employee in dept.members:
-                dept.members.remove(employees[employee_index])
+                dept.members.remove(employee)
                 if os.getenv("HRMGR_DB") == "TRUE":
                     department_repo.update_one(
                         { "_id": dept.id },
@@ -125,10 +122,10 @@ class MenuEmployee:
                         upsert=True
                     )
 
-        # remove from whatever benefit plan they're in
-        for benefit in benefits:
+        # remove employee from the benefits they're enrolled in
+        for benefit in self.__company.benefits:
             if employee in benefit.enrolled_employees:
-                benefit.enrolled_employees.remove(employees[employee_index])
+                benefit.enrolled_employees.remove(employee)
                 if os.getenv("HRMGR_DB") == "TRUE":
                     benefit_repo.update_one(
                         { "_id": benefit.id },
@@ -139,9 +136,9 @@ class MenuEmployee:
         # remove from the company
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.delete_one({ "_id": employee.id })
-        del employees[employee_index - 1]
+        del self.__company.employees[employee_index]
 
-        return f"Employee {employee.name} ({employee.employee_id}) removed successfully!"
+        return f"Employee {FCOLORS.RED}{employee.name}{FCOLORS.END} ({FCOLORS.RED}{employee.employee_id}{FCOLORS.END}) removed successfully!"
 
     def __update(self) -> str:
         employees = self.__company.employees
@@ -176,7 +173,7 @@ class MenuEmployee:
                 upsert=True,
             )
 
-        return f"Employee {employee.name} ({employee.employee_id}) updated successfully!"
+        return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.employee_id}{FCOLORS.END}) updated successfully!"
 
     def __view(self) -> str:
         employees = self.__company.employees
