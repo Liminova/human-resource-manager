@@ -18,10 +18,6 @@ class MenuAttendance:
     def start(self) -> tuple[bool, str]:
         employees = self.__company.employees
 
-        # check if there are any employees to manage attendance for
-        if not employees:
-            return False, "No employees to manage attendance for!"
-
         # a list containing the string representation of each employee
         employee_items = [f"{employee.name} ({employee.id})" for employee in employees]
 
@@ -33,6 +29,7 @@ class MenuAttendance:
         # get the employee object from the index
         self.__employee = employees[selected_employee_index]
         self.__attendances = self.__employee.attendance
+        self.__payroll = self.__employee.payroll
 
         last_msg = ""
         while True:
@@ -63,6 +60,8 @@ class MenuAttendance:
             if not is_presence:
                 reason = input("Enter reason for absent: ")
                 self.__attendances.add_absent_day(date, reason).unwrap()
+                self.__payroll.set_punish(10)
+
         except (ValueError, TypeError) as e:
             return str(e)
         return ""
@@ -70,7 +69,7 @@ class MenuAttendance:
     def __update(self) -> str:
         date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
         try:
-            # try to parse the date, if it fails, use today's date
+            # parse the date, if the date is empty, use today's date
             date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
 
             # check if attendance exists for that date
@@ -87,6 +86,7 @@ class MenuAttendance:
             if not is_presence:
                 reason = input("Enter reason for absent: ")
                 self.__attendances.add_absent_day(date, reason).unwrap()
+                self.__payroll.set_punish(10)
         except (ValueError, TypeError) as e:
             return str(e)
         return ""

@@ -60,6 +60,10 @@ def main():
         ]
         user_choice = get_user_option_from_menu("Main menu", main_menu)
 
+        if user_choice in [3, 4, 6] and not the_company.employees:
+            last_msg = FCOLORS.RED + "No employees available! Please add an employee first." + FCOLORS.END
+            continue
+
         respond: tuple[bool, str] = (True, "")
         match user_choice:
             case 1: respond = MenuEmployee(the_company).start()

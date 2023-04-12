@@ -1,4 +1,5 @@
 import hashlib
+from option import Result, Ok, Err
 
 # example class for employee (i.e. consider adding this to models/employee.py)
 class Employee:

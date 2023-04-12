@@ -9,9 +9,9 @@ from database import PyObjectId
 from bson.objectid import ObjectId
 
 if sys.version_info >= (3, 11):
-    from typing import Self, TYPE_CHECKING
+    from typing import Self
 else:
-    from typing_extensions import Self, TYPE_CHECKING
+    from typing_extensions import Self
 
 from .attendance_check import Attendance
 from .benefits import BenefitPlan
@@ -65,10 +65,6 @@ class Employee(BaseModel):
             return Err("Phone number cannot contain letters!")
         self.phone = phone
         return Ok(self) if phone else Err("Phone number cannot be empty!")
-
-    def set_department(self, department: str) -> Result[Self, str]:
-        self.department_id = department
-        return Ok(self)
 
     def set_payroll(self, payroll: Payroll) -> Result[Self, str]:
         self.payroll = payroll

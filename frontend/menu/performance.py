@@ -17,10 +17,6 @@ class MenuPerformance:
     def start(self) -> tuple[bool, str]:
         employees = self.__company.employees
 
-        # if there are no employees, there's no point in managing performance
-        if len(employees) == 0:
-            return False, "No employees to manage performance, please add an employee first!"
-
         # a list containing the string representation of each employee
         employee_items = [f"{employee.name} ({employee.employee_id})" for employee in employees]
 
