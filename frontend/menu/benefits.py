@@ -5,6 +5,7 @@ import os
 from ..helpers import *
 from models import BenefitPlan
 from database.mongo import benefit_repo, employee_repo # type: ignore
+from option import Result, Ok
 
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
@@ -18,7 +19,7 @@ class MenuBenefits:
     def __init__(self, company: Company):
         self.__company = company
 
-    def start(self) -> tuple[bool, str]:
+    def start(self) -> Result[None, str]:
         benefits = self.__company.benefits
 
         last_msg = ""
@@ -39,7 +40,7 @@ class MenuBenefits:
             choice = get_user_option_from_menu("Benefit plan management", benefit_plan_menu)
 
             if (choice not in [1, 6]) and (not benefits):
-                last_msg = "No benefit plan available! Please add a benefit plan first."
+                last_msg = NO_BENEFIT_MSG
                 continue
 
             match choice:
@@ -48,7 +49,8 @@ class MenuBenefits:
                 case 3: last_msg = self.__remove()
                 case 4: last_msg = self.__update()
                 case 5: last_msg = self.__view()
-                case _: return True, ""
+                case 7: return Ok(None)
+                case _: last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
         benefits = self.__company.benefits
@@ -199,6 +201,6 @@ class MenuBenefits:
 
         # print the benefit
         print(benefits[selected_benefit_index])
-        input("Press enter to continue...")
+        input(ENTER_TO_CONTINUE_MSG)
 
         return ""

@@ -193,7 +193,7 @@ class MenuEmployee:
 
         # print the employee
         print(employees[selected_employee_index])
-        input("\nPress enter to continue...")
+        input(ENTER_TO_CONTINUE_MSG)
         return ""
 
     def __view_all(self) -> str:

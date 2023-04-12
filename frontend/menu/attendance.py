@@ -2,6 +2,7 @@ from __future__ import annotations
 import sys
 from ..helpers import *
 from datetime import datetime
+from option import Result, Ok, Err
 
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
@@ -15,16 +16,16 @@ class MenuAttendance:
     def __init__(self, company: Company) -> None:
         self.__company = company
 
-    def start(self) -> tuple[bool, str]:
         employees = self.__company.employees
 
+    def start(self) -> Result[None, str]:
         # a list containing the string representation of each employee
         employee_items = [f"{employee.name} ({employee.id})" for employee in employees]
 
         # get the index of the selected employee
         selected_employee_index = get_user_option_from_list("Select an employee to manage attendance for", employee_items)
         if selected_employee_index == -1:
-            return False, "No employee selected!"
+            return Err(NO_EMPLOYEE_MSG)
 
         # get the employee object from the index
         self.__employee = employees[selected_employee_index]
@@ -94,7 +95,7 @@ class MenuAttendance:
     def __report(self) -> str:
         # check if there are any attendance data available
         if not self.__attendances:
-            return "No attendance data available!"
+            return NO_ATTENDANCE_MSG
 
         # get all the available years existing in the attendance data
         available_years = self.__attendances.get_available_years()
@@ -105,9 +106,9 @@ class MenuAttendance:
         # get the index of the selected year
         selected_year_index = get_user_option_from_list("Select a year to view attendance report for", year_items)
         if selected_year_index == -1:
-            return "No year selected!"
+            return NO_ATTENDANCE_MSG
 
         # print the attendance report
         print(self.__attendances.get_report(available_years[selected_year_index]))
-        input("Press enter to continue...")
+        input(ENTER_TO_CONTINUE_MSG)
         return ""

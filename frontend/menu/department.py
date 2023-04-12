@@ -5,6 +5,7 @@ import os
 from ..helpers import *
 from models import Department
 from database.mongo import department_repo, employee_repo # type: ignore
+from option import Result, Ok
 
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
@@ -18,9 +19,7 @@ class MenuDepartment:
     def __init__(self, company: Company) -> None:
         self.__company = company
 
-    def start(self) -> tuple[bool, str]:
-        depts = self.__company.departments
-
+    def start(self) -> Result[None, str]:
         last_msg = ""
         while True:
             clrscr()
@@ -38,7 +37,7 @@ class MenuDepartment:
 
             choice = get_user_option_from_menu("Department management", department_menu)
             if (choice in range(2, 6)) and (not depts):
-                last_msg = "No departments to manage, please add a department first!"
+                last_msg = NO_DEPARTMENT_MSG
                 continue
 
             match choice:
@@ -47,8 +46,8 @@ class MenuDepartment:
                 case 3: last_msg = self.__update()
                 case 4: last_msg = self.__view()
                 case 5: listing("Departments", [f"{dept.name} ({dept.dept_id})" for dept in depts])
-                case 6: return True, ""
-                case _: continue
+                case 8: return Ok(None)
+                case _: last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
         # create a new, empty department
@@ -137,4 +136,4 @@ class MenuDepartment:
 
         # print the department info
         print(depts[dept_selected_index])
-        input("Press enter to continue...")
+        input(ENTER_TO_CONTINUE_MSG)
