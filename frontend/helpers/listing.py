@@ -9,6 +9,9 @@ def listing(title: str, entries: list[str]) -> None:
     clusters = clustering(entries, 9)
     current_cluster = 0
 
+    if not clusters:
+        return
+
     while True:
         clrscr()
         print(f"--- {title} ---")
