@@ -3,6 +3,7 @@ import textwrap
 from option import Result, Ok, Err
 from datetime import datetime
 from pydantic import BaseModel, Field
+from frontend.helpers import styling
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -65,13 +66,14 @@ class Sale(BaseModel):
 
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\
-            - Sale ID: {self.sale_id}
-            - Revenue: {self.revenue}
-            - Cost: {self.cost}
-            - Profit: {self.profit}
-            - Client ID: {self.client_id}
-            - Client rating: {self.client_rating}
-            - Client comment: {self.client_comment}\
+            {styling('Sale ID:', self.sale_id)}
+            {styling('Date:', self.date.strftime('%Y-%m-%d'))}
+            {styling('Revenue:', self.revenue)}
+            {styling('Cost:', self.cost)}
+            {styling('Profit:', self.profit)}
+            {styling('Client ID:', self.client_id)}
+            {styling('Client rating:', self.client_rating)}
+            {styling('Client comment:', self.client_comment)}\
             """)
         return data
 
@@ -134,11 +136,11 @@ class Performance(BaseModel):
 
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\
-            - Sales count: {self.sales_count}
-            - Total revenue: {self.total_revenue}
-            - Total cost: {self.total_cost}
-            - Total profit: {self.total_profit}
-            - Average rating: {self.average_rating}\
+            {styling('Sales count:', self.sales_count)}
+            {styling('Total revenue:', self.total_revenue)}
+            {styling('Total cost:', self.total_cost)}
+            {styling('Total profit:', self.total_profit)}
+            {styling('Average rating:', self.average_rating)}\
             """)
         return data
 

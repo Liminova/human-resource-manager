@@ -76,5 +76,4 @@ class Attendance(BaseModel):
                 else:
                     absent_reason = self.absents.get(date, "No reason")
                     data += f"{datetime.strftime(date, '%d %b %Y')} - Absent ({absent_reason})\n"
-
         return data

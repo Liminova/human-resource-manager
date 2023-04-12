@@ -3,6 +3,7 @@ import sys
 from option import Result, Ok, Err
 import textwrap
 from pydantic import BaseModel, Field
+from frontend.helpers import styling
 
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
@@ -68,11 +69,11 @@ class Payroll(BaseModel):
     def __str__(self) -> str:
         self.calculate_total()
         return textwrap.dedent(f"""\
-            - Salary: {self.salary}
-            - Bonus: {self.bonus}
-            - Tax: {self.tax}
-            - Punish: {self.punish}
-            - Total: {self.total}\
+            {styling('Salary', self.salary)}\
+            {styling('Bonus', self.bonus)}\
+            {styling('Tax', self.tax)}\
+            {styling('Punish', self.punish)}\
+            {styling('Total', self.total)}\
         """)
 
     class Config:
