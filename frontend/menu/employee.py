@@ -5,6 +5,7 @@ import os
 from ..helpers import *
 from models import Employee
 from database.mongo import employee_repo, benefit_repo, department_repo # type: ignore
+from option import Result, Ok
 
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
@@ -18,13 +19,7 @@ class MenuEmployee:
     def __init__(self, company: Company):
         self.__company = company
 
-    def start(self) -> tuple[bool, str]:
-        depts = self.__company.departments
-        employees = self.__company.employees
-
-        if not depts:
-            return False, "No departments available! Please add a department first."
-
+    def start(self) -> Result[None, str]:
         last_msg = ""
         while True:
             clrscr()
@@ -42,8 +37,8 @@ class MenuEmployee:
             ]
             choice = get_user_option_from_menu("Employee management", employee_menu)
 
-            if (choice not in [1, 6]) and (not employees):
-                last_msg = "No employees available! Please add an employee first."
+            if (choice not in [1, 6]) and (not self.__company.employees):
+                last_msg = NO_EMPLOYEE_MSG
                 continue
 
             match choice:
@@ -52,8 +47,8 @@ class MenuEmployee:
                 case 3: last_msg = self.__update()
                 case 4: last_msg = self.__view()
                 case 5: last_msg = self.__view_all()
-                case _:
-                    return True, ""
+                case 6: return Ok(None)
+                case _: last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
         # create a new, empty employee

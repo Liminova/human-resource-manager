@@ -3,6 +3,8 @@ import sys
 from datetime import datetime
 from ..helpers import *
 from models import Sale
+from option import Result, Ok, Err
+
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
 else:
