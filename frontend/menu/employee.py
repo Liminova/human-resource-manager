@@ -33,11 +33,11 @@ class MenuEmployee:
                 last_msg = ""
 
             employee_menu = [
-                "[1] Add employee",
-                "[2] Remove employee",
-                "[3] Update employee",
-                "[4] View employee",
-                "[5] View all employees",
+                "[1] Add",
+                "[2] Remove",
+                "[3] Update information",
+                "[4] View details of one",
+                "[5] List all",
                 "[6] Back",
             ]
             choice = get_user_option_from_menu("Employee management", employee_menu)

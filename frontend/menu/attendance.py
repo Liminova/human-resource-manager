@@ -39,10 +39,10 @@ class MenuAttendance:
                 last_msg = ""
             print(f"=== Attendance management for {self.__employee.name} ===")
             attendance_menu = [
-                "[1] Check attendance",
-                "[2] Update attendance",
-                "[3] Get attendance report",
-                "[4] Exit",
+                "[1] Check",
+                "[2] Update",
+                "[3] Get report",
+                "[4] Back",
             ]
             choice = get_user_option_from_menu("Attendance management", attendance_menu)
             match choice:

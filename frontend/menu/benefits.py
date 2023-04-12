@@ -28,17 +28,18 @@ class MenuBenefits:
                 print(last_msg)
                 last_msg = ""
             benefit_plan_menu = [
-                "[1] Add benefit plan",
-                "[2] Apply benefit plan to employee",
-                "[3] Remove benefit plan",
-                "[4] Update benefit plan",
-                "[5] View benefit plan",
-                "[6] Exit",
+                "[1] Add",
+                "[2] Apply one to employee",
+                "[3] Remove",
+                "[4] Update",
+                "[5] View details of one",
+                "[6] List all",
+                "[7] Back",
             ]
             choice = get_user_option_from_menu("Benefit plan management", benefit_plan_menu)
 
             if (choice not in [1, 6]) and (not benefits):
-                last_msg = "No benefits available! Please add a benefit plan first."
+                last_msg = "No benefit plan available! Please add a benefit plan first."
                 continue
 
             match choice:

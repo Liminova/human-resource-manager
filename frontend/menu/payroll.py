@@ -28,9 +28,9 @@ class MenuPayroll:
                 print(last_msg)
                 last_msg = ""
             payroll_menu = [
-                "[1] Create payroll",
-                "[2] Update payroll",
-                "[else] Exit"
+                "[1] Create",
+                "[2] Update",
+                "[else] Back"
             ]
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:

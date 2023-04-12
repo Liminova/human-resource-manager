@@ -28,11 +28,11 @@ class MenuDepartment:
                 print(last_msg)
                 last_msg = ""
             department_menu = [
-                "[1] Add department",
-                "[2] Remove department",
-                "[3] Update department",
-                "[4] View department",
-                "[5] View all departments",
+                "[1] Add",
+                "[2] Remove",
+                "[3] Update information for one",
+                "[4] View details of one",
+                "[5] List all",
                 "[6] Back",
             ]
 
