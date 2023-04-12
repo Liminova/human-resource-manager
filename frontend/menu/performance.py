@@ -35,7 +35,7 @@ class MenuPerformance:
                 print(last_msg)
                 last_msg = ""
             performance_menu = [
-                "[1] Add sale"
+                "[1] Add sale",
                 "[2] View sales performance",
                 "[3] Remove sale",
                 "[4] Get sale info",
@@ -117,7 +117,7 @@ class MenuPerformance:
             "[1] Sale ID",
             "[2] Client ID",
             "[3] Client rating",
-            "[4] Date"
+            "[4] Date",
             "[else] Back"
         ]
         search_selection = get_user_option_from_menu("Find all sales by...", search_fields)
