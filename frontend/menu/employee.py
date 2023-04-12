@@ -61,14 +61,15 @@ class MenuEmployee:
 
         # get user input for employee name, date of birth, ID, phone number, and email
         fields_data = [
-            ("Enter employee name: ", employee.set_name),
-            ("Enter employee date of birth (YYYY-MM-DD): ", employee.set_dob),
-            ("Enter employee ID: ", employee.set_id),
-            ("Enter employee phone number: ", employee.set_phone),
-            ("Enter employee email: ", employee.set_email),
+            ("Enter employee name", employee.set_name),
+            ("Enter employee date of birth (YYYY-MM-DD)", employee.set_dob),
+            ("Enter employee ID", employee.set_id),
+            ("Enter employee phone number", employee.set_phone),
+            ("Enter employee email", employee.set_email),
         ]
         for (field, setter) in fields_data:
-            loop_til_valid_input(field, setter)
+            if (msg := loop_til_valid_input(field, setter)) != "":
+                return msg
 
         # a list containing the string representation of each department
         dept_items = [f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments]
@@ -160,14 +161,15 @@ class MenuEmployee:
 
         # get the new data
         fields_data = [
-            ("Enter employee name: ", employee.set_name),
-            ("Enter employee date of birth (YYYY-MM-DD): ", employee.set_dob),
-            ("Enter employee ID: ", employee.set_id),
-            ("Enter employee phone number: ", employee.set_phone),
-            ("Enter employee email: ", employee.set_email),
+            ("Enter employee name", employee.set_name),
+            ("Enter employee date of birth (YYYY-MM-DD)", employee.set_dob),
+            ("Enter employee ID", employee.set_id),
+            ("Enter employee phone number", employee.set_phone),
+            ("Enter employee email", employee.set_email),
         ]
         for (field, setter) in fields_data:
-            loop_til_valid_input(field, setter)
+            if (msg := loop_til_valid_input(field, setter)) != "":
+                return msg
 
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one(

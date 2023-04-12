@@ -59,20 +59,27 @@ class MenuPerformance:
 
         # enter the sale data
         fields_data = [
-            ("Enter sale ID: ", sale.set_sale_id),
-            ("Enter revenue: ", sale.set_revenue),
-            ("Enter cost: ", sale.set_cost),
-            ("Enter profit: ", sale.set_profit),
-            ("Enter client ID: ", sale.set_client_id),
-            ("Enter client rating: ", sale.set_client_rating),
-            ("Enter client comment: ", sale.set_client_comment)
+            ("Enter sale ID", sale.set_sale_id),
+            ("Enter revenue", sale.set_revenue),
+            ("Enter cost", sale.set_cost),
+            ("Enter profit", sale.set_profit),
+            ("Enter client ID", sale.set_client_id),
+            ("Enter client rating", sale.set_client_rating),
+            ("Enter client comment", sale.set_client_comment)
         ]
         for (field, setter) in fields_data:
-            loop_til_valid_input(field, setter)
+            if (msg := loop_til_valid_input(field, setter)) != "":
+                return msg
 
         while True:
             # sale date has a default value, can't use the loop_til_valid_input function
-            sale_date = input("Enter sale date (YYYY-MM-DD, leave blank for today): ")
+            sale_date = input("Enter sale date (YYYY-MM-DD, 't' for today, leave blank to cancel): ")
+            if sale_date == "":
+                return "Input cancelled!"
+            elif sale_date == "t":
+                sale_date = datetime.now()
+                sale.set_date(sale_date).unwrap()
+                break
             try:
                 sale_date = datetime.strptime(sale_date, "%Y-%m-%d") if sale_date else datetime.now()
                 sale.set_date(sale_date).unwrap()

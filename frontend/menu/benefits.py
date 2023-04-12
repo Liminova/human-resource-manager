@@ -58,12 +58,13 @@ class MenuBenefits:
 
         # assign values to the benefit plan object
         input_fields = [
-            ("Enter benefit plan name: ", benefit.set_name),
-            ("Enter benefit plan description: ", benefit.set_description),
-            ("Enter benefit plan cost: ", benefit.set_cost),
+            ("Enter benefit plan name", benefit.set_name),
+            ("Enter benefit plan description", benefit.set_description),
+            ("Enter benefit plan cost", benefit.set_cost),
         ]
         for prompt, setter in input_fields:
-            loop_til_valid_input(prompt, setter)
+            if (msg := loop_til_valid_input(prompt, setter)) != "":
+                return msg
 
         # add the benefit plan to the company
         benefits.append(benefit)
@@ -168,12 +169,13 @@ class MenuBenefits:
 
         # assigning the new values to the benefit object
         fields_data = [
-            ("Enter benefit plan name: ", benefit.set_name),
-            ("Enter benefit plan description: ", benefit.set_description),
-            ("Enter benefit plan cost: ", benefit.set_cost),
+            ("Enter benefit plan name", benefit.set_name),
+            ("Enter benefit plan description", benefit.set_description),
+            ("Enter benefit plan cost", benefit.set_cost),
         ]
         for (field, setter) in fields_data:
-            loop_til_valid_input(field, setter)
+            if (msg := loop_til_valid_input(field, setter)) != "":
+                return msg
 
         if os.getenv("HRMGR_DB") == "TRUE":
             benefit_repo.update_one(

@@ -55,8 +55,10 @@ class MenuDepartment:
         dept = Department()
 
         # get user input for department name and ID
-        loop_til_valid_input("Enter department name: ", dept.set_name)
-        loop_til_valid_input("Enter department ID: ", dept.set_id)
+        if (msg := loop_til_valid_input("Enter department name", dept.set_name)) != "":
+            return msg
+        if (msg := loop_til_valid_input("Enter department ID", dept.set_id)) != "":
+            return msg
 
         if os.getenv("HRMGR_DB") == "TRUE":
             department_repo.insert_one(dept.dict(by_alias=True)) # type: ignore
@@ -108,8 +110,10 @@ class MenuDepartment:
         dept = depts[dept_selected_index - 1]
 
         # re-assign the department name and ID
-        loop_til_valid_input("Enter department name: ", dept.set_name)
-        loop_til_valid_input("Enter department ID: ", dept.set_id)
+        if (msg := loop_til_valid_input("Enter department name", dept.set_name)) != "":
+            return msg
+        if (msg := loop_til_valid_input("Enter department ID", dept.set_id)) != "":
+            return msg
 
         if os.getenv("HRMGR_DB") == "TRUE":
             department_repo.update_one(
