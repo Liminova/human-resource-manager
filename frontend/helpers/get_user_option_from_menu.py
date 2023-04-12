@@ -1,7 +1,7 @@
 from .COLORS import FCOLORS
 
 def print_menu(title: str, entries: list[str]) -> None:
-    longest_entry = len(max(entries, key=len)) + 9
+    longest_entry = len(max(entries+[title], key=len)) + 9
 
     print(FCOLORS.GREEN + "╔" + "═" * (longest_entry - 1) + "╗" + FCOLORS.END)
     border = FCOLORS.GREEN + "║" + FCOLORS.END
