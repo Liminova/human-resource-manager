@@ -1,61 +1,115 @@
-# Attendance GUI: implement check attendance, upadtea attendance, get attendance report and exit
+class AttendanceGUI(ctk.CTk):
+    def __init__(self, master = None):
+        super().__init__()
 
-class AttendanceGUI:
-    def __init__(self, employee: Employee, frame: Frame):
-        self.__employee = employee
-        self.__frame = frame  
-        self.__last_msg = ""
-        self.__last_msg_label = Label(self.__frame, text=self.__last_msg)
-        self.__last_msg_label.pack()
+        self.title("Attendance Management")
+        self.geometry(f"{Width}x{Height}")
+        self.resizable(True, True)
 
-        self.__input_fields = [
-            ("Enter attendance date: ", self.__set_date),
-            ("Enter attendance time: ", self.__set_time),
-            ("Enter attendance status: ", self.__set_status),
-        ]
+        self.frame1 = ctk.CTkFrame(master=self, width=325, height=700, corner_radius=10)
+        self.frame1.pack(padx = 10, pady = 10, side = tkinter.LEFT)
 
-        self.__input_entries = []
-        for prompt, _ in self.__input_fields:
-            entry = Entry(self.__frame)
-            entry.pack(fill=X, expand=True)
-            self.__input_entries.append(entry)
+        self.label = ctk.CTkLabel(master=self.frame1, text="Index", font=("Century Gothic", 25, "bold"))
+        self.label.place(relx=0.5, rely=0.085, anchor=tkinter.CENTER)
 
-        self.__buttons = []
-        for text, command in [
-            ("Check Attendance", self.__check_attendance),
-            ("Update Attendance", self.__update_attendance),
-            ("Get Attendance Report", self.__get_attendance_report),
-            ("Exit", self.__exit),
-        ]:
-            button = Button(self.__frame, text=text, command=command)
-            button.pack(fill=X, expand=True)
-            self.__buttons.append(button)
+        def button_size(button):
+            button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
 
-    def __set_date(self, date: str) -> None:
-        self.__date = date
+        # Bind the button1 to frame3
+        self.button1 = ctk.CTkButton(master=self.frame1, text="Check Attendance", command=self.add_attendance)
+        button_size(self.button1)
+        self.button1.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
 
-    def __set_time(self, time: str) -> None:
-        self.__time = time
+        self.button2 = ctk.CTkButton(master=self.frame1, text="Update Attendance")
+        button_size(self.button2)
+        self.button2.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
 
-    def __set_status(self, status: str) -> None:
-        self.__status = status
+        self.button3 = ctk.CTkButton(master=self.frame1, text="Get Attendance Report")
+        button_size(self.button3)
+        self.button3.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
 
-    def __check_attendance(self) -> None:
-        self.__employee.check_attendance(self.__date, self.__time, self.__status)
-        self.__last_msg = "Attendance checked"
-        self.__last_msg_label.config(text=self.__last_msg)
+        self.button4 = ctk.CTkButton(master=self.frame1, text="Exit")
+        button_size(self.button4)
+        self.button4.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
 
-    def __update_attendance(self) -> None:
-        self.__employee.update_attendance(self.__date, self.__time, self.__status)
-        self.__last_msg = "Attendance updated"
-        self.__last_msg_label.config(text=self.__last_msg)
+        # create second frame
+        self.frame2 = ctk.CTkFrame(master=self, width=900, height=700, corner_radius=10)
+        self.frame2.pack(padx = 10, pady = 10, side = tkinter.RIGHT)
 
-    def __get_attendance_report(self) -> None:
-        self.__employee.get_attendance_report(self.__date, self.__time, self.__status)
-        self.__last_msg = "Attendance report generated"
-        self.__last_msg_label.config(text=self.__last_msg)
+        # display on the second frame
+        self.label = ctk.CTkLabel(master=self.frame2, text="Attendance Management", font=("Century Gothic", 25, "bold"))
+        self.label.place(relx=0.5, rely=0.085, anchor=tkinter.CENTER)
 
-    def __exit(self) -> None:
-        self.__frame.destroy() 
+        def check_attendance(self):
+            self.frame3 = ctk.CTkFrame(master=self.frame2, width=900, height=700, corner_radius=10)
+            self.frame3.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="Check Attendance", font=("Century Gothic", 25, "bold"))
+            self.label.place(relx=0.5, rely=0.085, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="Enter Index", font=("Century Gothic", 16))
+            self.label.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
+
+            self.entry = ctk.CTkEntry(master=self.frame3, width=30)
+            self.entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Check", command=self.check_attendance)
+            self.button.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Back", command=self.back)
+            self.button.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+        def update_attendance(self):
+            self.frame3 = ctk.CTkFrame(master=self.frame2, width=900, height=700, corner_radius=10)
+            self.frame3.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="Update Attendance", font=("Century Gothic", 25, "bold"))
+            self.label.place(relx=0.5, rely=0.085, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="Enter Index", font=("Century Gothic", 16))
+            self.label.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
+
+            self.entry = ctk.CTkEntry(master=self.frame3, width=30)
+            self.entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Update", command=self.update_attendance)
+            self.button.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Back", command=self.back)
+            self.button.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+        def get_attendance_report(self):
+            self.frame3 = ctk.CTkFrame(master=self.frame2, width=900, height=700, corner_radius=10)
+            self.frame3.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="Get Attendance Report", font=("Century Gothic", 25, "bold"))
+            self.label.place(relx=0.5, rely=0.085, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="Enter Index", font=("Century Gothic", 16))
+            self.label.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
+
+            self.entry = ctk.CTkEntry(master=self.frame3, width=30)
+            self.entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Get Report", command=self.get_attendance_report)
+            self.button.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Back", command=self.back)
+            self.button.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+        def back(self):
+            self.frame3.destroy()
+
+    def main():
+        root = tkinter.Tk()
+        root.title("Attendance Management")
+        root.geometry("1200x700")
+        root.resizable(False, False)
+        app = Application(master=root)
+        app.mainloop()
+
+    if __name__ == "__main__":
+        main()
+
 
         
