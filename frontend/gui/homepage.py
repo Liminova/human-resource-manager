@@ -30,32 +30,32 @@ class homepage(ctk.CTk):
         self.label1.bind("<Button-1>", callback)
 
         self.label2 = ctk.CTkLabel(master=self.frame1, text="You are currently sign in as: admin", font=("Century Gothic", 14))
-        self.label2.place(relx=0.725, rely=0.975, anchor=tkinter.CENTER)
+        self.label2.place(relx=0.825, rely=0.935, anchor=tkinter.CENTER)
 
         def button_size(button):
-            button.configure(width=255, height=40, font=("Century Gothic", 14))
+            button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
 
-        self.button1 = ctk.CTkButton(master=self.frame1, text="Employee Management", font=("Century Gothic", 14), width=14,corner_radius = 10)
+        self.button1 = ctk.CTkButton(master=self.frame1, text="Employee Management", command=self.click_employeegui)
         button_size(self.button1)
         self.button1.place(relx=0.25, rely=0.35, anchor=tkinter.CENTER)
 
-        self.button2 = ctk.CTkButton(master=self.frame1, text="Benefit Plan Management", font=("Century Gothic", 14), corner_radius = 10)
+        self.button2 = ctk.CTkButton(master=self.frame1, text="Benefit Plan Management")
         button_size(self.button2)
         self.button2.place(relx=0.75, rely=0.35, anchor=tkinter.CENTER)
 
-        self.button3 = ctk.CTkButton(master=self.frame1, text="Attendance Management", font=("Century Gothic", 14), corner_radius = 10)
+        self.button3 = ctk.CTkButton(master=self.frame1, text="Attendance Management")
         button_size(self.button3)
         self.button3.place(relx=0.25, rely=0.55, anchor=tkinter.CENTER)
 
-        self.button4 = ctk.CTkButton(master=self.frame1, text="Payroll Management", font=("Century Gothic", 14), corner_radius = 10)
+        self.button4 = ctk.CTkButton(master=self.frame1, text="Payroll Management")
         button_size(self.button4)
         self.button4.place(relx=0.75, rely=0.55, anchor=tkinter.CENTER)
 
-        self.button5 = ctk.CTkButton(master=self.frame1, text="Department Management", font=("Century Gothic", 14), corner_radius = 10)
+        self.button5 = ctk.CTkButton(master=self.frame1, text="Department Management")
         button_size(self.button5)
         self.button5.place(relx=0.25, rely=0.75, anchor=tkinter.CENTER)
 
-        self.button6 = ctk.CTkButton(master=self.frame1, text="Performance Management", font=("Century Gothic", 14), corner_radius = 10)
+        self.button6 = ctk.CTkButton(master=self.frame1, text="Performance Management")
         button_size(self.button6)
         self.button6.place(relx=0.75, rely=0.75, anchor=tkinter.CENTER)
     
@@ -65,6 +65,11 @@ class homepage(ctk.CTk):
         messagebox.showwarning("Sign Out", "Are you sure you want to sign out?", icon="warning", parent=self, type="okcancel")
         self.destroy()
         login.login().run()
+
+    def click_employeegui(self):
+        import employeegui
+        self.destroy()
+        employeegui.employeegui().run()
 
     def run(self):
         self.mainloop()
