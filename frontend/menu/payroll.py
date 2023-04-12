@@ -32,7 +32,7 @@ class MenuPayroll:
             payroll_menu = [
                 "[1] Create",
                 "[2] Update",
-                "[else] Back"
+                "[3] Back"
             ]
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:

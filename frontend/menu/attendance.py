@@ -50,7 +50,8 @@ class MenuAttendance:
                 case 1: last_msg = self.__check()
                 case 2: last_msg = self.__update()
                 case 3: last_msg = self.__report()
-                case _: return True, ""
+                case 4: return Ok(None)
+                case _: last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __check(self) -> str:
         date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
