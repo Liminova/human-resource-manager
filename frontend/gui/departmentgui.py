@@ -1,74 +1,166 @@
-# Department GUI: implement add department, remove department, update department, view department, view all departments and back
+class DepartmentGUI(ctk.CTk):
+    def __init__(self, master = None):
+        super().__init__()
+        self.title("Department Management")
+        self.geometry(f"{Width}x{Height}")
+        self.resizable(True, True)
 
-class DepartmentGUI:
-    def __init__(self, company: Company, frame: Frame):
-        self.__company = company
-        self.__frame = frame
-        self.__last_msg = ""
-        self.__last_msg_label = Label(self.__frame, text=self.__last_msg)
-        self.__last_msg_label.pack()
+        self.frame1 = ctk.CTkFrame(master=self, width=325, height=700, corner_radius=10)
+        self.frame1.pack(padx = 10, pady = 10, side = tkinter.LEFT)
 
-        self.__input_fields = [
-            ("Enter department name: ", self.__set_name),
-            ("Enter department ID: ", self.__set_id),
-        ]
+        self.label = ctk.CTkLabel(master=self.frame1, text="Index", font=("Century Gothic", 25, "bold"))
+        self.label.place(relx=0.5, rely=0.085, anchor=tkinter.CENTER)
 
-        self.__input_entries = []
-        for prompt, _ in self.__input_fields:
-            entry = Entry(self.__frame)
-            entry.pack(fill=X, expand=True)
-            self.__input_entries.append(entry)
+        def button_size(button):
+            button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
 
-        self.__buttons = []
-        for text, command in [
-            ("Add", self.__add_department),
-            ("Remove", self.__remove_department),
-            ("Update", self.__update_department),
-            ("View", self.__view_department),
-            ("View All", self.__view_all_departments),
-            ("Back", self.__back),
-        ]:
-            button = Button(self.__frame, text=text, command=command)
-            button.pack(fill=X, expand=True)
-            self.__buttons.append(button)
+        # Bind the button1 to frame3
+        self.button1 = ctk.CTkButton(master=self.frame1, text="Add Department", command=self.add_department)
+        button_size(self.button1)
+        self.button1.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
 
-    def __set_name(self, name: str) -> None:
-        self.__name = name
+        self.button2 = ctk.CTkButton(master=self.frame1, text="Update Department")
+        button_size(self.button2)
+        self.button2.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
 
-    def __set_id(self, id: str) -> None:
-        self.__id = id
+        self.button3 = ctk.CTkButton(master=self.frame1, text="Remove Department")
+        button_size(self.button3)
+        self.button3.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
 
-    def __add_department(self) -> None:
-        for entry, (prompt, setter) in zip(self.__input_entries, self.__input_fields):
-            try:
-                setter(entry.get())
-            except ValueError:
-                self.__last_msg = f"Invalid input for {prompt}"
-                self.__last_msg_label["text"] = self.__last_msg
-                return
+        self.button4 = ctk.CTkButton(master=self.frame1, text="View Department")
+        button_size(self.button4)
+        self.button4.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
 
-        department = Department()
-        department.set_name(self.__name)
-        department.set_id(self.__id)
-        self.__company.departments.append(department)
+        self.button5 = ctk.CTkButton(master=self.frame1, text="View All Departments")
+        button_size(self.button5)
+        self.button5.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
 
-        self.__last_msg = "Department added!"
-        self.__last_msg_label["text"] = self.__last_msg
+        self.button6 = ctk.CTkButton(master=self.frame1, text="Back", command=self.back)
+        button_size(self.button6)
+        self.button6.place(relx=0.5, rely=0.8, anchor=tkinter.CENTER)
 
-    def __remove_department(self) -> None:
-        pass
+        # create second frame
+        self.frame2 = ctk.CTkFrame(master=self, width=900, height=700, corner_radius=10)
+        self.frame2.pack(padx = 10, pady = 10, side = tkinter.RIGHT)
 
-    def __update_department(self) -> None:
-        pass
+        # display on second frame
+        self.label = ctk.CTkLabel(master=self.frame2, text="Department Management", font=("Century Gothic", 25, "bold"))
+        self.label.place(relx=0.5, rely=0.085, anchor=tkinter.CENTER)
 
-    def __view_department(self) -> None:
-        pass
+        def add_department(self):
+            self.frame3 = ctk.CTkFrame(master=self, width=900, height=700, corner_radius=10)
+            self.frame3.pack(padx = 10, pady = 10, side = tkinter.RIGHT)
 
-    def __view_all_departments(self) -> None:
-        pass
+            self.label = ctk.CTkLabel(master=self.frame3, text="Add Department", font=("Century Gothic", 25, "bold"))
+            self.label.place(relx=0.5, rely=0.085, anchor=tkinter.CENTER)
 
-    def __back(self) -> None:
-        pass
+            self.label = ctk.CTkLabel(master=self.frame3, text="Department Name", font=("Century Gothic", 16))
+            self.label.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
 
-    def __apply(self) -> None:
-        pass
+            self.entry = ctk.CTkEntry(master=self.frame3, width=20, font=("Century Gothic", 16))
+            self.entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Add", command=self.add)
+            self.button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
+            self.button.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Back", command=self.back)
+            self.button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
+            self.button.place(relx=0.5, rely=0.8, anchor=tkinter.CENTER)
+
+        def update_department(self):
+            self.frame3 = ctk.CTkFrame(master=self.frame2, width=900, height=700, corner_radius=10)
+            self.frame3.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="Update Department", font=("Century Gothic", 25, "bold"))
+            self.label.place(relx=0.5, rely=0.085, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="Department Name", font=("Century Gothic", 16))
+            self.label.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
+
+            self.entry = ctk.CTkEntry(master=self.frame3, width=20, font=("Century Gothic", 16))
+            self.entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Update", command=self.update)
+            self.button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
+            self.button.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Back", command=self.back)
+            self.button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
+            self.button.place(relx=0.5, rely=0.8, anchor=tkinter.CENTER)
+
+        def remove_department(self):
+            self.frame3 = ctk.CTkFrame(master=self.frame2, width=900, height=700, corner_radius=10)
+            self.frame3.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="Remove Department", font=("Century Gothic", 25, "bold"))
+            self.label.place(relx=0.5, rely=0.085, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="Department Name", font=("Century Gothic", 16))
+            self.label.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
+
+            self.entry = ctk.CTkEntry(master=self.frame3, width=20, font=("Century Gothic", 16))
+            self.entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Remove", command=self.remove)
+            self.button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
+            self.button.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Back", command=self.back)
+            self.button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
+            self.button.place(relx=0.5, rely=0.8, anchor=tkinter.CENTER)
+
+        def view_department(self):
+            self.frame3 = ctk.CTkFrame(master=self.frame2, width=900, height=700, corner_radius=10)
+            self.frame3.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="View Department", font=("Century Gothic", 25, "bold"))
+            self.label.place(relx=0.5, rely=0.085, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="Department Name", font=("Century Gothic", 16))
+            self.label.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
+
+            self.entry = ctk.CTkEntry(master=self.frame3, width=20, font=("Century Gothic", 16))
+            self.entry.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="View", command=self.view)
+            self.button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
+            self.button.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Back", command=self.back)
+            self.button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
+            self.button.place(relx=0.5, rely=0.8, anchor=tkinter.CENTER)
+
+        def view_all_departments(self):
+            self.frame3 = ctk.CTkFrame(master=self.frame2, width=900, height=700, corner_radius=10)
+            self.frame3.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+            self.label = ctk.CTkLabel(master=self.frame3, text="View All Departments", font=("Century Gothic", 25, "bold"))
+            self.label.place(relx=0.5, rely=0.085, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="View", command=self.view_all)
+            self.button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
+            self.button.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+
+            self.button = ctk.CTkButton(master=self.frame3, text="Back", command=self.back)
+            self.button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
+            self.button.place(relx=0.5, rely=0.8, anchor=tkinter.CENTER)
+
+        def back(self):
+            self.frame3.destroy()
+
+    def main():
+        root = tkinter.Tk()
+        root.title("Department")
+        root.geometry("900x700")
+        root.resizable(False, False)
+        root.configure(bg="#ffffff")
+        app = Department(root)
+        root.mainloop()
+
+    if __name__ == "__main__":
+        main()
+
+
+
+            
