@@ -11,14 +11,18 @@ from frontend.helpers import styling
 from bson.objectid import ObjectId
 
 if sys.version_info >= (3, 11):
-    from typing import Self
+    from typing import Self, TYPE_CHECKING
 else:
-    from typing_extensions import Self
+    from typing_extensions import Self, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .benefits import BenefitPlan
 
 from .attendance_check import Attendance
-from .benefits import BenefitPlan
 from .payroll import Payroll
 from .performance import Performance
+
+from .password import hash
 
 class Employee(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
@@ -28,10 +32,12 @@ class Employee(BaseModel):
     employee_id: str = Field(default_factory=str)
     phone: str = Field(default_factory=str)
     department_id: str = Field(default_factory=str)
-    benefits: list[BenefitPlan] = Field(default_factory=list)
+    benefits: list[str] = Field(default_factory=list)
     payroll: Payroll = Field(default_factory=Payroll)
     attendance: Attendance = Field(default_factory=Attendance)
     performance: Performance = Field(default_factory=Performance)
+    hashed_password: str = Field(default_factory=str)
+    is_admin: bool = Field(default_factory=bool)
 
     def set_name(self, name: str) -> Result[Self, str]:
         if name == "":
@@ -83,7 +89,7 @@ class Employee(BaseModel):
         return Ok(self)
 
     def request_enrollment(self, benefit: BenefitPlan) -> Result[Self, str]:
-        if benefit in self.benefits:
+        if benefit.name in self.benefits:
             return Err("Employee is already enrolled in this plan!")
         # request enrollment
         benefit.add_pending_enrollment_request(self)
@@ -99,7 +105,7 @@ class Employee(BaseModel):
             {styling('Benefit plans', len(self.benefits))}
         """)
         for (i, benefit) in enumerate(self.benefits, 1):
-            data += f"  {styling(i, benefit.name)}\n"
+            data += f"  {styling(i, benefit)}\n"
         return data
 
     class Config:
