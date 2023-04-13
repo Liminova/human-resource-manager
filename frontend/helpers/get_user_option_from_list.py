@@ -49,4 +49,3 @@ def get_user_option_from_list(title: str, options: list[str]) -> int:
                 except:
                     user_choice = input(f"{FCOLORS.RED}Invalid choice! Try again: {FCOLORS.END}")
                     continue
-
