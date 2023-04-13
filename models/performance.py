@@ -3,12 +3,12 @@ import textwrap
 from option import Result, Ok, Err
 from datetime import datetime
 from pydantic import BaseModel, Field
-from frontend.helpers import styling
+from frontend.helpers import styling, FCOLORS
 
 if sys.version_info >= (3, 11):
-    from typing import Self
+    from typing import Self, Callable
 else:
-    from typing_extensions import Self
+    from typing_extensions import Self, Callable
 
 class Sale(BaseModel):
     employee_id: str = Field(default_factory=str)
@@ -79,6 +79,15 @@ class Sale(BaseModel):
             """)
         return data
 
+    def one_line_str(self) -> str:
+        _styling: Callable[[str, str], str] = lambda key, value: f" | {key}: {FCOLORS.GREEN}{value}{FCOLORS.END}"
+        data: str = styling("Sale ID:", self.sale_id)
+        data += _styling("Date", self.date.strftime("%Y-%m-%d"))
+        data += _styling("Profit", self.profit)
+        data += _styling("Client ID", self.client_id)
+        data += _styling("Rating", self.client_rating)
+        data += _styling("Employee", f"{self.employee_name} ({self.employee_id})")
+        return data
 
 class Performance(BaseModel):
     """Monitoring an employee's performance."""
