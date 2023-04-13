@@ -33,25 +33,25 @@ class homepage(ctk.CTk):
         self.label2.place(relx=0.825, rely=0.935, anchor=tkinter.CENTER)
 
         def button_size(button):
-            button.configure(width=260, height=40, font=("Century Gothic", 16), corner_radius=10)
+            button.configure(width=260, height=40, font=("Century Gothic", 16, "bold"), corner_radius=10)
 
         self.button1 = ctk.CTkButton(master=self.frame1, text="Employee Management", command=self.click_employeegui)
         button_size(self.button1)
         self.button1.place(relx=0.25, rely=0.35, anchor=tkinter.CENTER)
 
-        self.button2 = ctk.CTkButton(master=self.frame1, text="Benefit Plan Management")
+        self.button2 = ctk.CTkButton(master=self.frame1, text="Benefit Plan Management", command=self.click_benefitgui)
         button_size(self.button2)
         self.button2.place(relx=0.75, rely=0.35, anchor=tkinter.CENTER)
 
-        self.button3 = ctk.CTkButton(master=self.frame1, text="Attendance Management")
+        self.button3 = ctk.CTkButton(master=self.frame1, text="Attendance Management", command=self.click_attendancegui)
         button_size(self.button3)
         self.button3.place(relx=0.25, rely=0.55, anchor=tkinter.CENTER)
 
-        self.button4 = ctk.CTkButton(master=self.frame1, text="Payroll Management")
+        self.button4 = ctk.CTkButton(master=self.frame1, text="Payroll Management", command=self.click_payrollgui)
         button_size(self.button4)
         self.button4.place(relx=0.75, rely=0.55, anchor=tkinter.CENTER)
 
-        self.button5 = ctk.CTkButton(master=self.frame1, text="Department Management")
+        self.button5 = ctk.CTkButton(master=self.frame1, text="Department Management", command=self.click_departmentgui)
         button_size(self.button5)
         self.button5.place(relx=0.25, rely=0.75, anchor=tkinter.CENTER)
 
@@ -61,7 +61,6 @@ class homepage(ctk.CTk):
     
     def sign_out(self):
         import login
-        # Are you sure you want to sign out? Yes/No button
         messagebox.showwarning("Sign Out", "Are you sure you want to sign out?", icon="warning", parent=self, type="okcancel")
         self.destroy()
         login.login().run()
@@ -69,11 +68,31 @@ class homepage(ctk.CTk):
     def click_employeegui(self):
         import employeegui
         self.destroy()
-        employeegui.employeegui().run()
+        employeegui.employeegui().mainloop()
+
+    def click_benefitgui(self):
+        import benefitplangui
+        self.destroy()
+        benefitplangui.benefitplangui().mainloop()
+
+    def click_attendancegui(self):
+        import attendancegui
+        self.destroy()
+        attendancegui.attendancegui().mainloop()
+
+    def click_payrollgui(self):
+        import payrollgui
+        self.destroy()
+        payrollgui.payrollgui().mainloop()
+
+    def click_departmentgui(self):
+        import departmentgui
+        self.destroy()
+        departmentgui.departmentgui().mainloop()
 
     def run(self):
         self.mainloop()
 
 if __name__ == "__main__":
     app = homepage()
-    app.run()
+    app.mainloop()
