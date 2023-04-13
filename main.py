@@ -35,7 +35,7 @@ def initialize_data():
             the_company.benefits.append(BenefitPlan.parse_obj(benefit))
 
 def main_tui():
-    last_msg = ""
+    last_msg: str = ""
     if not os.getenv("MONGO_USER") or not os.getenv("MONGO_PASS") or not os.getenv("MONGO_URI"):
         os.environ["HRMGR_DB"] = "FALSE"
         input(textwrap.dedent("""\
