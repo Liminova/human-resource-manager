@@ -26,6 +26,8 @@ class MenuPerformance:
         employee_selected_index = get_user_option_from_list("Select an employee to manage performance", employee_items)
         if employee_selected_index == -1:
             return Err(NO_EMPLOYEE_MSG)
+        elif employee_selected_index == -2:
+            return Ok(None)
 
         # get the employee object
         self.__employee = employees[employee_selected_index]
@@ -106,6 +108,8 @@ class MenuPerformance:
         selected_sale_index = get_user_option_from_list("Select a sale to remove", sale_items)
         if selected_sale_index == -1:
             return NO_SALES_MSG
+        elif selected_sale_index == -2:
+            return ""
 
         # remove the sale
         del self.__employee.performance.sale_list[selected_sale_index]
