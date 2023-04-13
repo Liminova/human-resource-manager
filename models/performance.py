@@ -11,6 +11,8 @@ else:
     from typing_extensions import Self
 
 class Sale(BaseModel):
+    employee_id: str = Field(default_factory=str)
+    employee_name: str = Field(default_factory=str)
     sale_id: str = Field(default_factory=str)
     date: datetime = Field(default_factory=datetime.now)
     revenue: float = Field(default_factory=float)
