@@ -49,11 +49,11 @@ class MenuBenefits:
                 case 3: last_msg = self.__remove()
                 case 4: last_msg = self.__update()
                 case 5: last_msg = self.__view()
+                case 6: last_msg = self.__view_all()
                 case 7: return Ok(None)
                 case _: last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
-
         # create a blank benefit plan object
         benefit = BenefitPlan()
 
@@ -201,4 +201,11 @@ class MenuBenefits:
         print(self.__company.benefits[selected_benefit_index])
         input(ENTER_TO_CONTINUE_MSG)
 
+        return ""
+
+    def __view_all(self) -> str:
+        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in self.__company.benefits]
+        if len(benefit_items) == 0:
+            return NO_BENEFIT_MSG
+        listing("All existing benefit plans", benefit_items)
         return ""
