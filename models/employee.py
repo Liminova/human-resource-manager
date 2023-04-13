@@ -76,6 +76,12 @@ class Employee(BaseModel):
         self.performance = performance
         return Ok(self)
 
+    def set_password(self, password: str) -> Result[Self, str]:
+        if password == "":
+            return Err("Hashed password cannot be empty!")
+        self.hashed_password = hash(self.employee_id, password)
+        return Ok(self)
+
     def request_enrollment(self, benefit: BenefitPlan) -> Result[Self, str]:
         if benefit in self.benefits:
             return Err("Employee is already enrolled in this plan!")

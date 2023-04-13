@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import sys
 import os
 import textwrap
 
 from frontend.helpers import *
 from frontend.menu import *
-from models import Company, BenefitPlan, Department, Employee
+from models import Company, Employee, BenefitPlan, Department
 from dotenv import load_dotenv
 from database.mongo import employee_repo, department_repo, benefit_repo # type: ignore
 from option import Result, Ok
@@ -45,11 +47,53 @@ def main_tui():
     else:
         initialize_data()
 
-    while True:
+    # ======================
+    #    WElCOME SCREEN
+    # ======================
+
+    if len(the_company.employees) == 0:
+        print(textwrap.dedent("""\
+            Welcome to HR Manager!
+            It seems like this is your first time using this program.
+            You will be asked to create an admin account."""))
+        input(ENTER_TO_CONTINUE_MSG)
+    else:
+        first_account_is_admin = the_company.employees[0].is_admin
+        first_account_name_is_owner = the_company.employees[0].name == "Owner"
+        only_one_owner = len([employee for employee in the_company.employees if employee.name == "Owner"]) == 1
+        if not first_account_is_admin:
+            print(FCOLORS.RED + "WARNING: The first account is not an admin! Contact the IT department immediately!" + FCOLORS.END)
+            raise KeyboardInterrupt
+        if not first_account_name_is_owner:
+            print(FCOLORS.RED + "WARNING: The first account's name is not 'Owner'! Contact the IT department immediately!" + FCOLORS.END)
+            raise KeyboardInterrupt
+        elif not only_one_owner:
+            print(FCOLORS.RED + "WARNING: There are more than one owner accounts! Contact the IT department immediately!" + FCOLORS.END)
+            raise KeyboardInterrupt
+
+    # ==========================
+    #       LOGIN/SIGNUP
+    # ==========================
+
+    menu_login_signup = MenuLoginSignup(the_company)
+    is_logged_in = False
+    if len(the_company.employees) == 0:
+        is_logged_in = menu_login_signup.signup_admin()
+    else:
+        is_logged_in = menu_login_signup.login()
+    if not is_logged_in:
+        raise KeyboardInterrupt
+
+    # ==========================
+    #        MAIN MENU
+    # ==========================
+
+    while is_logged_in:
         clrscr()
+        last_msg: str = ""
         if last_msg:
             print(last_msg)
-            last_msg = ""
+            last_msg: str = ""
         main_menu = [
             "[1] Employee management",
             "[2] Benefit plan management",
@@ -62,24 +106,35 @@ def main_tui():
         user_choice = get_user_option_from_menu("Main menu", main_menu)
 
         if user_choice in [3, 4, 6] and not the_company.employees:
-            last_msg = NO_EMPLOYEE_MSG
+            last_msg: str = NO_EMPLOYEE_MSG
             continue
 
         respond: Result[bool, str] = Ok(None)
-        match user_choice:
-            case 1: respond = MenuEmployee(the_company).start()
-            case 2: respond = MenuBenefits(the_company).start()
-            case 3: respond = MenuAttendance(the_company).start()
-            case 4: respond = MenuPayroll(the_company).start()
-            case 5: respond = MenuDepartment(the_company).start()
-            case 6: respond = MenuPerformance(the_company).start()
-            case 7: break
-            case _: last_msg = FCOLORS.RED + "Invalid choice!" + FCOLORS.END
 
+        if the_company.logged_in_employee.is_admin:
+            match user_choice:
+                case 1: respond = MenuEmployee(the_company).admin()
+                case 2: respond = MenuBenefits(the_company).admin()
+                case 3: respond = MenuAttendance(the_company).admin()
+                case 4: respond = MenuPayroll(the_company).admin()
+                case 5: respond = MenuDepartment(the_company).admin()
+                case 6: respond = MenuPerformance(the_company).admin()
+                case 7: break
+                case _: last_msg: str = FCOLORS.RED + "Invalid choice!" + FCOLORS.END
+        else:
+            match user_choice:
+                case 1: respond = MenuEmployee(the_company).employee()
+                case 2: respond = MenuBenefits(the_company).employee()
+                case 3: respond = MenuAttendance(the_company).employee()
+                case 4: respond = MenuPayroll(the_company).employee()
+                case 5: respond = MenuDepartment(the_company).employee()
+                case 6: respond = MenuPerformance(the_company).employee()
+                case 7: break
+                case _: last_msg: str = FCOLORS.RED + "Invalid choice!" + FCOLORS.END
         try:
             respond.unwrap() # type: ignore
         except (ValueError, TypeError) as e:
-            last_msg = str(e)
+            last_msg: str = str(e)
 
 if __name__ == "__main__":
     try:
