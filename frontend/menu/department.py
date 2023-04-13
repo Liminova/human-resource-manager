@@ -102,8 +102,6 @@ class MenuDepartment:
         return f"Department {FCOLORS.RED}{dept_name}{FCOLORS.END} ({FCOLORS.RED}{dept_id}{FCOLORS.END}) removed successfully!"
 
     def __update(self) -> str:
-        depts = self.__company.departments
-
         # a list containing the string representation of each department
         dept_items = [f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments]
 
