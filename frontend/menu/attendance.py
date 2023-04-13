@@ -32,7 +32,7 @@ class MenuAttendance:
         self.__attendances = self.__employee.attendance
         self.__payroll = self.__employee.payroll
 
-        last_msg = ""
+        last_msg: str = ""
         while True:
             clrscr()
             if last_msg:
