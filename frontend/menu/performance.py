@@ -3,6 +3,8 @@ import sys
 from datetime import datetime
 from ..helpers import *
 from models import Sale
+from option import Result, Ok, Err
+
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
 else:
@@ -14,7 +16,7 @@ class MenuPerformance:
     def __init__(self, company: Company):
         self.__company = company
 
-    def start(self) -> tuple[bool, str]:
+    def start(self) -> Result[None, str]:
         employees = self.__company.employees
 
         # a list containing the string representation of each employee
@@ -23,7 +25,9 @@ class MenuPerformance:
         # get the index of the employee to manage performance for
         employee_selected_index = get_user_option_from_list("Select an employee to manage performance", employee_items)
         if employee_selected_index == -1:
-            return False, "No employee selected!"
+            return Err(NO_EMPLOYEE_MSG)
+        elif employee_selected_index == -2:
+            return Ok(None)
 
         # get the employee object
         self.__employee = employees[employee_selected_index]
@@ -35,7 +39,7 @@ class MenuPerformance:
                 print(last_msg)
                 last_msg = ""
             performance_menu = [
-                "[1] Add sale"
+                "[1] Add sale",
                 "[2] View sales performance",
                 "[3] Remove sale",
                 "[4] Get sale info",
@@ -49,9 +53,8 @@ class MenuPerformance:
                 case 3: last_msg = self.__remove()
                 case 4: last_msg = self.__get_info()
                 case 5: last_msg = self.__find()
-
-                case _:  # Back
-                    return True, ""
+                case 6: return Ok(None)
+                case _: last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
         # create a new, empty sale object
@@ -75,14 +78,16 @@ class MenuPerformance:
             # sale date has a default value, can't use the loop_til_valid_input function
             sale_date = input("Enter sale date (YYYY-MM-DD, 't' for today, leave blank to cancel): ")
             if sale_date == "":
-                return "Input cancelled!"
+                confirm = input("Are you sure you want to cancel? (Y/n): ")
+                if confirm.lower() != "n":
+                    return "Input cancelled!"
             elif sale_date == "t":
                 sale_date = datetime.now()
-                sale.set_date(sale_date).unwrap()
+                sale.set_date(datetime.strftime(sale_date, "%Y-%m-%d")).unwrap()
                 break
             try:
                 sale_date = datetime.strptime(sale_date, "%Y-%m-%d") if sale_date else datetime.now()
-                sale.set_date(sale_date).unwrap()
+                sale.set_date(datetime.strftime(sale_date, "%Y-%m-%d")).unwrap()
                 break
             except (ValueError, TypeError) as e:
                 return str(e)
@@ -94,7 +99,7 @@ class MenuPerformance:
 
     def __view(self) -> str:
         print(self.__employee.performance)
-        input("Press enter to continue...")
+        input(ENTER_TO_CONTINUE_MSG)
         return ""
 
     def __remove(self) -> str:
@@ -104,21 +109,33 @@ class MenuPerformance:
         # get the index of the sale to remove
         selected_sale_index = get_user_option_from_list("Select a sale to remove", sale_items)
         if selected_sale_index == -1:
-            return "No sale selected!"
+            return NO_SALES_MSG
+        elif selected_sale_index == -2:
+            return ""
 
         # remove the sale
         del self.__employee.performance.sale_list[selected_sale_index]
         return ""
 
     def __get_info(self) -> str:
-        pass
+        sale_items = [f"{sale.sale_id} ({sale.client_id})" for sale in self.__employee.performance.sale_list]
+        selected_sale_index = get_user_option_from_list("Select a sale to view info", sale_items)
+        if selected_sale_index == -1:
+            return NO_SALES_MSG
+        elif selected_sale_index == -2:
+            return ""
+
+        sale = self.__employee.performance.sale_list[selected_sale_index]
+        print(sale)
+        input(ENTER_TO_CONTINUE_MSG)
+        return ""
 
     def __find(self) -> str:
         search_fields = [
             "[1] Sale ID",
             "[2] Client ID",
             "[3] Client rating",
-            "[4] Date"
+            "[4] Date",
             "[else] Back"
         ]
         search_selection = get_user_option_from_menu("Find all sales by...", search_fields)
@@ -130,7 +147,7 @@ class MenuPerformance:
                     return "No sales found!"
 
                 print(sale)
-                input("Press enter to continue...")
+                input(ENTER_TO_CONTINUE_MSG)
                 return ""
 
             case 2:  # Client ID

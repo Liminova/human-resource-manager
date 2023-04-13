@@ -7,6 +7,7 @@ from frontend.menu import *
 from models import Company, BenefitPlan, Department, Employee
 from dotenv import load_dotenv
 from database.mongo import employee_repo, department_repo, benefit_repo # type: ignore
+from option import Result, Ok
 
 load_dotenv()
 
@@ -61,10 +62,10 @@ def main_tui():
         user_choice = get_user_option_from_menu("Main menu", main_menu)
 
         if user_choice in [3, 4, 6] and not the_company.employees:
-            last_msg = FCOLORS.RED + "No employees available! Please add an employee first." + FCOLORS.END
+            last_msg = NO_EMPLOYEE_MSG
             continue
 
-        respond: tuple[bool, str] = (True, "")
+        respond: Result[bool, str] = Ok(None)
         match user_choice:
             case 1: respond = MenuEmployee(the_company).start()
             case 2: respond = MenuBenefits(the_company).start()
@@ -75,8 +76,10 @@ def main_tui():
             case 7: break
             case _: last_msg = FCOLORS.RED + "Invalid choice!" + FCOLORS.END
 
-        if not respond[0]:
-            last_msg = FCOLORS.RED + respond[1] + FCOLORS.END
+        try:
+            respond.unwrap() # type: ignore
+        except (ValueError, TypeError) as e:
+            last_msg = str(e)
 
 if __name__ == "__main__":
     try:

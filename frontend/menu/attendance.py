@@ -2,6 +2,7 @@ from __future__ import annotations
 import sys
 from ..helpers import *
 from datetime import datetime
+from option import Result, Ok, Err
 
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
@@ -15,23 +16,23 @@ class MenuAttendance:
     def __init__(self, company: Company) -> None:
         self.__company = company
 
-    def start(self) -> tuple[bool, str]:
-        employees = self.__company.employees
-
+    def start(self) -> Result[None, str]:
         # a list containing the string representation of each employee
-        employee_items = [f"{employee.name} ({employee.id})" for employee in employees]
+        employee_items = [f"{employee.name} ({employee.id})" for employee in self.__company.employees]
 
         # get the index of the selected employee
         selected_employee_index = get_user_option_from_list("Select an employee to manage attendance for", employee_items)
         if selected_employee_index == -1:
-            return False, "No employee selected!"
+            return Err(NO_EMPLOYEE_MSG)
+        elif selected_employee_index == -2:
+            return Ok(None)
 
         # get the employee object from the index
-        self.__employee = employees[selected_employee_index]
+        self.__employee = self.__company.employees[selected_employee_index]
         self.__attendances = self.__employee.attendance
         self.__payroll = self.__employee.payroll
 
-        last_msg = ""
+        last_msg: str = ""
         while True:
             clrscr()
             if last_msg:
@@ -49,7 +50,8 @@ class MenuAttendance:
                 case 1: last_msg = self.__check()
                 case 2: last_msg = self.__update()
                 case 3: last_msg = self.__report()
-                case _: return True, ""
+                case 4: return Ok(None)
+                case _: last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __check(self) -> str:
         date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
@@ -94,7 +96,7 @@ class MenuAttendance:
     def __report(self) -> str:
         # check if there are any attendance data available
         if not self.__attendances:
-            return "No attendance data available!"
+            return NO_ATTENDANCE_MSG
 
         # get all the available years existing in the attendance data
         available_years = self.__attendances.get_available_years()
@@ -105,9 +107,11 @@ class MenuAttendance:
         # get the index of the selected year
         selected_year_index = get_user_option_from_list("Select a year to view attendance report for", year_items)
         if selected_year_index == -1:
-            return "No year selected!"
+            return NO_ATTENDANCE_MSG
+        elif selected_year_index == -2:
+            return ""
 
         # print the attendance report
         print(self.__attendances.get_report(available_years[selected_year_index]))
-        input("Press enter to continue...")
+        input(ENTER_TO_CONTINUE_MSG)
         return ""

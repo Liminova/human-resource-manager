@@ -4,6 +4,7 @@ import textwrap
 from option import Result, Ok, Err
 from pydantic import BaseModel, Field
 from bson.objectid import ObjectId
+from frontend.helpers import styling
 
 from database.pyobjectid import PyObjectId
 
@@ -30,12 +31,12 @@ class Department(BaseModel):
 
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\
-                - Name: {self.name}
-                - ID: {self.dept_id}
-                - Members:
+                {styling('Name', self.name)}
+                {styling('ID', self.dept_id)}
+                {styling('Members', len(self.members))}
             """)
         for (i, member) in enumerate(self.members, 1):
-            data += f"{i}. {member.name}\n"
+            data += f"  {styling(i, member.name)} ({member.employee_id})\n"
         return data
 
     class Config:

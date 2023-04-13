@@ -4,7 +4,10 @@ from .clustering import clustering
 
 
 def get_user_option_from_list(title: str, options: list[str]) -> int:
-    """Takes a list of options and returns the users choice's index"""
+    """Takes a list of options and returns the users choice's index | returns -1 if options empty, -2 if user cancels"""
+
+    if len(options) == 0:
+        return -1
 
     # split options into clusters of 9
     clusters = clustering(options, 9)
@@ -23,7 +26,7 @@ def get_user_option_from_list(title: str, options: list[str]) -> int:
 
         user_choice = input("{}[P]{}revious, {}[N]{}ext, enter a number to choose an entry or press enter to go back: ".format(FCOLORS.YELLOW, FCOLORS.END, FCOLORS.YELLOW, FCOLORS.END))
         match user_choice.upper():
-            case "": return -1
+            case "": return -2
             case "P":
                 if current_cluster == 0:
                     continue
@@ -46,4 +49,3 @@ def get_user_option_from_list(title: str, options: list[str]) -> int:
                 except:
                     user_choice = input(f"{FCOLORS.RED}Invalid choice! Try again: {FCOLORS.END}")
                     continue
-

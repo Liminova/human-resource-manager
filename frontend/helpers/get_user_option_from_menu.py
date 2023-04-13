@@ -1,7 +1,7 @@
 from .COLORS import FCOLORS
 
 def print_menu(title: str, entries: list[str]) -> None:
-    longest_entry = len(max(entries, key=len)) + 9
+    longest_entry = len(max(entries+[title], key=len)) + 9
 
     print(FCOLORS.GREEN + "╔" + "═" * (longest_entry - 1) + "╗" + FCOLORS.END)
     border = FCOLORS.GREEN + "║" + FCOLORS.END
@@ -32,7 +32,7 @@ def get_user_option_from_menu(
         title: str,
         menu_list: list[str],
 ) -> int:
-    """Takes a list of menu entries and returns the user's choice"""
+    """Takes a list of menu entries and returns the user's choice | returns -1 if user cancels"""
     print_menu(title, menu_list)
     user_choice = 0
     while True:

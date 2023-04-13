@@ -5,6 +5,7 @@ import os
 from ..helpers import *
 from models import Employee
 from database.mongo import employee_repo, benefit_repo, department_repo # type: ignore
+from option import Result, Ok
 
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
@@ -18,13 +19,7 @@ class MenuEmployee:
     def __init__(self, company: Company):
         self.__company = company
 
-    def start(self) -> tuple[bool, str]:
-        depts = self.__company.departments
-        employees = self.__company.employees
-
-        if not depts:
-            return False, "No departments available! Please add a department first."
-
+    def start(self) -> Result[None, str]:
         last_msg = ""
         while True:
             clrscr()
@@ -42,8 +37,8 @@ class MenuEmployee:
             ]
             choice = get_user_option_from_menu("Employee management", employee_menu)
 
-            if (choice not in [1, 6]) and (not employees):
-                last_msg = "No employees available! Please add an employee first."
+            if (choice not in [1, 6]) and (not self.__company.employees):
+                last_msg = NO_EMPLOYEE_MSG
                 continue
 
             match choice:
@@ -52,8 +47,8 @@ class MenuEmployee:
                 case 3: last_msg = self.__update()
                 case 4: last_msg = self.__view()
                 case 5: last_msg = self.__view_all()
-                case _:
-                    return True, ""
+                case 6: return Ok(None)
+                case _: last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
         # create a new, empty employee
@@ -74,23 +69,26 @@ class MenuEmployee:
         # a list containing the string representation of each department
         dept_items = [f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments]
 
-        # get the index of the department to add the employee to
-        dept_index = get_user_option_from_list("Select a department to add the employee to", dept_items)
-        dept = self.__company.departments[dept_index]
-        if dept_index == -1:
-            return ""
+        if len(dept_items) > 0:
+            # get the index of the department to add the employee to
+            dept_index = get_user_option_from_list("Select a department to add the employee to", dept_items)
+            dept = self.__company.departments[dept_index]
+            if dept_index == -1:
+                return NO_DEPARTMENT_MSG
+            elif dept_index == -2:
+                return ""
 
-        # add the employee to the department's members
-        dept.members.append(employee)
-        if os.getenv("HRMGR_DB") == "TRUE":
-            department_repo.update_one(
-                { "_id": dept.id },
-                { "$set": dept.dict(exclude={"id"}, by_alias=True) },
-                upsert=True,
-            )
+            # add the employee to the department's members
+            dept.members.append(employee)
+            if os.getenv("HRMGR_DB") == "TRUE":
+                department_repo.update_one(
+                    { "_id": dept.id },
+                    { "$set": dept.dict(exclude={"id"}, by_alias=True) },
+                    upsert=True,
+                )
 
-        # add the department id to the employee's department_id
-        employee.department_id = self.__company.departments[dept_index].dept_id
+            # add the department id to the employee's department_id
+            employee.department_id = self.__company.departments[dept_index].dept_id
 
         # append the employee to the company's employees
         self.__company.employees.append(employee)
@@ -99,27 +97,26 @@ class MenuEmployee:
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.insert_one(employee.dict(by_alias=True)) # type: ignore
 
-        return f"Employee {employee.name} ({employee.employee_id}) added successfully!"
+        return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.employee_id}{FCOLORS.END}) added successfully!"
 
     def __remove(self) -> str:
-        employees = self.__company.employees
-        depts = self.__company.departments
-        benefits = self.__company.benefits
-
         # a list containing the string representation of each employee
-        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in employees]
+        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in self.__company.employees]
 
         # get the index of the employee to remove
         employee_index = get_user_option_from_list("Select an employee to remove", employee_items)
         if employee_index == -1:
+            return NO_EMPLOYEE_MSG
+        elif employee_index == -2:
             return ""
 
-        employee = employees[employee_index - 1]
+        # get the actual employee
+        employee = self.__company.employees[employee_index]
 
-        # remove from whatever department they're in
-        for dept in depts:
+        # remove employee from the department they're in
+        for dept in self.__company.departments:
             if employee in dept.members:
-                dept.members.remove(employees[employee_index])
+                dept.members.remove(employee)
                 if os.getenv("HRMGR_DB") == "TRUE":
                     department_repo.update_one(
                         { "_id": dept.id },
@@ -127,10 +124,10 @@ class MenuEmployee:
                         upsert=True
                     )
 
-        # remove from whatever benefit plan they're in
-        for benefit in benefits:
+        # remove employee from the benefits they're enrolled in
+        for benefit in self.__company.benefits:
             if employee in benefit.enrolled_employees:
-                benefit.enrolled_employees.remove(employees[employee_index])
+                benefit.enrolled_employees.remove(employee)
                 if os.getenv("HRMGR_DB") == "TRUE":
                     benefit_repo.update_one(
                         { "_id": benefit.id },
@@ -141,9 +138,9 @@ class MenuEmployee:
         # remove from the company
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.delete_one({ "_id": employee.id })
-        del employees[employee_index - 1]
+        del self.__company.employees[employee_index]
 
-        return f"Employee {employee.name} ({employee.employee_id}) removed successfully!"
+        return f"Employee {FCOLORS.RED}{employee.name}{FCOLORS.END} ({FCOLORS.RED}{employee.employee_id}{FCOLORS.END}) removed successfully!"
 
     def __update(self) -> str:
         employees = self.__company.employees
@@ -154,6 +151,8 @@ class MenuEmployee:
         # get the employee to update
         selected_employee_index = get_user_option_from_list("Select an employee to update", employee_items)
         if selected_employee_index == -1:
+            return NO_EMPLOYEE_MSG
+        elif selected_employee_index == -2:
             return ""
 
         # get the actual employee object
@@ -178,7 +177,7 @@ class MenuEmployee:
                 upsert=True,
             )
 
-        return f"Employee {employee.name} ({employee.employee_id}) updated successfully!"
+        return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.employee_id}{FCOLORS.END}) updated successfully!"
 
     def __view(self) -> str:
         employees = self.__company.employees
@@ -189,11 +188,13 @@ class MenuEmployee:
         # get the employee to view
         selected_employee_index = get_user_option_from_list("Select an employee to view", employee_items)
         if selected_employee_index == -1:
+            return NO_EMPLOYEE_MSG
+        elif selected_employee_index == -2:
             return ""
 
         # print the employee
         print(employees[selected_employee_index])
-        input("\nPress enter to continue...")
+        input(ENTER_TO_CONTINUE_MSG)
         return ""
 
     def __view_all(self) -> str:

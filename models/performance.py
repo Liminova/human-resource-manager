@@ -3,6 +3,7 @@ import textwrap
 from option import Result, Ok, Err
 from datetime import datetime
 from pydantic import BaseModel, Field
+from frontend.helpers import styling
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -23,28 +24,41 @@ class Sale(BaseModel):
         self.sale_id = sale_id
         return Ok(self) if sale_id != "" else Err("Sale ID cannot be empty.")
 
-    def set_date(self, date: datetime) -> Result[Self, str]:
+    def set_date(self, date: str) -> Result[Self, str]:
+        date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
         self.date = date
         return Ok(self)
 
-    def set_revenue(self, revenue: float) -> Result[Self, str]:
+    def set_revenue(self, revenue: str) -> Result[Self, str]:
+        revenue = float(revenue)
+        if revenue < 0:
+            return Err("Revenue cannot be negative.")
         self.revenue = revenue
-        return Ok(self) if revenue >= 0 else Err("Revenue cannot be negative.")
+        return Ok(self)
 
-    def set_cost(self, cost: float) -> Result[Self, str]:
+    def set_cost(self, cost: str) -> Result[Self, str]:
+        cost = float(cost)
+        if cost < 0:
+            return Err("Cost cannot be negative.")
         self.cost = cost
-        return Ok(self) if cost >= 0 else Err("Cost cannot be negative.")
+        return Ok(self)
 
-    def set_profit(self, profit: float) -> Result[Self, str]:
+    def set_profit(self, profit: str) -> Result[Self, str]:
+        profit = float(profit)
+        if profit < 0:
+            return Err("Profit cannot be negative.")
         self.profit = profit
-        return Ok(self) if profit >= 0 else Err("Profit cannot be negative.")
+        return Ok(self)
 
     def set_client_id(self, client_id: str) -> Result[Self, str]:
         return Ok(self) if client_id != "" else Err("Client ID cannot be empty.")
 
-    def set_client_rating(self, client_rating: float) -> Result[Self, str]:
+    def set_client_rating(self, client_rating: str) -> Result[Self, str]:
+        client_rating = float(client_rating)
+        if client_rating < 1 or client_rating > 5:
+            return Err("Client rating must be between 1 and 5.")
         self.client_rating = client_rating
-        return Ok(self) if client_rating >= 1 and client_rating <= 5 else Err("Client rating must be between 1 and 5.")
+        return Ok(self)
 
     def set_client_comment(self, client_comment: str) -> Result[Self, str]:
         self.client_comment = client_comment
@@ -52,13 +66,14 @@ class Sale(BaseModel):
 
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\
-            - Sale ID: {self.sale_id}
-            - Revenue: {self.revenue}
-            - Cost: {self.cost}
-            - Profit: {self.profit}
-            - Client ID: {self.client_id}
-            - Client rating: {self.client_rating}
-            - Client comment: {self.client_comment}\
+            {styling('Sale ID:', self.sale_id)}
+            {styling('Date:', self.date.strftime('%Y-%m-%d'))}
+            {styling('Revenue:', self.revenue)}
+            {styling('Cost:', self.cost)}
+            {styling('Profit:', self.profit)}
+            {styling('Client ID:', self.client_id)}
+            {styling('Client rating:', self.client_rating)}
+            {styling('Client comment:', self.client_comment)}\
             """)
         return data
 
@@ -121,11 +136,11 @@ class Performance(BaseModel):
 
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\
-            - Sales count: {self.sales_count}
-            - Total revenue: {self.total_revenue}
-            - Total cost: {self.total_cost}
-            - Total profit: {self.total_profit}
-            - Average rating: {self.average_rating}\
+            {styling('Sales count:', self.sales_count)}
+            {styling('Total revenue:', self.total_revenue)}
+            {styling('Total cost:', self.total_cost)}
+            {styling('Total profit:', self.total_profit)}
+            {styling('Average rating:', self.average_rating)}\
             """)
         return data
 

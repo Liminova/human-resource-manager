@@ -4,6 +4,7 @@ import textwrap
 from option import Result, Ok, Err
 from pydantic import BaseModel, Field
 from bson.objectid import ObjectId
+from frontend.helpers import styling
 
 from database.pyobjectid import PyObjectId
 
@@ -43,13 +44,13 @@ class BenefitPlan(BaseModel):
 
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\
-            - Name: {self.name}
-            - Description: {self.description}
-            - Cost: {self.cost}
-            - Enrolled employees:
+            {styling('Name', self.name)}
+            {styling('Description', self.description)}
+            {styling('Cost', self.cost)}
+            {styling('Enrolled employees', self.enrolled_employees)}
         """)
         for (i, employee) in enumerate(self.enrolled_employees, 1):
-            data += f"{i}: {employee}\n"
+            data += f"  {styling(i, employee.name)} ({employee.employee_id})\n"
         return data
 
     class Config:

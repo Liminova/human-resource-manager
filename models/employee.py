@@ -6,6 +6,8 @@ from datetime import datetime
 from option import Result, Ok, Err
 from pydantic import BaseModel, Field
 from database import PyObjectId
+from frontend.helpers import styling
+
 from bson.objectid import ObjectId
 
 if sys.version_info >= (3, 11):
@@ -83,15 +85,15 @@ class Employee(BaseModel):
 
     def __str__(self) -> str:
         data = textwrap.dedent(f"""\
-            - Name: {self.name}
-            - DoB: {self.dob}
-            - ID: {self.employee_id}
-            - Phone: {self.phone}
-            - Department ID: {self.department_id}
-            - Benefit plans:
+            {styling('Name', self.name)}
+            {styling('DoB', self.dob.strftime("%Y-%m-%d"))}
+            {styling('ID', self.employee_id)}
+            {styling('Phone', self.phone)}
+            {styling('Department ID', self.department_id)}
+            {styling('Benefit plans', len(self.benefits))}
         """)
         for (i, benefit) in enumerate(self.benefits, 1):
-            data += f"{i}. {benefit.name}\n"
+            data += f"  {styling(i, benefit.name)}\n"
         return data
 
     class Config:

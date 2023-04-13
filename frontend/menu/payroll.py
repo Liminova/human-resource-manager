@@ -2,6 +2,8 @@ from __future__ import annotations
 import sys
 from ..helpers import *
 from models import Payroll
+from option import Result, Ok, Err
+
 if sys.version_info >= (3, 11):
     from typing import TYPE_CHECKING
 else:
@@ -13,12 +15,14 @@ class MenuPayroll:
     def __init__(self, company: Company):
         self.__company = company
 
-    def start(self) -> tuple[bool, str]:
+    def start(self) -> Result[None, str]:
         employees = self.__company.employees
 
         selected_employee_index = get_user_option_from_list("Select an employee to manage payroll for", [f"{employee.name} ({employee.id})" for employee in employees])
         if selected_employee_index == -1:
-            return False, "No employee selected!"
+            return Err(NO_EMPLOYEE_MSG)
+        elif selected_employee_index == -2:
+            return Ok(None)
         self.__employee = employees[selected_employee_index]
 
         last_msg = ""
@@ -30,13 +34,14 @@ class MenuPayroll:
             payroll_menu = [
                 "[1] Create",
                 "[2] Update",
-                "[else] Back"
+                "[3] Back"
             ]
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:
                 case 1: last_msg = self.__create()
                 case 2: last_msg = self.__update()
-                case _: return True, ""
+                case 3: return Ok(None)
+                case _: last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __create(self) -> str:
         if self.__employee.payroll.total != 0:
