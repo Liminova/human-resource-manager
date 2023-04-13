@@ -9,6 +9,7 @@ option = "*"
 pymongo = "*"
 pydantic = "*"
 python-dotenv = "*"
+customtkinter = "*"
 
 [dev-packages]
 ruff = "*"
