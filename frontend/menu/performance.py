@@ -118,7 +118,17 @@ class MenuPerformance:
         return ""
 
     def __get_info(self) -> str:
-        pass
+        sale_items = [f"{sale.sale_id} ({sale.client_id})" for sale in self.__employee.performance.sale_list]
+        selected_sale_index = get_user_option_from_list("Select a sale to view info", sale_items)
+        if selected_sale_index == -1:
+            return NO_SALES_MSG
+        elif selected_sale_index == -2:
+            return ""
+
+        sale = self.__employee.performance.sale_list[selected_sale_index]
+        print(sale)
+        input(ENTER_TO_CONTINUE_MSG)
+        return ""
 
     def __find(self) -> str:
         search_fields = [
