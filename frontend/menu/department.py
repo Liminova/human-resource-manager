@@ -34,7 +34,8 @@ class MenuDepartment:
                 "[5] Remove employee from one",
                 "[6] View details of one",
                 "[7] List all",
-                "[8] Back",
+                "[8] List employees does not belong to any department",
+                "[9] Back",
             ]
 
             choice = get_user_option_from_menu("Department management", department_menu)
@@ -50,7 +51,8 @@ class MenuDepartment:
                 case 5: last_msg = self.__remove_employee()
                 case 6: last_msg = self.__view()
                 case 7: last_msg = self.__view_all()
-                case 8: return Ok(None)
+                case 8: last_msg = self.__view_employees_not_belong_to_any_department()
+                case 9: return Ok(None)
                 case _: last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
@@ -233,4 +235,11 @@ class MenuDepartment:
         if len(dept_items) == 0:
             return NO_DEPARTMENT_MSG
         listing("Departments", dept_items)
+        return ""
+
+    def __view_employees_not_belong_to_any_department(self) -> str:
+        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in self.__company.employees if employee.department_id == ""]
+        if len(employee_items) == 0:
+            return NO_EMPLOYEE_MSG
+        listing("Employees not belong to any department", employee_items)
         return ""
