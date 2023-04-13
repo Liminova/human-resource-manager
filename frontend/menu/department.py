@@ -75,9 +75,13 @@ class MenuDepartment:
         elif dept_selected_index == -2:
             return ""
 
-        # remove the department from whatever employee it's applied to
-        for employee in employees:
-            if employee.department_id == depts[dept_selected_index].id:
+        # get the department name and ID to return a message before removing it
+        dept_name = self.__company.departments[dept_selected_index].name
+        dept_id = self.__company.departments[dept_selected_index].dept_id
+
+        # remove the department id from all employees in the department
+        for employee in self.__company.employees:
+            if employee.department_id == self.__company.departments[dept_selected_index].dept_id:
                 employee.department_id = ""
                 if os.getenv("HRMGR_DB") == "TRUE":
                     employee_repo.update_one(
@@ -86,11 +90,12 @@ class MenuDepartment:
                         upsert=True,
                     )
 
+        # remove the department from the company
+        del self.__company.departments[dept_selected_index]
         if os.getenv("HRMGR_DB") == "TRUE":
             department_repo.delete_one({ "_id": self.__company.departments[dept_selected_index].id })
 
-        depts.pop(dept_selected_index)
-        return "Department removed successfully!"
+        return f"Department {FCOLORS.RED}{dept_name}{FCOLORS.END} ({FCOLORS.RED}{dept_id}{FCOLORS.END}) removed successfully!"
 
     def __update(self) -> str:
         depts = self.__company.departments

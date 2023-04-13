@@ -147,8 +147,7 @@ class MenuBenefits:
                     )
 
         # remove the benefit from the company's list of benefits
-        # benefits.pop(benefit_index_selected)
-        benefits.remove(benefit)
+        del self.__company.benefits[benefit_index_selected]
         if os.getenv("HRMGR_DB") == "TRUE":
             benefit_repo.delete_one({ "_id": benefit.id })
 
