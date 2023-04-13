@@ -55,7 +55,7 @@ class homepage(ctk.CTk):
         button_size(self.button5)
         self.button5.place(relx=0.25, rely=0.75, anchor=tkinter.CENTER)
 
-        self.button6 = ctk.CTkButton(master=self.frame1, text="Performance Management")
+        self.button6 = ctk.CTkButton(master=self.frame1, text="Performance Management", command=self.click_performancegui)
         button_size(self.button6)
         self.button6.place(relx=0.75, rely=0.75, anchor=tkinter.CENTER)
     
@@ -89,6 +89,11 @@ class homepage(ctk.CTk):
         import departmentgui
         self.destroy()
         departmentgui.departmentgui().mainloop()
+
+    def click_performancegui(self):
+        import performancegui
+        self.destroy()
+        performancegui.performancegui().mainloop()
 
     def run(self):
         self.mainloop()
