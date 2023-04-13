@@ -83,11 +83,11 @@ class MenuPerformance:
                     return "Input cancelled!"
             elif sale_date == "t":
                 sale_date = datetime.now()
-                sale.set_date(sale_date).unwrap()
+                sale.set_date(datetime.strftime(sale_date, "%Y-%m-%d")).unwrap()
                 break
             try:
                 sale_date = datetime.strptime(sale_date, "%Y-%m-%d") if sale_date else datetime.now()
-                sale.set_date(sale_date).unwrap()
+                sale.set_date(datetime.strftime(sale_date, "%Y-%m-%d")).unwrap()
                 break
             except (ValueError, TypeError) as e:
                 return str(e)
