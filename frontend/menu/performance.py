@@ -78,7 +78,9 @@ class MenuPerformance:
             # sale date has a default value, can't use the loop_til_valid_input function
             sale_date = input("Enter sale date (YYYY-MM-DD, 't' for today, leave blank to cancel): ")
             if sale_date == "":
-                return "Input cancelled!"
+                confirm = input("Are you sure you want to cancel? (Y/n): ")
+                if confirm.lower() != "n":
+                    return "Input cancelled!"
             elif sale_date == "t":
                 sale_date = datetime.now()
                 sale.set_date(sale_date).unwrap()
