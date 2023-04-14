@@ -62,13 +62,15 @@ class MenuAttendance:
                 print(last_msg)
                 last_msg: str = ""
             attendance_menu = [
-                "[1] Get report",
-                "[2] Back",
+                "[1] Check",
+                "[2] Get report",
+                "[3] Back",
             ]
             choice = get_user_option_from_menu("Attendance management for " + self.__logged_in_employee.name, attendance_menu)
             match choice:
-                case 1: last_msg: str = self.__report()
-                case 2: return Ok(None)
+                case 1: last_msg: str = self.__check()
+                case 2: last_msg: str = self.__report()
+                case 3: return Ok(None)
                 case _: last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __check(self) -> str:
