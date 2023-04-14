@@ -139,7 +139,6 @@ class AttendanceGui(ctk.CTk):
                     or id == ""
                     or date == ""
                     or time == ""
-                    or present == "None"
                 ):
                     messagebox.showerror("Error", "Please fill in all the fields")
                 elif not name.isalpha():
@@ -275,7 +274,6 @@ class AttendanceGui(ctk.CTk):
                     or id == ""
                     or date == ""
                     or time == ""
-                    or present == "None"
                 ):
                     messagebox.showerror("Error", "Please fill in all the fields")
                 elif not name.isalpha():

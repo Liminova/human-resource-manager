@@ -143,7 +143,7 @@ class BenefitPlanGui(ctk.CTk):
 
             def remove_successfully(self):
                 name = self.entry1.get()
-                if name == "" or id == "" or department == "":
+                if name == "":
                     messagebox.showerror("Error", "Please fill in all the fields")
                 elif not name.isalpha():
                     messagebox.showerror("Error", "Please enter a valid name")
