@@ -44,16 +44,16 @@ Fill out `.env` using `.env.example` as a base.
 Afterwards, either use:
 
 ```shell
-$ pipenv run python main.py
+$ pipenv run python main_gui.py
 ```
 
-or:
+or, if you have `pnpm` set up:
 
 ```shell
-$ pnpm launch
+$ pnpm start-gui
 ```
 
-to start the program.
+to start the program. The TUI is also available by replacing `gui` with `tui`.
 
 ## Contributing
 
