@@ -2,8 +2,8 @@ import customtkinter as ctk
 import tkinter
 from tkinter import messagebox
 
-import homepage
-import signup
+from .homepage import Homepage
+from .signup import Signup
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
@@ -71,9 +71,9 @@ class Login(ctk.CTk):
             messagebox.showerror("Error", "Please fill in all the fields")
         elif username == "admin" and password == "admin":
             self.destroy()
-            homepage.homepage().run()
+            Homepage.homepage().run()
         else:
             messagebox.showerror("Error", "Incorrect username or password")
 
     def click_signup(self):
-        signup.signup().run()
+        Signup.signup().run()
