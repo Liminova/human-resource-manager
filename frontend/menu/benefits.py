@@ -13,7 +13,7 @@ else:
     from typing_extensions import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from models import Company, Employee, BenefitPlan
+    from models import Company, Employee
 
 class MenuBenefits:
     def __init__(self, company: Company):
