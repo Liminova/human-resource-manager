@@ -7,7 +7,7 @@
     "test": "pipenv run python -m unittest",
     "start-tui": "pipenv run python main_tui.py",
     "start-gui": "pipenv run python main_gui.py",
-    "lint": "pipenv run ruff . --fix && pipenv run black ."
+    "lint": "pipenv run black . && pipenv run ruff . --fix"
   },
   "config": {
     "commitizen": {
