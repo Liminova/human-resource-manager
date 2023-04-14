@@ -215,31 +215,28 @@ class MenuDepartment:
             return "You do not have permission to modify this employee's department!"
 
         # add the employee to the department, department ID to the employee
-        empls[employee_selected_index].department_id = depts[
-            dept_selected_index
-        ].dept_id
-        depts[dept_selected_index].members.append(empls[employee_selected_index])
+        employee = empls[employee_selected_index]
+        department = depts[dept_selected_index]
+
+        employee.set_department(department.dept_id).unwrap()
+        department.members.append(employee)
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one(
-                {"_id": empls[employee_selected_index].id},
+                {"_id": employee.id},
                 {
-                    "$set": empls[employee_selected_index].dict(
+                    "$set": employee.dict(
                         include={"department_id"}
                     )
                 },
                 upsert=True,
             )
             department_repo.update_one(
-                {"_id": depts[dept_selected_index].id},
-                {"$set": depts[dept_selected_index].dict(include={"members"})},
+                {"_id": department.id},
+                {"$set": department.dict(include={"members"})},
                 upsert=True,
             )
 
-        employee_name = empls[employee_selected_index].name
-        employee_id = empls[employee_selected_index].employee_id
-        dept_name = depts[dept_selected_index].name
-        dept_id = depts[dept_selected_index].dept_id
-        return f"Employee {FCOLORS.GREEN}{employee_name}{FCOLORS.END} ({FCOLORS.GREEN}{employee_id}{FCOLORS.END}) added to department {FCOLORS.GREEN}{dept_name}{FCOLORS.END} ({FCOLORS.GREEN}{dept_id}{FCOLORS.END}) successfully!"
+        return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.id}{FCOLORS.END}) added to department {FCOLORS.GREEN}{department.name}{FCOLORS.END} ({FCOLORS.GREEN}{department.id}{FCOLORS.END}) successfully!"
 
     def __remove_employee(self) -> str:
         depts = self.__company.departments
@@ -256,12 +253,13 @@ class MenuDepartment:
             return NO_DEPARTMENT_MSG
         elif dept_selected_index == -2:
             return ""
+        department = depts[dept_selected_index]
 
         # get the index of the employee to remove
         employee_items = [
             f"{employee.name} ({employee.employee_id})"
             for employee in empls
-            if employee.department_id == depts[dept_selected_index].dept_id
+            if employee.department_id == department.dept_id
         ]
         employee_selected_index = get_user_option_from_list(
             "Select an employee to remove from the department", employee_items
@@ -274,32 +272,28 @@ class MenuDepartment:
         if not self.__company.can_modify("department", empls[employee_selected_index]):
             return "Only the company owner can manage admins! You can only manage employees."
 
-        # get the actual employee, department names, and IDs to print before removing
-        employee_name = empls[employee_selected_index].name
-        employee_id = empls[employee_selected_index].employee_id
-        dept_name = depts[dept_selected_index].name
-        dept_id = depts[dept_selected_index].dept_id
+        employee = empls[employee_selected_index + 1]
 
         # remove the employee from the department
-        empls[employee_selected_index].department_id = ""
-        depts[dept_selected_index].members.remove(empls[employee_selected_index])
+        employee.set_department("").unwrap()
+        department.members.remove(employee)
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one(
-                {"_id": empls[employee_selected_index].id},
+                {"_id": employee.id},
                 {
-                    "$set": empls[employee_selected_index].dict(
+                    "$set": employee.dict(
                         include={"department_id"}
                     )
                 },
                 upsert=True,
             )
             department_repo.update_one(
-                {"_id": depts[dept_selected_index].id},
-                {"$set": depts[dept_selected_index].dict(include={"members"})},
+                {"_id": department.id},
+                {"$set": department.dict(include={"members"})},
                 upsert=True,
             )
 
-        return f"Employee {FCOLORS.GREEN}{employee_name}{FCOLORS.END} ({FCOLORS.GREEN}{employee_id}{FCOLORS.END}) removed from department {FCOLORS.GREEN}{dept_name}{FCOLORS.END} ({FCOLORS.GREEN}{dept_id}{FCOLORS.END}) successfully!"
+        return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.employee_id}{FCOLORS.END}) removed from department {FCOLORS.GREEN}{department.name}{FCOLORS.END} ({FCOLORS.GREEN}{department.dept_id}{FCOLORS.END}) successfully!"
 
     def __view(self) -> str:
         depts = self.__company.departments
