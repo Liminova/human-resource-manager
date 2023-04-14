@@ -48,7 +48,7 @@ def main_tui():
         initialize_data()
 
     # ======================
-    #    WElCOME SCREEN
+    #    WELCOME SCREEN
     # ======================
 
     if len(the_company.employees) == 0:
