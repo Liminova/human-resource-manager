@@ -1,6 +1,6 @@
 {
   "python.analysis.typeCheckingMode": "strict",
-  "python.formatting.provider": "yapf",
+  "python.formatting.provider": "black",
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
