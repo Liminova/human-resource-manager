@@ -32,8 +32,9 @@ class MenuEmployee:
                 "[2] Remove",
                 "[3] Update information",
                 "[4] View details of one",
-                "[5] List all",
-                "[6] Back",
+                "[5] Change password",
+                "[6] List all",
+                "[7] Back",
             ]
             choice = get_user_option_from_menu("Employee management", employee_menu)
 
@@ -47,7 +48,8 @@ class MenuEmployee:
                 case 3: last_msg: str = self.__update()
                 case 4: last_msg: str = self.__view()
                 case 5: last_msg: str = self.__view_all()
-                case 6: return Ok(None)
+                case 6: last_msg: str = self.__change_password()
+                case 7: return Ok(None)
                 case _: last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
