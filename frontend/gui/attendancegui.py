@@ -81,9 +81,9 @@ class attendancegui(ctk.CTk):
                     messagebox.showerror("Error", "Please fill in all the fields")
                 elif not name.isalpha():
                     messagebox.showerror("Error", "Please enter a valid name")
-                elif not "-" in date:
+                elif "-" not in date:
                     messagebox.showerror("Error", "Please enter a valid date")
-                elif not ":" in time:
+                elif ":" not in time:
                     messagebox.showerror("Error", "Please enter a valid time")
                 else:
                     messagebox.showinfo("Success", "Attendance has been recorded")
@@ -153,9 +153,9 @@ class attendancegui(ctk.CTk):
                     messagebox.showerror("Error", "Please fill in all the fields")
                 elif not name.isalpha():
                     messagebox.showerror("Error", "Please enter a valid name")
-                elif not "-" in date:
+                elif "-" not in date:
                     messagebox.showerror("Error", "Please enter a valid date")
-                elif not ":" in time:
+                elif ":" not in time:
                     messagebox.showerror("Error", "Please enter a valid time")
                 else:
                     messagebox.showinfo("Success", "Attendance has been recorded")

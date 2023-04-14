@@ -78,9 +78,9 @@ class employeegui(ctk.CTk):
                     messagebox.showerror("Error", "Please enter a valid name")
                 elif not phone.isdigit() and len(phone) != 10:
                     messagebox.showerror("Error", "Please enter a valid phone number")
-                elif not "@" in email:
+                elif "@" not in email:
                     messagebox.showerror("Error", "Please enter a valid email")
-                elif not "-" in dob:
+                elif "-" not in dob:
                     messagebox.showerror("Error", "Please enter a valid date of birth")
                 else:
                     messagebox.showinfo("Success", "Employee added successfully")
@@ -193,9 +193,9 @@ class employeegui(ctk.CTk):
                     messagebox.showerror("Error", "Please enter a valid ID")
                 elif not phone.isdigit() and len(phone) != 10:
                     messagebox.showerror("Error", "Please enter a valid phone number")
-                elif not "@" in email:
+                elif "@" not in email:
                     messagebox.showerror("Error", "Please enter a valid email")
-                elif not "-" in dob:
+                elif "-" not in dob:
                     messagebox.showerror("Error", "Please enter a valid date of birth")
                 else:
                     messagebox.showinfo("Success", "Employee updated successfully")
