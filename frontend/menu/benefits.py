@@ -28,13 +28,13 @@ class MenuBenefits:
                 print(last_msg)
                 last_msg: str = ""
             benefit_plan_menu = [
-                "[1] Add",
-                "[2] Apply one to employee",
-                "[3] Remove",
-                "[4] Update",
-                "[5] View details of one",
-                "[6] List all",
-                "[7] Request to enroll in one",
+                "[1] Add benefit",
+                "[2] Apply benefit to employee",
+                "[3] Remove benefit",
+                "[4] Update benefit",
+                "[5] View details of benefit",
+                "[6] List all benefits",
+                "[7] Request to enroll in benefit",
                 "[8] Resolve pending requests",
                 "[9] Back",
             ]

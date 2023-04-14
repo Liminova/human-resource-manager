@@ -48,9 +48,9 @@ class MenuAttendance:
                 print(last_msg)
                 last_msg: str = ""
             attendance_menu = [
-                "[1] Check",
-                "[2] Update",
-                "[3] Get report",
+                "[1] Check attendance",
+                "[2] Update attendance",
+                "[3] Get attendance report",
                 "[4] Back",
             ]
             choice = get_user_option_from_menu(
@@ -76,8 +76,8 @@ class MenuAttendance:
                 print(last_msg)
                 last_msg: str = ""
             attendance_menu = [
-                "[1] Check",
-                "[2] Get report",
+                "[1] Check attendance",
+                "[2] Get attendance report",
                 "[3] Back",
             ]
             choice = get_user_option_from_menu(

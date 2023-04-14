@@ -29,14 +29,14 @@ class MenuDepartment:
                 print(last_msg)
                 last_msg: str = ""
             department_menu = [
-                "[1] Add",
-                "[2] Remove",
-                "[3] Update information for one",
-                "[4] Add employee to one",
-                "[5] Remove employee from one",
-                "[6] View details of one",
-                "[7] List all",
-                "[8] List employees does not belong to any department",
+                "[1] Add department",
+                "[2] Remove department",
+                "[3] Update information for department",
+                "[4] Add employee to department",
+                "[5] Remove employee from department",
+                "[6] View details of department",
+                "[7] List all departments",
+                "[8] List employees without a department",
                 "[9] Back",
             ]
 
@@ -194,10 +194,11 @@ class MenuDepartment:
         dept_selected_index = get_user_option_from_list(
             "Select a department to add an employee to", dept_items
         )
-        if dept_selected_index == -1:
-            return NO_DEPARTMENT_MSG
-        elif dept_selected_index == -2:
-            return ""
+        match dept_selected_index:
+            case -1:
+                return NO_DEPARTMENT_MSG
+            case -2:
+                return ""
 
         # get the index of the employee to add
         employee_items = [
@@ -206,10 +207,11 @@ class MenuDepartment:
         employee_selected_index = get_user_option_from_list(
             "Select an employee to add to the department", employee_items
         )
-        if employee_selected_index == -1:
-            return NO_EMPLOYEE_MSG
-        elif employee_selected_index == -2:
-            return ""
+        match employee_selected_index:
+            case -1:
+                return NO_EMPLOYEE_MSG
+            case -2:
+                return ""
 
         if not self.__company.can_modify("department", empls[employee_selected_index]):
             return "You do not have permission to modify this employee's department!"
@@ -249,10 +251,12 @@ class MenuDepartment:
         dept_selected_index = get_user_option_from_list(
             "Select a department to remove an employee from", dept_items
         )
-        if dept_selected_index == -1:
-            return NO_DEPARTMENT_MSG
-        elif dept_selected_index == -2:
-            return ""
+        match dept_selected_index:
+            case -1:
+                return NO_DEPARTMENT_MSG
+            case -2:
+                return ""
+
         department = depts[dept_selected_index]
 
         # get the index of the employee to remove
