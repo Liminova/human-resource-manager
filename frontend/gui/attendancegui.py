@@ -65,18 +65,18 @@ class AttendanceGui(ctk.CTk):
             self.radio3 = ctk.CTkRadioButton(master=self.right_frame, text="Present", font=("Century Gothic", 15, "italic"))
             self.radio3.place(relx=0.325, rely=0.795, anchor=tkinter.CENTER)
 
-            self.button = ctk.CTkButton(master=self.right_frame, text="Confirm", command=(lambda: attendace_check(self)))
+            self.button = ctk.CTkButton(master=self.right_frame, text="Confirm", command=(lambda: attendance_check(self)))
             self.button.configure(width=100, height = 40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
             self.button.place(relx=0.5, rely=0.875, anchor=tkinter.CENTER)
 
             self.button1_frame.pack(pady = 20)
 
-            def attendace_check(self):
+            def attendance_check(self):
                 name = self.entry1.get()
                 id = self.entry2.get()
                 date = self.entry3.get()
                 time = self.entry4.get()
-                
+
                 if name == "" or id == "" or date == "" or time == "" or present == "None":
                     messagebox.showerror("Error", "Please fill in all the fields")
                 elif not name.isalpha():
@@ -137,18 +137,18 @@ class AttendanceGui(ctk.CTk):
             self.radio3 = ctk.CTkRadioButton(master=self.right_frame, text="Present", font=("Century Gothic", 15, "italic"))
             self.radio3.place(relx=0.325, rely=0.795, anchor=tkinter.CENTER)
 
-            self.button = ctk.CTkButton(master=self.right_frame, text="Update", command=(lambda: attendace_check(self)))
+            self.button = ctk.CTkButton(master=self.right_frame, text="Update", command=(lambda: attendance_check(self)))
             self.button.configure(width=100, height = 40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
             self.button.place(relx=0.5, rely=0.875, anchor=tkinter.CENTER)
 
             self.button1_frame.pack(pady = 20)
 
-            def attendace_check(self):
+            def attendance_check(self):
                 name = self.entry1.get()
                 id = self.entry2.get()
                 date = self.entry3.get()
                 time = self.entry4.get()
-                
+
                 if name == "" or id == "" or date == "" or time == "" or present == "None":
                     messagebox.showerror("Error", "Please fill in all the fields")
                 elif not name.isalpha():
