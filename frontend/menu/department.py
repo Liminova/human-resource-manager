@@ -225,11 +225,7 @@ class MenuDepartment:
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one(
                 {"_id": employee.id},
-                {
-                    "$set": employee.dict(
-                        include={"department_id"}
-                    )
-                },
+                {"$set": employee.dict(include={"department_id"})},
                 upsert=True,
             )
             department_repo.update_one(
@@ -284,11 +280,7 @@ class MenuDepartment:
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one(
                 {"_id": employee.id},
-                {
-                    "$set": employee.dict(
-                        include={"department_id"}
-                    )
-                },
+                {"$set": employee.dict(include={"department_id"})},
                 upsert=True,
             )
             department_repo.update_one(

@@ -24,7 +24,12 @@ class MenuPayroll:
             if last_msg:
                 print(last_msg)
                 last_msg: str = ""
-            payroll_menu = ["[1] Create payroll", "[2] Update payroll", "[3] View all payrolls", "[4] Back"]
+            payroll_menu = [
+                "[1] Create payroll",
+                "[2] Update payroll",
+                "[3] View all payrolls",
+                "[4] Back",
+            ]
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:
                 case 1:
