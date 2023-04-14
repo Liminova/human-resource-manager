@@ -10,7 +10,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import TYPE_CHECKING
 if TYPE_CHECKING:
-    from models import Company, Sale
+    from models import Company
 
 
 class MenuPerformance:
