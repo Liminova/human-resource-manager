@@ -53,9 +53,6 @@ class Attendance(BaseModel):
         self.allowed_absent_days[date.year] -= 1
         return Ok(Self)
 
-    class Config:
-        arbitrary_types_allowed = True
-
     def get_available_years(self) -> list[int]:
         """For user to choose in the attendance report menu."""
         years: list[int] = []
@@ -79,3 +76,6 @@ class Attendance(BaseModel):
                     absent_reason = self.absents.get(date, "No reason")
                     data += f"{datetime.strftime(date, '%d %b %Y')} - Absent ({absent_reason})\n"
         return data
+
+    class Config:
+        arbitrary_types_allowed = True
