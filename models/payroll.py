@@ -3,6 +3,7 @@ import sys
 from option import Result, Ok, Err
 import textwrap
 from pydantic import BaseModel, Field
+from frontend.helpers import styling
 
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
@@ -11,8 +12,11 @@ else:
 
 if TYPE_CHECKING:
     from .employee import Employee
+
+
 class Payroll(BaseModel):
     """Monthly payroll for an employee."""
+
     salary: int = Field(default_factory=int)
     bonus: int = Field(default_factory=int)
     tax: int = Field(default_factory=int)
@@ -39,13 +43,15 @@ class Payroll(BaseModel):
 
     def calculate_bonus(self, employees: list[Employee]) -> None:
         """Calculate bonus for each employee based on their sales count."""
-        bonus_budget = 100 # temporary value for now
+        bonus_budget = 100  # temporary value for now
         num_employees = len(employees)
 
         top_10 = int(num_employees * 0.1)
         middle_80 = int(num_employees * 0.8)
 
-        employees.sort(key=lambda employee: employee.performance.sales_count, reverse=True)
+        employees.sort(
+            key=lambda employee: employee.performance.sales_count, reverse=True
+        )
 
         for i in range(top_10):
             employees[i].payroll.set_bonus(bonus_budget * 0.5 / top_10)
@@ -67,13 +73,15 @@ class Payroll(BaseModel):
 
     def __str__(self) -> str:
         self.calculate_total()
-        return textwrap.dedent(f"""\
-            - Salary: {self.salary}
-            - Bonus: {self.bonus}
-            - Tax: {self.tax}
-            - Punish: {self.punish}
-            - Total: {self.total}\
-        """)
+        return textwrap.dedent(
+            f"""\
+            {styling('Salary', self.salary)}\
+            {styling('Bonus', self.bonus)}\
+            {styling('Tax', self.tax)}\
+            {styling('Punish', self.punish)}\
+            {styling('Total', self.total)}\
+        """
+        )
 
     class Config:
         arbitrary_types_allowed = True

@@ -4,7 +4,10 @@ from .clustering import clustering
 
 
 def get_user_option_from_list(title: str, options: list[str]) -> int:
-    """Takes a list of options and returns the users choice's index"""
+    """Takes a list of options and returns the users choice's index | returns -1 if options empty, -2 if user cancels"""
+
+    if len(options) == 0:
+        return -1
 
     # split options into clusters of 9
     clusters = clustering(options, 9)
@@ -21,9 +24,14 @@ def get_user_option_from_list(title: str, options: list[str]) -> int:
         # navigation bar
         print(f"--- Page {current_cluster+1} of {len(clusters)} ---")
 
-        user_choice = input("{}[P]{}revious, {}[N]{}ext, enter a number to choose an entry or press enter to go back: ".format(FCOLORS.YELLOW, FCOLORS.END, FCOLORS.YELLOW, FCOLORS.END))
+        user_choice = input(
+            "{}[P]{}revious, {}[N]{}ext, enter a number to choose an entry or press enter to go back: ".format(
+                FCOLORS.YELLOW, FCOLORS.END, FCOLORS.YELLOW, FCOLORS.END
+            )
+        )
         match user_choice.upper():
-            case "": return -1
+            case "":
+                return -2
             case "P":
                 if current_cluster == 0:
                     continue
@@ -34,7 +42,7 @@ def get_user_option_from_list(title: str, options: list[str]) -> int:
                     continue
                 current_cluster += 1
                 break
-            case _: # assume user entered a number
+            case _:  # assume user entered a number
                 try:
                     user_choice = int(user_choice)
                     if user_choice not in range(1, 10):
@@ -44,6 +52,7 @@ def get_user_option_from_list(title: str, options: list[str]) -> int:
                 except KeyboardInterrupt:
                     exit()
                 except:
-                    user_choice = input(f"{FCOLORS.RED}Invalid choice! Try again: {FCOLORS.END}")
+                    user_choice = input(
+                        f"{FCOLORS.RED}Invalid choice! Try again: {FCOLORS.END}"
+                    )
                     continue
-

@@ -8,11 +8,13 @@ typing-extensions = "*"
 option = "*"
 pymongo = "*"
 pydantic = "*"
-orjson = "*"
+python-dotenv = "*"
+customtkinter = "*"
 
 [dev-packages]
 ruff = "*"
 yapf = "*"
+black = "*"
 
 [requires]
 python_version = "3"

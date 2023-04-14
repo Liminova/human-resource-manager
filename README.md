@@ -12,6 +12,12 @@ Nguyen Le Minh Duc  | BI12-092 | https://github.com/menhhduc
 Nguyen The Kien     | BI12-225 | https://github.com/Delnegend
 Dao Duy Manh Ha     | BI12-141 | https://github.com/R1verrrr
 
+## Requirements
+
+- Python 3.10+.
+- Dependencies: `pipenv`, `typing_extensions`, `option`, `pymongo`, `pydantic`.
+- MongoDB: you can either use an Atlas instance or a locally installed instance.
+
 ## Usage
 
 This repository uses `pipenv` to manage its dependencies and Python interpreter.
@@ -32,6 +38,22 @@ Everything else can be ran under the environment managed by `pipenv` by:
 ```shell
 $ pipenv run <command>
 ```
+
+Fill out `.env` using `.env.example` as a base.
+
+Afterwards, either use:
+
+```shell
+$ pipenv run python main_gui.py
+```
+
+or, if you have `pnpm` set up:
+
+```shell
+$ pnpm start-gui
+```
+
+to start the program. The TUI is also available by replacing `gui` with `tui`.
 
 ## Contributing
 

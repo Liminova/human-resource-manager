@@ -5,12 +5,10 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 if sys.version_info >= (3, 11):
-    from typing import Self, TYPE_CHECKING
+    from typing import Self
 else:
-    from typing_extensions import Self, TYPE_CHECKING
+    from typing_extensions import Self
 
-if TYPE_CHECKING:
-    from .payroll import Payroll
 
 class Attendance(BaseModel):
     start_date: datetime = Field(default_factory=datetime.now)
@@ -39,19 +37,12 @@ class Attendance(BaseModel):
         self.start_date = start_date.strftime("%Y-%m-%d")
         return Ok(self)
 
-    def add_attendance(self, date: datetime, is_present: bool, payroll: Payroll) -> Result[Self, str]:
+    def add_attendance(self, date: datetime, is_present: bool) -> Result[Self, str]:
         date_str = date.strftime("%Y-%m-%d")
         # Check the "allowed_absent_days" first, if it doesn't contain current year, add it and set to 3
         if date.year not in self.allowed_absent_days:
             self.allowed_absent_days[date.year] = 3
         self.attendances[date_str] = is_present
-
-        # If the employee is absent then set the punishment
-        if not is_present:
-            self.allowed_absent_days[date.year] -= 1
-            if self.allowed_absent_days[date.year] < 0:
-                payroll.set_punish(10) # -10$ for each absent day if the employee is absent more than 3 days
-
         return Ok(self)
 
     def add_absent_day(self, date: datetime, reason: str) -> Result[Self, str]:
@@ -62,8 +53,6 @@ class Attendance(BaseModel):
         self.allowed_absent_days[date.year] -= 1
         return Ok(Self)
 
-    class Config:
-        arbitrary_types_allowed = True
     def get_available_years(self) -> list[int]:
         """For user to choose in the attendance report menu."""
         years: list[int] = []
@@ -71,10 +60,11 @@ class Attendance(BaseModel):
             date = datetime.strptime(date, "%Y-%m-%d")
             if date.year not in years:
                 years.append(date.year)
+        return years
 
     def get_report(self, year: datetime) -> str:
         """Get the attendance report for a specific year."""
-        data = "" # temporary variable to store the report data
+        data = ""  # temporary variable to store the report data
         for date, is_present in self.attendances.items():
             # only get the attendance data for the specified year
             date = datetime.strptime(date, "%Y-%m-%d")
@@ -85,6 +75,7 @@ class Attendance(BaseModel):
                 else:
                     absent_reason = self.absents.get(date, "No reason")
                     data += f"{datetime.strftime(date, '%d %b %Y')} - Absent ({absent_reason})\n"
-
-        
         return data
+
+    class Config:
+        arbitrary_types_allowed = True

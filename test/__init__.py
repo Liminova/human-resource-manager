@@ -4,4 +4,10 @@ from .test_department import TestDepartment
 from .test_employee import TestEmployee
 from .test_payroll import TestPayroll
 
-__all__ = ["TestBenefit", "TestCompany", "TestDepartment", "TestEmployee", "TestPayroll"]
+__all__ = [
+    "TestBenefit",
+    "TestCompany",
+    "TestDepartment",
+    "TestEmployee",
+    "TestPayroll",
+]

@@ -3,6 +3,10 @@ import sys
 import textwrap
 from option import Result, Ok, Err
 from pydantic import BaseModel, Field
+from bson.objectid import ObjectId
+from frontend.helpers import styling
+
+from database.pyobjectid import PyObjectId
 
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING
@@ -12,7 +16,9 @@ else:
 if TYPE_CHECKING:
     from .employee import Employee
 
+
 class BenefitPlan(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(default_factory=str)
     description: str = Field(default_factory=str)
     cost: float = Field(default_factory=float)
@@ -38,15 +44,19 @@ class BenefitPlan(BaseModel):
         return Ok(self)
 
     def __str__(self) -> str:
-        data = textwrap.dedent(f"""\
-            - Name: {self.name}
-            - Description: {self.description}
-            - Cost: {self.cost}
-            - Enrolled employees:
-        """)
-        for (i, employee) in enumerate(self.enrolled_employees, 1):
-            data += f"{i}: {employee}\n"
+        data = textwrap.dedent(
+            f"""\
+            {styling('Name', self.name)}
+            {styling('Description', self.description)}
+            {styling('Cost', self.cost)}
+            {styling('Enrolled employees', self.enrolled_employees)}
+        """
+        )
+        for i, employee in enumerate(self.enrolled_employees, 1):
+            data += f"  {styling(i, employee.name)} ({employee.employee_id})\n"
         return data
 
     class Config:
         arbitrary_types_allowed = True
+        allow_population_by_field_name = True
+        json_encoders = {ObjectId: str}
