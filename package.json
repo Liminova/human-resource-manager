@@ -5,7 +5,8 @@
     "postinstall": "husky install",
     "commit": "cz",
     "test": "pipenv run python -m unittest",
-    "launch": "pipenv run python main.py",
+    "start-tui": "pipenv run python main_tui.py",
+    "start-gui": "pipenv run python main_gui.py",
     "lint": "pipenv run ruff . --fix"
   },
   "config": {
