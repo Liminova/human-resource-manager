@@ -323,10 +323,10 @@ class PerformanceGui(ctk.CTk):
         self.right_frame.configure(width=700, height=760)
 
     def back_to_homepage(self):
-        import homepage
+        from .homepage import Homepage
 
         self.destroy()
-        homepage.homepage().mainloop()
+        Homepage().mainloop()
 
 
 if __name__ == "__main__":

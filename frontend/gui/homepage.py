@@ -102,7 +102,7 @@ class Homepage(ctk.CTk):
         self.button6.place(relx=0.75, rely=0.75, anchor=tkinter.CENTER)
 
     def sign_out(self):
-        import login
+        from .login import Login
 
         messagebox.showwarning(
             "Sign Out",
@@ -112,43 +112,43 @@ class Homepage(ctk.CTk):
             type="okcancel",
         )
         self.destroy()
-        login.login().run()
+        Login().run()
 
     def click_employeegui(self):
-        import employeegui
+        from .employeegui import EmployeeGui
 
         self.destroy()
-        employeegui.employeegui().mainloop()
+        EmployeeGui().mainloop()
 
     def click_benefitgui(self):
-        import benefitplangui
+        from .benefitplangui import BenefitPlanGui
 
         self.destroy()
-        benefitplangui.benefitplangui().mainloop()
+        BenefitPlanGui().mainloop()
 
     def click_attendancegui(self):
-        import attendancegui
+        from .attendancegui import AttendanceGui
 
         self.destroy()
-        attendancegui.attendancegui().mainloop()
+        AttendanceGui().mainloop()
 
     def click_payrollgui(self):
-        import payrollgui
+        from .payrollgui import PayrollGui
 
         self.destroy()
-        payrollgui.payrollgui().mainloop()
+        PayrollGui().mainloop()
 
     def click_departmentgui(self):
-        import departmentgui
+        from .departmentgui import DepartmentGui
 
         self.destroy()
-        departmentgui.departmentgui().mainloop()
+        DepartmentGui().mainloop()
 
     def click_performancegui(self):
-        import performancegui
+        from .performancegui import PerformanceGui
 
         self.destroy()
-        performancegui.performancegui().mainloop()
+        PerformanceGui().mainloop()
 
     def run(self):
         self.mainloop()

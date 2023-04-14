@@ -121,9 +121,9 @@ class Signup(ctk.CTk):
 
     def click_signin(self):
         self.destroy()
-        import login
+        from .login import Login
 
-        window = login.login()
+        window = Login()
         window.run()
 
 

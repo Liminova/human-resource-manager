@@ -102,7 +102,7 @@ class Login(ctk.CTk):
             messagebox.showerror("Error", "Please fill in all the fields")
         elif username == "admin" and password == "admin":
             self.destroy()
-            Homepage.homepage().run()
+            Homepage().run()
         else:
             messagebox.showerror("Error", "Incorrect username or password")
 
