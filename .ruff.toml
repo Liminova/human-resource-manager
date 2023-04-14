@@ -1,0 +1,2 @@
+# ignore glob undefined names, bare excepts, line too long errors
+ignore = ["F405", "F403", "E501", "E722"]
