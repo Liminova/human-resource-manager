@@ -84,31 +84,15 @@ class Company(metaclass=CompanyMeta):
         # + everyone
         match type:
             # - themselves, other admins (owner included)
-            case "attendance":
+            case "attendance" | "department" | "payroll" | "performance":
                 if (not is_self) and (not is_input_admin):
                     return True
             # - themselves, owner
             case "benefits":
                 if (not is_self) and (not self.is_owner):
                     return True
-            # - themselves, other admins (owner included)
-            case "department":
-                if (not is_self) and (not is_input_admin):
-                    return True
             # - other admins (owner included)
-            case "employee":
-                if not is_input_admin:
-                    return True
-            # - themselves, other admins (owner included)
-            case "payroll":
-                if (not is_self) and (not is_input_admin):
-                    return True
-            # - themselves, other admins (owner included)
-            case "performance":
-                if (not is_self) and (not is_input_admin):
-                    return True
-            # - other admins (owner included)
-            case "password":
+            case "employee" | "password":
                 if not is_input_admin:
                     return True
             case _:
