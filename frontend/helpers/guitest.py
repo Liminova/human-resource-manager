@@ -1,3 +1,4 @@
+# type: ignore
 import customtkinter
 import tkinter
 from tkinter import messagebox
@@ -13,8 +14,8 @@ app.title('Human Resources System Management')
 def button_function():
     username = entry1.get()
     password = entry2.get()
-    if username == "admin" and password == "1234":    
-        w = customtkinter.CTk()  
+    if username == "admin" and password == "1234":
+        w = customtkinter.CTk()
         w.geometry("1024x768")
         w.title('Welcome')
         l1=customtkinter.CTkLabel(master=w, text="Home Page",font=('Century Gothic',60))

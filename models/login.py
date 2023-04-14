@@ -1,12 +1,12 @@
-import hashlib
 from option import Result, Ok, Err
+from .password import hash
 
 # example class for employee (i.e. consider adding this to models/employee.py)
 class Employee:
     """Employee class for login system."""
     def __init__(self, username: str, password: str, role: str) -> None:
         self.username = username
-        self.password = hashlib.sha256(password.encode()).hexdigest()
+        self.password = hash(username, password)
         self.role = role
         return None
 
@@ -36,7 +36,7 @@ class Login:
         return Ok(self)
 
     def login(self, username: str, password: str) -> Result[Employee | Admin, str]:
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        hashed_password = hash(username, password)
         for employee in self.employees:
             if employee.username == username and employee.password == hashed_password:
                 return Ok(employee)

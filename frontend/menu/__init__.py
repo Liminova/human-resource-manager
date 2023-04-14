@@ -2,6 +2,7 @@ from .attendance import MenuAttendance
 from .benefits import MenuBenefits
 from .department import MenuDepartment
 from .employee import MenuEmployee
+from .login_signup import MenuLoginSignup
 from .payroll import MenuPayroll
 from .performance import MenuPerformance
 
@@ -10,6 +11,7 @@ __all__ = [
     'MenuBenefits',
     'MenuDepartment',
     'MenuEmployee',
+    'MenuLoginSignup',
     'MenuPayroll',
     'MenuPerformance',
 ]
