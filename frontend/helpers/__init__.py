@@ -3,7 +3,7 @@ from .COLORS import BCOLORS, FCOLORS
 from .get_user_option_from_list import get_user_option_from_list
 from .get_user_option_from_menu import get_user_option_from_menu
 from .listing import listing
-from .loop_til_valid_input import loop_til_valid_input  # type: ignore
+from .loop_til_valid_input import loop_til_valid_input
 
 
 def styling(x, y):

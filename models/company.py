@@ -20,12 +20,12 @@ class CompanyMeta(type):
     _instances = {}
     _lock: Lock = Lock()
 
-    def __call__(cls, *args, **kwargs):  # type: ignore
+    def __call__(cls, *args, **kwargs):
         with cls._lock:
-            if cls not in cls._instances:  # type: ignore
+            if cls not in cls._instances:
                 instance = super().__call__(*args, **kwargs)
-                cls._instances[cls] = instance  # type: ignore
-        return cls._instances[cls]  # type: ignore
+                cls._instances[cls] = instance
+        return cls._instances[cls]
 
 
 class Company(metaclass=CompanyMeta):

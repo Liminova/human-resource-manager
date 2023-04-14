@@ -4,7 +4,7 @@ import os
 
 from ..helpers import *
 from models import Employee, hash
-from database.mongo import employee_repo, benefit_repo, department_repo  # type: ignore
+from database.mongo import employee_repo, benefit_repo, department_repo
 from option import Result, Ok
 
 if sys.version_info >= (3, 11):
@@ -139,7 +139,7 @@ class MenuEmployee:
 
         # add employee to mongodb database
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.insert_one(employee.dict(by_alias=True))  # type: ignore
+            employee_repo.insert_one(employee.dict(by_alias=True))
 
         return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.employee_id}{FCOLORS.END}) added successfully!"
 
