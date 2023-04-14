@@ -174,7 +174,7 @@ class MenuEmployee:
                 if os.getenv("HRMGR_DB") == "TRUE":
                     department_repo.update_one(
                         {"_id": dept.id},
-                        {"$set": dept.dict(exclude={"id"}, by_alias=True)},
+                        {"$set": dept.dict(include={"members"})},
                         upsert=True,
                     )
 
@@ -185,7 +185,7 @@ class MenuEmployee:
                 if os.getenv("HRMGR_DB") == "TRUE":
                     benefit_repo.update_one(
                         {"_id": benefit.id},
-                        {"$set": benefit.dict(exclude={"id"}, by_alias=True)},
+                        {"$set": benefit.dict(include={"enrolled_employees"})},
                         upsert=True,
                     )
 
