@@ -4,7 +4,6 @@ from option import Result, Ok, Err
 from datetime import datetime
 from pydantic import BaseModel, Field
 from frontend.helpers import styling, FCOLORS
-from typing import Callable
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -81,7 +80,8 @@ class Sale(BaseModel):
         return data
 
     def one_line_str(self) -> str:
-        _styling: Callable[[str, str], str] = lambda key, value: f" | {key}: {FCOLORS.GREEN}{value}{FCOLORS.END}"
+        def _styling(key, value):
+            return f" | {key}: {FCOLORS.GREEN}{value}{FCOLORS.END}"
         data: str = styling("Sale ID:", self.sale_id)
         data += _styling("Date", self.date.strftime("%Y-%m-%d"))
         data += _styling("Profit", self.profit)

@@ -1,4 +1,3 @@
-import sys
 from .clrscr import clrscr
 from .COLORS import BCOLORS, FCOLORS
 from .get_user_option_from_list import get_user_option_from_list
@@ -6,11 +5,12 @@ from .get_user_option_from_menu import get_user_option_from_menu
 from .listing import listing
 from .loop_til_valid_input import loop_til_valid_input # type: ignore
 
-from typing import Callable
 
-styling: Callable[[str, str], str] = lambda x, y: f"- {FCOLORS.CYAN}{x}{FCOLORS.END}: {FCOLORS.GREEN}{y}{FCOLORS.END}"
+def styling(x, y):
+    return f"- {FCOLORS.CYAN}{x}{FCOLORS.END}: {FCOLORS.GREEN}{y}{FCOLORS.END}"
 
-__error_msg: Callable[[str], str] = lambda x: FCOLORS.RED + x + FCOLORS.END
+def __error_msg(x):
+    return FCOLORS.RED + x + FCOLORS.END
 NO_ATTENDANCE_MSG: str = __error_msg("No attendance records available! Please add an attendance record first.")
 NO_BENEFIT_MSG: str = __error_msg("No benefit plan available! Please add a benefit plan first.")
 NO_DEPARTMENT_MSG: str = __error_msg("No departments available! Please add a department first.")
