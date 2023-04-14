@@ -28,3 +28,7 @@ class TestCompany(unittest.TestCase):
 
         # this should return the first instance of Company initialized
         self.assertEqual(company_1, company_2)
+
+
+if __name__ == "__main__":
+    unittest.main()

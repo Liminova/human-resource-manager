@@ -33,3 +33,7 @@ class TestBenefit(unittest.TestCase):
         benefit.enrolled_employees.append(rylie)
 
         self.assertEqual(benefit.enrolled_employees, [rylie])
+
+
+if __name__ == "__main__":
+    unittest.main()

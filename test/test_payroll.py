@@ -20,3 +20,7 @@ class TestPayroll(unittest.TestCase):
         payroll.set_bonus(300).unwrap()
 
         self.assertEqual(payroll.total, 4800)
+
+
+if __name__ == "__main__":
+    unittest.main()
