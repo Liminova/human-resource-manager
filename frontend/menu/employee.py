@@ -53,9 +53,9 @@ class MenuEmployee:
                 case 4:
                     last_msg: str = self.__view()
                 case 5:
-                    last_msg: str = self.__view_all()
-                case 6:
                     last_msg: str = self.__change_password()
+                case 6:
+                    last_msg: str = self.__view_all()
                 case 7:
                     return Ok(None)
                 case _:
