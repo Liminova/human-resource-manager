@@ -7,7 +7,7 @@ ctk.set_default_color_theme("green")
 appWidth = 400
 appHeight = 500
 
-class signup(ctk.CTk):
+class Signup(ctk.CTk):
     def __init__(self, master=None):
         super().__init__()
 
@@ -39,7 +39,7 @@ class signup(ctk.CTk):
         #create sign up button
         self.button2 = ctk.CTkButton(master=self.frame, width=220, text="Sign Up", command=self.click_signup, corner_radius=6, font=('Century Gothic', 14))
         self.button2.place(x = 50, y = 275)
-        
+
         def callback(event):
             self.click_signin()
         self.label2 = ctk.CTkLabel(master=self.frame, text="Sign in", text_color="cyan", font=('Century Gothic', 12, "underline"))
@@ -60,7 +60,7 @@ class signup(ctk.CTk):
         if username == "":
             msgbox.showerror("Error", "Username cannot be empty!")
             return False
-        
+
         return True
 
     def get_password(self)->bool:
@@ -72,7 +72,7 @@ class signup(ctk.CTk):
         elif password == "":
             msgbox.showerror("Error", "Password cannot be empty!")
             return False
-        
+
         return True
 
     def click_signup(self):
@@ -89,4 +89,4 @@ class signup(ctk.CTk):
         window.run()
 
 if __name__ == "__main__":
-    test = signup().run()
+    test = Signup().run()

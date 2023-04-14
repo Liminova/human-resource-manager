@@ -8,7 +8,7 @@ ctk.set_default_color_theme("green")
 Width = 1024
 Height = 768
 
-class benefitplangui(ctk.CTk):
+class BenefitPlanGui(ctk.CTk):
     def __init__(self, master = None):
         super().__init__()
 
@@ -257,5 +257,5 @@ class benefitplangui(ctk.CTk):
         homepage.homepage().mainloop()
 
 if __name__ == "__main__":
-    app = benefitplangui()
+    app = BenefitPlanGui()
     app.mainloop()

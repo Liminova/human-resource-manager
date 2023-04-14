@@ -7,7 +7,7 @@ ctk.set_default_color_theme("green")
 Width = 1024
 Height = 768
 
-class performancegui(ctk.CTk):
+class PerformanceGui(ctk.CTk):
     def __init__(self, master = None):
         super().__init__()
 
@@ -90,7 +90,7 @@ class performancegui(ctk.CTk):
             self.button.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
 
             self.button2_frame.pack(pady=20)
-            
+
         def remove_sale(self):
             self.button3_frame = ctk.CTkFrame(master=self.right_frame)
 
@@ -112,7 +112,6 @@ class performancegui(ctk.CTk):
             self.button = ctk.CTkButton(master=self.right_frame, text="Get sale info", font=("Century Gothic", 20, "bold"))
             self.button.configure(width=100, height = 40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
             self.button.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
-
 
             self.button4_frame.pack(pady=20)
 
@@ -177,5 +176,5 @@ class performancegui(ctk.CTk):
         homepage.homepage().mainloop()
 
 if __name__ == "__main__":
-    app = performancegui()
+    app = PerformanceGui()
     app.mainloop()

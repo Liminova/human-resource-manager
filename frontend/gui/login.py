@@ -11,7 +11,7 @@ ctk.set_default_color_theme("green")
 appWidth = 400
 appHeight = 500
 
-class login(ctk.CTk):
+class Login(ctk.CTk):
     def __init__(self, master=None):
         super().__init__()
         #set title and size of the window
@@ -32,7 +32,7 @@ class login(ctk.CTk):
         # self.label1 = ctk.CTkLabel(master=self.frame, text="Forgot password?", font=('Century Gothic', 12))
         # self.label1.place(x=155, y=195)
         
-        # "here" label link to sign up page 
+        # "here" label link to sign up page
         def callback(event):
             self.click_signup()
         self.label2 = ctk.CTkLabel(master=self.frame, text="Sign up", text_color="cyan", font=('Century Gothic', 12, "underline"))
@@ -40,7 +40,7 @@ class login(ctk.CTk):
         self.label2.bind("<Button-1>", callback)
 
         self.label3 = ctk.CTkLabel(master=self.frame, text="Don't have an account?", font=('Century Gothic', 12))
-        self.label3.place(x=50, y=270)    
+        self.label3.place(x=50, y=270)
 
         #create entries
         #username entry
@@ -57,7 +57,6 @@ class login(ctk.CTk):
 
         #listen for enter key
         self.bind('<Return>', lambda event: self.login_successfully())
-
 
     def signup(self):
         self.destroy()

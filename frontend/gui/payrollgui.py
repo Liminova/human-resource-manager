@@ -8,7 +8,7 @@ ctk.set_default_color_theme("green")
 Width = 1024
 Height = 768
 
-class payrollgui(ctk.CTk):
+class PayrollGui(ctk.CTk):
     def __init__(self, master = None):
         super().__init__()
 
@@ -21,7 +21,7 @@ class payrollgui(ctk.CTk):
 
         def create_payroll(self):
             self.button1_frame= ctk.CTkFrame(master=self.right_frame)
-            
+
             self.label = ctk.CTkLabel(master=self.button1_frame, text="Create payroll", font=("Century Gothic", 30, "bold"))
             self.label.pack()
 
@@ -70,11 +70,10 @@ class payrollgui(ctk.CTk):
                     messagebox.showerror("Error", "Please enter a valid number")
                 else:
                     messagebox.showinfo("Success", "Payroll has been created successfully")
-            
 
         def update_payroll(self):
             self.button1_frame= ctk.CTkFrame(master=self.right_frame)
-            
+
             self.label = ctk.CTkLabel(master=self.button1_frame, text="Update payroll", font=("Century Gothic", 30, "bold"))
             self.label.pack()
 
@@ -133,7 +132,7 @@ class payrollgui(ctk.CTk):
 
         def button_size(button):
             button.configure(width=260, height = 40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        
+
         self.button1 = ctk.CTkButton(master=self.left_frame, text="Create Payroll", command=(lambda: [destroy_all_frames(self), create_payroll(self)]))
         button_size(self.button1)
         self.button1.place(relx=0.5, rely=0.15, anchor=tkinter.CENTER)
@@ -161,5 +160,5 @@ class payrollgui(ctk.CTk):
         homepage.homepage().mainloop()
 
 if __name__ == "__main__":
-    app = payrollgui()
+    app = PayrollGui()
     app.mainloop()

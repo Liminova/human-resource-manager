@@ -8,7 +8,7 @@ ctk.set_default_color_theme("green")
 Width = 1024
 Height = 768
 
-class attendancegui(ctk.CTk):
+class AttendanceGui(ctk.CTk):
     def __init__(self, master = None):
         super().__init__()
 
@@ -238,5 +238,5 @@ class attendancegui(ctk.CTk):
         homepage.homepage().mainloop()
 
 if __name__ == "__main__":
-    app = attendancegui()
+    app = AttendanceGui()
     app.mainloop()

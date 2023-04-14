@@ -8,7 +8,7 @@ height = 640
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
 
-class homepage(ctk.CTk):
+class Homepage(ctk.CTk):
     def __init__(self, master = None):
         super().__init__()
 
@@ -99,5 +99,5 @@ class homepage(ctk.CTk):
         self.mainloop()
 
 if __name__ == "__main__":
-    app = homepage()
+    app = Homepage()
     app.mainloop()

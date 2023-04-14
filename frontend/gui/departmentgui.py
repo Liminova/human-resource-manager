@@ -8,7 +8,7 @@ ctk.set_default_color_theme("green")
 Width = 1024
 Height = 768
 
-class departmentgui(ctk.CTk):
+class DepartmentGui(ctk.CTk):
     def __init__(self, master = None):
         super().__init__()
 
@@ -229,5 +229,5 @@ class departmentgui(ctk.CTk):
         homepage.homepage().mainloop()
 
 if __name__ == "__main__":
-    app = departmentgui()
+    app = DepartmentGui()
     app.mainloop()

@@ -8,7 +8,7 @@ ctk.set_default_color_theme("green")
 Width = 1024
 Height = 768
 
-class employeegui(ctk.CTk):
+class EmployeeGui(ctk.CTk):
     def __init__(self, master = None):
         super().__init__()
 
@@ -276,5 +276,5 @@ class employeegui(ctk.CTk):
         homepage.homepage().mainloop()
 
 if __name__ == "__main__":
-    app = employeegui()
+    app = EmployeeGui()
     app.mainloop()
