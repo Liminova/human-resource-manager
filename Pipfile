@@ -13,7 +13,6 @@ customtkinter = "*"
 
 [dev-packages]
 ruff = "*"
-yapf = "*"
 black = "*"
 
 [requires]
