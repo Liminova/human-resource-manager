@@ -9,6 +9,15 @@ from .payroll import Payroll
 from .performance import Performance, Sale
 
 __all__ = [
-    "Admin", "Attendance", "BenefitPlan", "Company", "Department", "Employee",
-    "hash", "validate", "Payroll", "Performance", "Sale"
+    "Admin",
+    "Attendance",
+    "BenefitPlan",
+    "Company",
+    "Department",
+    "Employee",
+    "hash",
+    "validate",
+    "Payroll",
+    "Performance",
+    "Sale",
 ]

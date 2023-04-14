@@ -15,6 +15,7 @@ else:
 
 from .employee import Employee
 
+
 class Department(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(default_factory=str)
@@ -30,18 +31,18 @@ class Department(BaseModel):
         return Ok(self) if id else Err("ID cannot be empty.")
 
     def __str__(self) -> str:
-        data = textwrap.dedent(f"""\
+        data = textwrap.dedent(
+            f"""\
                 {styling('Name', self.name)}
                 {styling('ID', self.dept_id)}
                 {styling('Members', len(self.members))}
-            """)
-        for (i, member) in enumerate(self.members, 1):
+            """
+        )
+        for i, member in enumerate(self.members, 1):
             data += f"  {styling(i, member.name)} ({member.employee_id})\n"
         return data
 
     class Config:
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
-        json_encoders = {
-            ObjectId: str
-        }
+        json_encoders = {ObjectId: str}

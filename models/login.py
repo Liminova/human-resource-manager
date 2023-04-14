@@ -1,9 +1,11 @@
 from option import Result, Ok, Err
 from .password import hash
 
+
 # example class for employee (i.e. consider adding this to models/employee.py)
 class Employee:
     """Employee class for login system."""
+
     def __init__(self, username: str, password: str, role: str) -> None:
         self.username = username
         self.password = hash(username, password)
@@ -13,16 +15,20 @@ class Employee:
     def __str__(self) -> str:
         return f"{self.username} ({self.role})"
 
+
 # example class for admin (i.e. consider adding this to models/admin.py)
 class Admin(Employee):
     """Admin class for login system."""
+
     def __init__(self, username: str, password: str) -> None:
         super().__init__(username, password, "admin")
         return None
 
+
 # login system
 class Login:
     """Login system for employees and managers."""
+
     def __init__(self) -> None:
         self.employees: list[Employee] = []
         self.admins: list[Admin] = []

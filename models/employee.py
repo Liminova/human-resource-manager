@@ -24,6 +24,7 @@ from .performance import Performance
 
 from .password import hash
 
+
 class Employee(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(default_factory=str)
@@ -96,21 +97,21 @@ class Employee(BaseModel):
         return Ok(self)
 
     def __str__(self) -> str:
-        data = textwrap.dedent(f"""\
+        data = textwrap.dedent(
+            f"""\
             {styling('Name', self.name)}
             {styling('DoB', self.dob.strftime("%Y-%m-%d"))}
             {styling('ID', self.employee_id)}
             {styling('Phone', self.phone)}
             {styling('Department ID', self.department_id)}
             {styling('Benefit plans', len(self.benefits))}
-        """)
-        for (i, benefit) in enumerate(self.benefits, 1):
+        """
+        )
+        for i, benefit in enumerate(self.benefits, 1):
             data += f"  {styling(i, benefit)}\n"
         return data
 
     class Config:
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
-        json_encoders = {
-            ObjectId: str
-        }
+        json_encoders = {ObjectId: str}

@@ -12,6 +12,7 @@ else:
 if TYPE_CHECKING:
     from models import Company
 
+
 class MenuAttendance:
     def __init__(self, company: Company) -> None:
         self.__company = company
@@ -19,10 +20,14 @@ class MenuAttendance:
 
     def admin(self) -> Result[None, str]:
         # a list containing the string representation of each employee
-        employee_items = [f"{e.name} ({e.employee_id})" for e in self.__company.employees]
+        employee_items = [
+            f"{e.name} ({e.employee_id})" for e in self.__company.employees
+        ]
 
         # get the index of the selected employee
-        selected_employee_index = get_user_option_from_list("Select an employee to manage attendance for", employee_items)
+        selected_employee_index = get_user_option_from_list(
+            "Select an employee to manage attendance for", employee_items
+        )
         if selected_employee_index == -1:
             return Err(NO_EMPLOYEE_MSG)
         elif selected_employee_index == -2:
@@ -32,7 +37,9 @@ class MenuAttendance:
         self.__employee = self.__company.employees[selected_employee_index]
 
         if not self.__company.can_modify("attendance", self.__employee):
-            return Err("You do not have permission to modify this employee's attendance!")
+            return Err(
+                "You do not have permission to modify this employee's attendance!"
+            )
 
         last_msg: str = ""
         while True:
@@ -46,13 +53,20 @@ class MenuAttendance:
                 "[3] Get report",
                 "[4] Back",
             ]
-            choice = get_user_option_from_menu("Attendance management for " + self.__employee.name, attendance_menu)
+            choice = get_user_option_from_menu(
+                "Attendance management for " + self.__employee.name, attendance_menu
+            )
             match choice:
-                case 1: last_msg: str = self.__check()
-                case 2: last_msg: str = self.__update()
-                case 3: last_msg: str = self.__report()
-                case 4: return Ok(None)
-                case _: last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                case 1:
+                    last_msg: str = self.__check()
+                case 2:
+                    last_msg: str = self.__update()
+                case 3:
+                    last_msg: str = self.__report()
+                case 4:
+                    return Ok(None)
+                case _:
+                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
         last_msg: str = ""
@@ -66,12 +80,19 @@ class MenuAttendance:
                 "[2] Get report",
                 "[3] Back",
             ]
-            choice = get_user_option_from_menu("Attendance management for " + self.__logged_in_employee.name, attendance_menu)
+            choice = get_user_option_from_menu(
+                "Attendance management for " + self.__logged_in_employee.name,
+                attendance_menu,
+            )
             match choice:
-                case 1: last_msg: str = self.__check()
-                case 2: last_msg: str = self.__report()
-                case 3: return Ok(None)
-                case _: last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                case 1:
+                    last_msg: str = self.__check()
+                case 2:
+                    last_msg: str = self.__report()
+                case 3:
+                    return Ok(None)
+                case _:
+                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __check(self) -> str:
         attendances = self.__logged_in_employee.attendance
@@ -144,7 +165,9 @@ class MenuAttendance:
             year_items = [str(year) for year in available_years]
 
             # get the index of the selected year
-            selected_year_index = get_user_option_from_list("Select a year to view attendance report for", year_items)
+            selected_year_index = get_user_option_from_list(
+                "Select a year to view attendance report for", year_items
+            )
             if selected_year_index == -1:
                 return NO_ATTENDANCE_MSG
             elif selected_year_index == -2:
@@ -154,7 +177,9 @@ class MenuAttendance:
             print(attendances.get_report(available_years[selected_year_index]))
         else:
             year_items = [str(year) for year in attendances.get_available_years()]
-            selected_year_index = get_user_option_from_list("Select a year to view attendance report for", year_items)
+            selected_year_index = get_user_option_from_list(
+                "Select a year to view attendance report for", year_items
+            )
             if selected_year_index == -1:
                 return NO_ATTENDANCE_MSG
             elif selected_year_index == -2:

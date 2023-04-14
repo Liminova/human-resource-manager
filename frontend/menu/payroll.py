@@ -11,6 +11,7 @@ else:
 if TYPE_CHECKING:
     from models import Company
 
+
 class MenuPayroll:
     def __init__(self, company: Company):
         self.__company = company
@@ -23,19 +24,19 @@ class MenuPayroll:
             if last_msg:
                 print(last_msg)
                 last_msg: str = ""
-            payroll_menu = [
-                "[1] Create",
-                "[2] Update",
-                "[3] View all",
-                "[4] Back"
-            ]
+            payroll_menu = ["[1] Create", "[2] Update", "[3] View all", "[4] Back"]
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:
-                case 1: last_msg: str = self.__create()
-                case 2: last_msg: str = self.__update()
-                case 3: last_msg: str = self.__view_all()
-                case 4: return Ok(None)
-                case _: last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                case 1:
+                    last_msg: str = self.__create()
+                case 2:
+                    last_msg: str = self.__update()
+                case 3:
+                    last_msg: str = self.__view_all()
+                case 4:
+                    return Ok(None)
+                case _:
+                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
         last_msg: str = ""
@@ -44,19 +45,21 @@ class MenuPayroll:
             if last_msg:
                 print(last_msg)
                 last_msg: str = ""
-            payroll_menu = [
-                "[1] View details",
-                "[2] Back"
-            ]
+            payroll_menu = ["[1] View details", "[2] Back"]
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:
-                case 1: last_msg: str = self.__view()
-                case 2: return Ok(None)
-                case _: last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                case 1:
+                    last_msg: str = self.__view()
+                case 2:
+                    return Ok(None)
+                case _:
+                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __create(self) -> str:
         empl_items = [f"{e.name} ({e.employee_id})" for e in self.__company.employees]
-        selected_empl_index = get_user_option_from_list("Select an employee to create payroll for", empl_items)
+        selected_empl_index = get_user_option_from_list(
+            "Select an employee to create payroll for", empl_items
+        )
         if selected_empl_index == -1:
             return NO_EMPLOYEE_MSG
         elif selected_empl_index == -2:
@@ -70,7 +73,9 @@ class MenuPayroll:
             return f"Employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} already has a payroll!"
 
         clrscr()
-        print(f"== Creating payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} ==")
+        print(
+            f"== Creating payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} =="
+        )
 
         # create an empty payroll object
         payroll = Payroll()
@@ -80,9 +85,9 @@ class MenuPayroll:
             ("Enter payroll salary", payroll.set_salary),
             ("Enter payroll bonus", payroll.set_bonus),
             ("Enter payroll tax", payroll.set_tax),
-            ("Enter payroll punishment", payroll.set_punish)
+            ("Enter payroll punishment", payroll.set_punish),
         ]
-        for (field, setter) in fields_data:
+        for field, setter in fields_data:
             if (msg := loop_til_valid_input(field, setter)) != "":
                 return msg
 
@@ -94,7 +99,9 @@ class MenuPayroll:
         empls = self.__company.employees
 
         empl_items = [f"{e.name} ({e.employee_id})" for e in empls]
-        selected_empl_index = get_user_option_from_list("Select an employee to update payroll for", empl_items)
+        selected_empl_index = get_user_option_from_list(
+            "Select an employee to update payroll for", empl_items
+        )
         if selected_empl_index == -1:
             return NO_EMPLOYEE_MSG
         elif selected_empl_index == -2:
@@ -108,16 +115,18 @@ class MenuPayroll:
             return f"Employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} has no payroll!"
 
         clrscr()
-        print(f"== Updating payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} ==")
+        print(
+            f"== Updating payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} =="
+        )
 
         # assigning values to the payroll object
         fields_data = [
             ("Enter payroll salary", selected_empl.payroll.set_salary),
             ("Enter payroll bonus", selected_empl.payroll.set_bonus),
             ("Enter payroll tax", selected_empl.payroll.set_tax),
-            ("Enter payroll punishment", selected_empl.payroll.set_punish)
+            ("Enter payroll punishment", selected_empl.payroll.set_punish),
         ]
-        for (field, setter) in fields_data:
+        for field, setter in fields_data:
             if (msg := loop_til_valid_input(field, setter)) != "":
                 return msg
 
@@ -135,12 +144,16 @@ class MenuPayroll:
         empls = self.__company.employees
 
         clrscr()
-        print(f"== Payroll for employee {FCOLORS.GREEN}{self.__logged_in_employee.name}{FCOLORS.END} ==")
+        print(
+            f"== Payroll for employee {FCOLORS.GREEN}{self.__logged_in_employee.name}{FCOLORS.END} =="
+        )
         if not self.__logged_in_employee.is_admin:
             print(self.__logged_in_employee.payroll)
         else:
             empl_items = [f"{e.name} ({e.employee_id})" for e in empls]
-            selected_empl_index = get_user_option_from_list("Select an employee to view payroll for", empl_items)
+            selected_empl_index = get_user_option_from_list(
+                "Select an employee to view payroll for", empl_items
+            )
             if selected_empl_index == -1:
                 return NO_EMPLOYEE_MSG
             elif selected_empl_index == -2:

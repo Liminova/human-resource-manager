@@ -7,11 +7,11 @@ from .payroll import MenuPayroll
 from .performance import MenuPerformance
 
 __all__ = [
-    'MenuAttendance',
-    'MenuBenefits',
-    'MenuDepartment',
-    'MenuEmployee',
-    'MenuLoginSignup',
-    'MenuPayroll',
-    'MenuPerformance',
+    "MenuAttendance",
+    "MenuBenefits",
+    "MenuDepartment",
+    "MenuEmployee",
+    "MenuLoginSignup",
+    "MenuPayroll",
+    "MenuPerformance",
 ]

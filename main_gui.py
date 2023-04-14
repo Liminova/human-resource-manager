@@ -2,9 +2,11 @@ from frontend.gui import Login
 
 import sys
 
+
 def main_gui():
     window = Login()
     window.run()
+
 
 if __name__ == "__main__":
     try:

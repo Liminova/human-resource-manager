@@ -10,6 +10,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import Self
 
+
 class Sale(BaseModel):
     employee_id: str = Field(default_factory=str)
     employee_name: str = Field(default_factory=str)
@@ -64,10 +65,13 @@ class Sale(BaseModel):
 
     def set_client_comment(self, client_comment: str) -> Result[Self, str]:
         self.client_comment = client_comment
-        return Ok(self) if client_comment != "" else Err("Client comment cannot be empty.")
+        return (
+            Ok(self) if client_comment != "" else Err("Client comment cannot be empty.")
+        )
 
     def __str__(self) -> str:
-        data = textwrap.dedent(f"""\
+        data = textwrap.dedent(
+            f"""\
             {styling('Sale ID:', self.sale_id)}
             {styling('Date:', self.date.strftime('%Y-%m-%d'))}
             {styling('Revenue:', self.revenue)}
@@ -76,12 +80,14 @@ class Sale(BaseModel):
             {styling('Client ID:', self.client_id)}
             {styling('Client rating:', self.client_rating)}
             {styling('Client comment:', self.client_comment)}\
-            """)
+            """
+        )
         return data
 
     def one_line_str(self) -> str:
         def _styling(key, value):
             return f" | {key}: {FCOLORS.GREEN}{value}{FCOLORS.END}"
+
         data: str = styling("Sale ID:", self.sale_id)
         data += _styling("Date", self.date.strftime("%Y-%m-%d"))
         data += _styling("Profit", self.profit)
@@ -90,8 +96,10 @@ class Sale(BaseModel):
         data += _styling("Employee", f"{self.employee_name} ({self.employee_id})")
         return data
 
+
 class Performance(BaseModel):
     """Monitoring an employee's performance."""
+
     sale_list: list[Sale] = Field(default_factory=list)
     sales_count: int = Field(default_factory=int)
     total_revenue: float = Field(default_factory=float)
@@ -147,13 +155,15 @@ class Performance(BaseModel):
         return sales
 
     def __str__(self) -> str:
-        data = textwrap.dedent(f"""\
+        data = textwrap.dedent(
+            f"""\
             {styling('Sales count:', self.sales_count)}
             {styling('Total revenue:', self.total_revenue)}
             {styling('Total cost:', self.total_cost)}
             {styling('Total profit:', self.total_profit)}
             {styling('Average rating:', self.average_rating)}\
-            """)
+            """
+        )
         return data
 
     class Config:

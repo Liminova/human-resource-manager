@@ -24,7 +24,11 @@ def listing(title: str, entries: list[str]) -> None:
         # navigation
         print(f"--- Page {current_cluster+1} of {len(clusters)} ---")
 
-        user_choice = input("{}[P]{}revious, {}[N]{}ext, enter a number to jump to a page or press enter to go back: ".format(FCOLORS.YELLOW, FCOLORS.END, FCOLORS.YELLOW, FCOLORS.END))
+        user_choice = input(
+            "{}[P]{}revious, {}[N]{}ext, enter a number to jump to a page or press enter to go back: ".format(
+                FCOLORS.YELLOW, FCOLORS.END, FCOLORS.YELLOW, FCOLORS.END
+            )
+        )
         match user_choice.upper():
             case "":
                 return

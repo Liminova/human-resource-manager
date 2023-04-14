@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 
 
 class MenuLoginSignup:
-
     def __init__(self, company: Company):
         self.__company: Company = company
 
@@ -30,7 +29,7 @@ class MenuLoginSignup:
                 last_msg: str = ""
             print(f"{FCOLORS.PURPLE}Employee login{FCOLORS.END}")
             print("Please contact the admin if you don't have an account yet.")
-            print(FCOLORS.CYAN + ("="*58) + FCOLORS.END)
+            print(FCOLORS.CYAN + ("=" * 58) + FCOLORS.END)
 
             employee_id = input("Employee ID, or leave blank to go back: ")
             if not employee_id:
@@ -54,7 +53,9 @@ class MenuLoginSignup:
             #         input_username=employee_id,
             #         input_password=input_password,
             #         hashed_password=employees[employee_id].hashed_password):
-            if not validate(employee_id, input_password, employees[employee_id].hashed_password):
+            if not validate(
+                employee_id, input_password, employees[employee_id].hashed_password
+            ):
                 last_msg: str = FCOLORS.RED + "Invalid password!" + FCOLORS.END
                 continue
 
@@ -74,7 +75,7 @@ class MenuLoginSignup:
                 print(last_msg)
                 last_msg: str = ""
             print(f"{FCOLORS.PURPLE}Admin signup{FCOLORS.END}")
-            print(FCOLORS.CYAN + ('='*12) + FCOLORS.END)
+            print(FCOLORS.CYAN + ("=" * 12) + FCOLORS.END)
 
             admin_username = input("Admin username, or leave blank to go back: ")
             if not admin_username:
@@ -103,5 +104,5 @@ class MenuLoginSignup:
             self.__company.logged_in_employee = owner
 
             if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.insert_one(owner.dict(by_alias=True)) # type: ignore
+                employee_repo.insert_one(owner.dict(by_alias=True))  # type: ignore
             return True

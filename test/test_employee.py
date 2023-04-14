@@ -2,18 +2,24 @@ from models import Department, Employee
 import unittest
 import datetime as dt
 
+
 class TestEmployee(unittest.TestCase):
     def test_create_employee(self):
-        department = Department() \
-            .set_name("Sleep").unwrap() \
-            .set_id("SLP").unwrap()
+        department = Department().set_name("Sleep").unwrap().set_id("SLP").unwrap()
 
-        employee = Employee() \
-            .set_name("Rylie").unwrap() \
-            .set_dob("2003-08-22").unwrap() \
-            .set_id("727").unwrap() \
-            .set_phone("0123456727").unwrap() \
-            .set_department(department.dept_id).unwrap()
+        employee = (
+            Employee()
+            .set_name("Rylie")
+            .unwrap()
+            .set_dob("2003-08-22")
+            .unwrap()
+            .set_id("727")
+            .unwrap()
+            .set_phone("0123456727")
+            .unwrap()
+            .set_department(department.dept_id)
+            .unwrap()
+        )
 
         self.assertEqual(employee.name, "Rylie")
         self.assertEqual(employee.dob, dt.datetime(2003, 8, 22))
@@ -22,17 +28,23 @@ class TestEmployee(unittest.TestCase):
         self.assertEqual(employee.department_id, "SLP")
 
     def test_mutate_employee(self):
-        employee = Employee() \
-            .set_name("Rylie").unwrap() \
-            .set_dob("2003-08-22").unwrap() \
-            .set_id("727").unwrap() \
-            .set_phone("0123456727").unwrap() \
-
+        employee = (
+            Employee()
+            .set_name("Rylie")
+            .unwrap()
+            .set_dob("2003-08-22")
+            .unwrap()
+            .set_id("727")
+            .unwrap()
+            .set_phone("0123456727")
+            .unwrap()
+        )
         self.assertEqual(employee.employee_id, "727")
 
         employee.set_id("420").unwrap()
 
         self.assertEqual(employee.employee_id, "420")
+
 
 if __name__ == "__main__":
     unittest.main()

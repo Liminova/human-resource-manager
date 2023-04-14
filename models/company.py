@@ -13,18 +13,20 @@ if TYPE_CHECKING:
     from .benefits import BenefitPlan
     from .department import Department
 
+
 # thread-safe singleton implementation, there should only be one instance of
 # Company existing at all times.
 class CompanyMeta(type):
     _instances = {}
     _lock: Lock = Lock()
 
-    def __call__(cls, *args, **kwargs): # type: ignore
+    def __call__(cls, *args, **kwargs):  # type: ignore
         with cls._lock:
-            if cls not in cls._instances: # type: ignore
+            if cls not in cls._instances:  # type: ignore
                 instance = super().__call__(*args, **kwargs)
-                cls._instances[cls] = instance # type: ignore
-        return cls._instances[cls] # type: ignore
+                cls._instances[cls] = instance  # type: ignore
+        return cls._instances[cls]  # type: ignore
+
 
 class Company(metaclass=CompanyMeta):
     def __init__(self) -> None:
@@ -35,7 +37,9 @@ class Company(metaclass=CompanyMeta):
 
         # don't add these to database
         self.logged_in_employee: Employee = Employee()
-        self.admins: list[Employee] = [employee for employee in self.employees if employee.is_admin]
+        self.admins: list[Employee] = [
+            employee for employee in self.employees if employee.is_admin
+        ]
 
     @property
     def is_owner(self) -> bool:
@@ -74,7 +78,7 @@ class Company(metaclass=CompanyMeta):
         if (type == "password") and (is_self) and (not is_logged_in_admin):
             return True
 
-        if (not is_logged_in_admin):
+        if not is_logged_in_admin:
             return False
 
         # + everyone
@@ -93,7 +97,7 @@ class Company(metaclass=CompanyMeta):
                     return True
             # - other admins (owner included)
             case "employee":
-                if (not is_input_admin):
+                if not is_input_admin:
                     return True
             # - themselves, other admins (owner included)
             case "payroll":
@@ -105,7 +109,7 @@ class Company(metaclass=CompanyMeta):
                     return True
             # - other admins (owner included)
             case "password":
-                if (not is_input_admin):
+                if not is_input_admin:
                     return True
             case _:
                 raise ValueError(f"Invalid type for system.can_modify: {type}")

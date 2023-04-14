@@ -4,7 +4,7 @@ import os
 
 from ..helpers import *
 from models import BenefitPlan
-from database.mongo import benefit_repo, employee_repo # type: ignore
+from database.mongo import benefit_repo, employee_repo  # type: ignore
 from option import Result, Ok
 
 if sys.version_info >= (3, 11):
@@ -14,6 +14,7 @@ else:
 
 if TYPE_CHECKING:
     from models import Company, Employee
+
 
 class MenuBenefits:
     def __init__(self, company: Company):
@@ -39,7 +40,16 @@ class MenuBenefits:
             ]
 
             title = "Benefit plan management"
-            if pending_request_count := len([employee for benefit in self.__company.benefits for employee in benefit.pending_requests]) > 0:
+            if (
+                pending_request_count := len(
+                    [
+                        employee
+                        for benefit in self.__company.benefits
+                        for employee in benefit.pending_requests
+                    ]
+                )
+                > 0
+            ):
                 title += f" ({FCOLORS.BLUE}{pending_request_count}{FCOLORS.END} pending requests)"
 
             choice = get_user_option_from_menu(title, benefit_plan_menu)
@@ -48,16 +58,26 @@ class MenuBenefits:
                 continue
 
             match choice:
-                case 1: last_msg: str = self.__add()
-                case 2: last_msg: str = self.__apply()
-                case 3: last_msg: str = self.__remove()
-                case 4: last_msg: str = self.__update()
-                case 5: last_msg: str = self.__view()
-                case 6: last_msg: str = self.__view_all()
-                case 7: last_msg: str = self.__request_enroll()
-                case 8: last_msg: str = self.__resolve_pending_requests()
-                case 9: return Ok(None)
-                case _: last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                case 1:
+                    last_msg: str = self.__add()
+                case 2:
+                    last_msg: str = self.__apply()
+                case 3:
+                    last_msg: str = self.__remove()
+                case 4:
+                    last_msg: str = self.__update()
+                case 5:
+                    last_msg: str = self.__view()
+                case 6:
+                    last_msg: str = self.__view_all()
+                case 7:
+                    last_msg: str = self.__request_enroll()
+                case 8:
+                    last_msg: str = self.__resolve_pending_requests()
+                case 9:
+                    return Ok(None)
+                case _:
+                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
         logged_in_employee = self.__company.logged_in_employee
@@ -74,18 +94,26 @@ class MenuBenefits:
                 "[3] Request to enroll in one",
                 "[4] Back",
             ]
-            choice = get_user_option_from_menu("Benefit plan management for" + logged_in_employee.name, benefit_plan_menu)
+            choice = get_user_option_from_menu(
+                "Benefit plan management for" + logged_in_employee.name,
+                benefit_plan_menu,
+            )
 
             if (choice not in [1, 2]) and (not benefits):
                 last_msg: str = NO_BENEFIT_MSG
                 continue
 
             match choice:
-                case 1: last_msg: str = self.__view()
-                case 2: last_msg: str = self.__view_all()
-                case 3: last_msg: str = self.__request_enroll()
-                case 4: return Ok(None)
-                case _: last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                case 1:
+                    last_msg: str = self.__view()
+                case 2:
+                    last_msg: str = self.__view_all()
+                case 3:
+                    last_msg: str = self.__request_enroll()
+                case 4:
+                    return Ok(None)
+                case _:
+                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
         # create a blank benefit plan object
@@ -104,7 +132,7 @@ class MenuBenefits:
         # add the benefit plan to the company
         self.__company.benefits.append(benefit)
         if os.getenv("HRMGR_DB") == "TRUE":
-            benefit_repo.insert_one(benefit.dict(by_alias=True)) # type: ignore
+            benefit_repo.insert_one(benefit.dict(by_alias=True))  # type: ignore
 
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} added successfully!"
 
@@ -116,7 +144,9 @@ class MenuBenefits:
         employee_items = [f"{e.name} ({e.employee_id})" for e in employees]
 
         # get the index of the employee selected by the user
-        employee_index_selected = get_user_option_from_list("Select an employee to apply benefit plan to", employee_items)
+        employee_index_selected = get_user_option_from_list(
+            "Select an employee to apply benefit plan to", employee_items
+        )
         if employee_index_selected == -1:
             return NO_EMPLOYEE_MSG
         elif employee_index_selected == -2:
@@ -132,7 +162,9 @@ class MenuBenefits:
         benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
 
         # get the index of the benefit selected by the user
-        benefit_index_selected = get_user_option_from_list("Select a benefit plan to apply to employee", benefit_items)
+        benefit_index_selected = get_user_option_from_list(
+            "Select a benefit plan to apply to employee", benefit_items
+        )
         if benefit_index_selected == -1:
             return NO_BENEFIT_MSG
         elif benefit_index_selected == -2:
@@ -150,13 +182,13 @@ class MenuBenefits:
         benefit.enrolled_employees.append(employee)
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one(
-                { "_id": employee.id },
-                { "$set": employee.dict(include={"benefits"}) },
+                {"_id": employee.id},
+                {"$set": employee.dict(include={"benefits"})},
                 upsert=True,
             )
             benefit_repo.update_one(
-                { "_id": benefit.id },
-                { "$set": benefit.dict(include={"enrolled_employees"}) },
+                {"_id": benefit.id},
+                {"$set": benefit.dict(include={"enrolled_employees"})},
                 upsert=True,
             )
 
@@ -170,7 +202,9 @@ class MenuBenefits:
         benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
 
         # get the index of the benefit selected by the user
-        benefit_index_selected = get_user_option_from_list("Select a benefit plan to remove", benefit_items)
+        benefit_index_selected = get_user_option_from_list(
+            "Select a benefit plan to remove", benefit_items
+        )
         if benefit_index_selected == -1:
             return NO_BENEFIT_MSG
         elif benefit_index_selected == -2:
@@ -185,17 +219,19 @@ class MenuBenefits:
                 employee.benefits.remove(benefit)
                 if os.getenv("HRMGR_DB") == "TRUE":
                     employee_repo.update_one(
-                        { "_id": employee.id },
-                        { "$set": employee.dict(include={"benefits"}) },
+                        {"_id": employee.id},
+                        {"$set": employee.dict(include={"benefits"})},
                         upsert=True,
                     )
 
         # remove the benefit from the company's list of benefits
         del benefits[benefit_index_selected]
         if os.getenv("HRMGR_DB") == "TRUE":
-            benefit_repo.delete_one({ "_id": benefit.id })
+            benefit_repo.delete_one({"_id": benefit.id})
 
-        return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} removed successfully!"
+        return (
+            f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} removed successfully!"
+        )
 
     def __update(self) -> str:
         benefits = self.__company.benefits
@@ -204,7 +240,9 @@ class MenuBenefits:
         benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
 
         # get the index of the benefit selected by the user
-        selected_benefit_index = get_user_option_from_list("Select a benefit plan to update", benefit_items)
+        selected_benefit_index = get_user_option_from_list(
+            "Select a benefit plan to update", benefit_items
+        )
         if selected_benefit_index == -1:
             return NO_BENEFIT_MSG
         elif selected_benefit_index == -2:
@@ -219,18 +257,20 @@ class MenuBenefits:
             ("Enter benefit plan description", benefit.set_description),
             ("Enter benefit plan cost", benefit.set_cost),
         ]
-        for (field, setter) in fields_data:
+        for field, setter in fields_data:
             if (msg := loop_til_valid_input(field, setter)) != "":
                 return msg
 
         if os.getenv("HRMGR_DB") == "TRUE":
             benefit_repo.update_one(
-                { "_id": benefit.id },
-                { "$set": benefit.dict(exclude={"id"}, by_alias=True) },
+                {"_id": benefit.id},
+                {"$set": benefit.dict(exclude={"id"}, by_alias=True)},
                 upsert=True,
             )
 
-        return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} updated successfully!"
+        return (
+            f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} updated successfully!"
+        )
 
     def __view(self) -> str:
         logged_in_employee = self.__company.logged_in_employee
@@ -239,13 +279,22 @@ class MenuBenefits:
         benefits: list[BenefitPlan] = []
         if not logged_in_employee.is_admin:
             # restore the benefit objects from the benefit names
-            benefits = [benefit for benefit in self.__company.benefits if benefit.name in logged_in_employee.benefits]
+            benefits = [
+                benefit
+                for benefit in self.__company.benefits
+                if benefit.name in logged_in_employee.benefits
+            ]
             benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
         else:
-            benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in self.__company.benefits]
+            benefit_items = [
+                f"{benefit.name} ({benefit.cost})"
+                for benefit in self.__company.benefits
+            ]
 
         # get the index of the benefit selected by the user
-        selected_benefit_index = get_user_option_from_list("Select a benefit plan to view", benefit_items)
+        selected_benefit_index = get_user_option_from_list(
+            "Select a benefit plan to view", benefit_items
+        )
         if selected_benefit_index == -1:
             return NO_BENEFIT_MSG
         elif selected_benefit_index == -2:
@@ -266,7 +315,11 @@ class MenuBenefits:
 
         if not logged_in_employee.is_admin:
             # restore the benefit objects from the benefit names
-            benefits: list[BenefitPlan] = [benefit for benefit in benefits if benefit.name in logged_in_employee.benefits]
+            benefits: list[BenefitPlan] = [
+                benefit
+                for benefit in benefits
+                if benefit.name in logged_in_employee.benefits
+            ]
             benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
         else:
             benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
@@ -280,7 +333,9 @@ class MenuBenefits:
         benefits = self.__company.benefits
 
         benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
-        selected_benefit_index = get_user_option_from_list("Select a benefit plan to request enrollment", benefit_items)
+        selected_benefit_index = get_user_option_from_list(
+            "Select a benefit plan to request enrollment", benefit_items
+        )
         if selected_benefit_index == -1:
             return NO_BENEFIT_MSG
         elif selected_benefit_index == -2:
@@ -296,8 +351,8 @@ class MenuBenefits:
         benefit.pending_requests.append(logged_in_employee)
         if os.getenv("HRMGR_DB") == "TRUE":
             benefit_repo.update_one(
-                { "_id": benefit.id },
-                { "$set": benefit.dict(include={"pending_requests"}) },
+                {"_id": benefit.id},
+                {"$set": benefit.dict(include={"pending_requests"})},
                 upsert=True,
             )
 
@@ -312,8 +367,13 @@ class MenuBenefits:
                 custom_pending_requests[benefit] = benefit.pending_requests
 
         # a list representing all benefit plans with pending requests
-        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in custom_pending_requests.keys()]
-        benefit_index_selected = get_user_option_from_list("Select a benefit plan to resolve pending requests for", benefit_items)
+        benefit_items = [
+            f"{benefit.name} ({benefit.cost})"
+            for benefit in custom_pending_requests.keys()
+        ]
+        benefit_index_selected = get_user_option_from_list(
+            "Select a benefit plan to resolve pending requests for", benefit_items
+        )
         if benefit_index_selected == -1:
             return NO_BENEFIT_MSG
         elif benefit_index_selected == -2:
@@ -323,8 +383,13 @@ class MenuBenefits:
         benefit = list(custom_pending_requests.keys())[benefit_index_selected]
 
         # a list representing all employees with pending requests for the selected benefit plan
-        employee_items = [f"{employee.name} ({employee.id})" for employee in custom_pending_requests[benefit]]
-        employee_index_selected = get_user_option_from_list("Select an employee to resolve their pending request", employee_items)
+        employee_items = [
+            f"{employee.name} ({employee.id})"
+            for employee in custom_pending_requests[benefit]
+        ]
+        employee_index_selected = get_user_option_from_list(
+            "Select an employee to resolve their pending request", employee_items
+        )
         if employee_index_selected == -1:
             return NO_EMPLOYEE_MSG
         elif employee_index_selected == -2:
@@ -361,18 +426,26 @@ class MenuBenefits:
 
         if os.getenv("HRMGR_DB") == "TRUE":
             benefit_repo.update_one(
-                { "_id": benefit.id },
-                { "$set": benefit.dict(include={"pending_requests", "enrolled_employees"}) },
+                {"_id": benefit.id},
+                {
+                    "$set": benefit.dict(
+                        include={"pending_requests", "enrolled_employees"}
+                    )
+                },
                 upsert=True,
             )
             if decision == 1:
                 employee_repo.update_one(
-                    { "_id": employee.id },
-                    { "$set": employee.dict(include={"benefits"}) },
+                    {"_id": employee.id},
+                    {"$set": employee.dict(include={"benefits"})},
                     upsert=True,
                 )
 
         if decision == 0:
-            return f"Employee {empl_name} ({empl_id}) approved for benefit {benefit_name}!"
+            return (
+                f"Employee {empl_name} ({empl_id}) approved for benefit {benefit_name}!"
+            )
         else:
-            return f"Employee {empl_name} ({empl_id}) denied for benefit {benefit_name}!"
+            return (
+                f"Employee {empl_name} ({empl_id}) denied for benefit {benefit_name}!"
+            )

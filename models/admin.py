@@ -4,6 +4,7 @@ from .employee import Employee
 
 company = Company()
 
+
 class Admin(Employee):
     def __init__(self) -> None:
         super().__init__

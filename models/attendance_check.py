@@ -9,6 +9,7 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import Self
 
+
 class Attendance(BaseModel):
     start_date: datetime = Field(default_factory=datetime.now)
     allowed_absent_days: dict[int, int] = Field(default_factory=dict)
@@ -54,6 +55,7 @@ class Attendance(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+
     def get_available_years(self) -> list[int]:
         """For user to choose in the attendance report menu."""
         years: list[int] = []
@@ -65,7 +67,7 @@ class Attendance(BaseModel):
 
     def get_report(self, year: datetime) -> str:
         """Get the attendance report for a specific year."""
-        data = "" # temporary variable to store the report data
+        data = ""  # temporary variable to store the report data
         for date, is_present in self.attendances.items():
             # only get the attendance data for the specified year
             date = datetime.strptime(date, "%Y-%m-%d")
