@@ -133,7 +133,7 @@ class MenuDepartment:
         # remove the department id from all employees in the department
         for employee in empls:
             if employee.department_id == depts[dept_selected_index].dept_id:
-                employee.department_id = ""
+                employee.set_department("").unwrap()
                 if os.getenv("HRMGR_DB") == "TRUE":
                     employee_repo.update_one(
                         {"_id": employee.id},

@@ -132,7 +132,7 @@ class MenuEmployee:
                 )
 
             # add the department id to the employee's department_id
-            employee.department_id = depts[dept_index].dept_id
+            employee.set_department(depts[dept_index].dept_id).unwrap()
 
         # append the employee to the company's employees
         self.__company.employees.append(employee)
