@@ -72,7 +72,7 @@ class MenuBenefits:
                 "[1] View details of one",
                 "[2] List all",
                 "[3] Request to enroll in one",
-                "[3] Back",
+                "[4] Back",
             ]
             choice = get_user_option_from_menu("Benefit plan management for" + logged_in_employee.name, benefit_plan_menu)
 
