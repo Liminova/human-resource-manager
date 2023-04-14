@@ -6,10 +6,7 @@ from .get_user_option_from_menu import get_user_option_from_menu
 from .listing import listing
 from .loop_til_valid_input import loop_til_valid_input # type: ignore
 
-if sys.version_info >= (3, 11):
-    from typing import Callable
-else:
-    from typing_extensions import Callable
+from typing import Callable
 
 styling: Callable[[str, str], str] = lambda x, y: f"- {FCOLORS.CYAN}{x}{FCOLORS.END}: {FCOLORS.GREEN}{y}{FCOLORS.END}"
 

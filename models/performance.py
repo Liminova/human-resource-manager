@@ -4,11 +4,12 @@ from option import Result, Ok, Err
 from datetime import datetime
 from pydantic import BaseModel, Field
 from frontend.helpers import styling, FCOLORS
+from typing import Callable
 
 if sys.version_info >= (3, 11):
-    from typing import Self, Callable
+    from typing import Self
 else:
-    from typing_extensions import Self, Callable
+    from typing_extensions import Self
 
 class Sale(BaseModel):
     employee_id: str = Field(default_factory=str)
