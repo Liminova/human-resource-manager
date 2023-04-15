@@ -2,8 +2,15 @@ import customtkinter as ctk
 import tkinter
 from tkinter import messagebox
 
+from frontend.menu import *
+
 from .homepage import Homepage
 from .signup import Signup
+from models import Company
+from dotenv import load_dotenv
+
+load = load_dotenv()
+the_company = Company()
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
@@ -98,13 +105,21 @@ class Login(ctk.CTk):
     def login_successfully(self):
         username = self.entry1.get()
         password = self.entry2.get()
-        if username == "" or password == "":
-            messagebox.showerror("Error", "Please fill in all the fields")
-        elif username == "admin" and password == "admin":
+        menu_login_signup = MenuLoginSignup(the_company)
+        is_logged_in = False
+        if len(the_company.employees) == 0:
+            is_logged_in = menu_login_signup.signup_admin()
+        else:
+            is_logged_in = menu_login_signup.login(username, password)
+        if is_logged_in:
             self.destroy()
             Homepage().run()
         else:
-            messagebox.showerror("Error", "Incorrect username or password")
+            messagebox.showerror(
+                "Error",
+                "Invalid username or password. Please try again or contact the HR department.",
+            )
+        
 
     def click_signup(self):
         Signup.signup().run()
