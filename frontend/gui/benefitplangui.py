@@ -10,7 +10,7 @@ from .signup import Signup
 from models import Company, BenefitPlan, Department
 from database.mongo import department_repo, employee_repo
 
-the_company = Company()
+the_company = Company() 
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
