@@ -35,7 +35,9 @@ class MenuEmployee:
                 "[4] View details of employee",
                 "[5] Change password",
                 "[6] List all employees",
-                "[7] Back",
+                "[7] Grant admin rights",
+                "[8] Revoke admin rights",
+                "[9] Back",
             ]
             choice = get_user_option_from_menu("Employee management", employee_menu)
 
@@ -57,6 +59,10 @@ class MenuEmployee:
                 case 6:
                     last_msg: str = self.__view_all()
                 case 7:
+                    last_msg: str = self.__grant_admin_rights()
+                case 8:
+                    last_msg: str = self.__revoke_admin_rights()
+                case 9:
                     return Ok(None)
                 case _:
                     last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
@@ -375,3 +381,89 @@ class MenuEmployee:
                     {"$set": logged_in_employee.dict(include={"hashed_password"})},
                     upsert=True,
                 )
+
+    def __grant_admin_rights(self):
+        empls = self.__company.employees
+
+        # check if logged in user is an owner
+        if not self.__company.can_modify(
+            "grant_admin", self.__company.logged_in_employee
+        ):
+            return "Only the owner can grant admin rights"
+
+        # a list containing the string representation of each employee
+        employee_items = [f"{e.name} ({e.employee_id})" for e in empls]
+        selected_employee_index = get_user_option_from_list(
+            "Select an employee to grant admin rights to", employee_items
+        )
+        if selected_employee_index == -1:
+            return NO_EMPLOYEE_MSG
+        elif selected_employee_index == -2:
+            return ""
+
+        # get the employee
+        employee = empls[selected_employee_index]
+        if employee.is_admin:
+            return f"{employee.name} already has admin rights"
+
+        # confirm
+        if (
+            input(
+                f"Are you sure you want to grant {employee.name} admin rights? (y/n): "
+            ).lower()
+            != "y"
+        ):
+            return ""
+
+        # grant admin rights
+        employee.is_admin = True
+        if os.getenv("HRMGR_DB") == "TRUE":
+            employee_repo.update_one(
+                {"_id": employee.id},
+                {"$set": employee.dict(include={"is_admin"})},
+                upsert=True,
+            )
+        return f"Admin rights granted to {employee.name}"
+
+    def __revoke_admin_rights(self):
+        empls = self.__company.employees
+
+        # check if logged in user is an owner
+        if not self.__company.can_modify(
+            "revoke_admin", self.__company.logged_in_employee
+        ):
+            return "Only the owner can revoke admin rights"
+
+        # a list containing the string representation of each employee
+        employee_items = [f"{e.name} ({e.employee_id})" for e in empls]
+        selected_employee_index = get_user_option_from_list(
+            "Select an employee to revoke admin rights from", employee_items
+        )
+        if selected_employee_index == -1:
+            return NO_EMPLOYEE_MSG
+        elif selected_employee_index == -2:
+            return ""
+
+        # get the employee
+        employee = empls[selected_employee_index]
+        if not employee.is_admin:
+            return f"{employee.name} does not have admin rights"
+
+        # confirm
+        if (
+            input(
+                f"Are you sure you want to revoke {employee.name}'s admin rights? (y/n): "
+            ).lower()
+            != "y"
+        ):
+            return ""
+
+        # revoke admin rights
+        employee.is_admin = False
+        if os.getenv("HRMGR_DB") == "TRUE":
+            employee_repo.update_one(
+                {"_id": employee.id},
+                {"$set": employee.dict(include={"is_admin"})},
+                upsert=True,
+            )
+        return f"Admin rights revoked from {employee.name}"

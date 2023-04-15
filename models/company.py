@@ -65,6 +65,7 @@ class Company(metaclass=CompanyMeta):
         - payroll
         - performance
         - password
+        - grant_admin
         """
         if self.is_owner:
             return True
@@ -77,6 +78,9 @@ class Company(metaclass=CompanyMeta):
 
         if (type == "password") and (is_self) and (not is_logged_in_admin):
             return True
+
+        if (type == "grant_admin") and (not self.is_owner):
+            return False
 
         if not is_logged_in_admin:
             return False
