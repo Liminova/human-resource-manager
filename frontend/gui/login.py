@@ -1,8 +1,8 @@
 import customtkinter as ctk
 import tkinter
+import os
 from tkinter import messagebox
 
-from frontend.menu import *
 
 from .homepage import Homepage
 from .signup import Signup
@@ -105,21 +105,21 @@ class Login(ctk.CTk):
     def login_successfully(self):
         username = self.entry1.get()
         password = self.entry2.get()
-        menu_login_signup = MenuLoginSignup(the_company)
+        # Take the data from sign up page and store it in the database
+        login = Login()
         is_logged_in = False
-        if len(the_company.employees) == 0:
-            is_logged_in = menu_login_signup.signup_admin()
+        if username == "" or password == "":
+            messagebox.showerror("Error", "Please enter username and password")
         else:
-            is_logged_in = menu_login_signup.login(username, password)
-        if is_logged_in:
-            self.destroy()
+            for employee in the_company.employees:
+                if username == employee.username and password == employee.password:
+                    is_logged_in = True
+                    break
+        if is_logged_in == True:
+            login.destroy()
             Homepage().run()
         else:
-            messagebox.showerror(
-                "Error",
-                "Invalid username or password. Please try again or contact the HR department.",
-            )
+            messagebox.showerror("Error", "Incorrect username or password")
         
-
     def click_signup(self):
         Signup.signup().run()
