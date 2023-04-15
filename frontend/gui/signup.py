@@ -1,6 +1,13 @@
 import customtkinter as ctk
 import tkinter.messagebox as msgbox
 
+from models import Company
+from dotenv import load_dotenv
+
+load_dotenv()
+
+the_company = Company()
+
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
 
@@ -87,6 +94,29 @@ class Signup(ctk.CTk):
         self.label3.place(x=50, y=315)
 
         self.bind("<Return>", lambda event: self.click_signup())
+
+    def first_account(self):
+        first_account_is_admin = the_company.employees[0].is_admin
+        first_account_name_is_owner = the_company.employees[0].name == "Owner"
+        only_one_owner = (
+            len(
+                [
+                    employee
+                    for employee in the_company.employees
+                    if employee.name == "Owner"
+                ]
+            )
+            == 1
+        )
+        if not first_account_is_admin:
+            msgbox.showerror("Error", "First account is not an admin!")
+            raise KeyboardInterrupt
+        elif not first_account_name_is_owner:
+            msgbox.showerror("Error", "First account name is not 'Owner'!")
+            raise KeyboardInterrupt
+        elif not only_one_owner:
+            msgbox.showerror("Error", "There are more than one 'Owner' account!")
+            raise KeyboardInterrupt
 
     def signup_successfully(self):
         msgbox.showinfo("Sign up", "Sign up successful!")
