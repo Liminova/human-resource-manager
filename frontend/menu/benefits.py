@@ -4,7 +4,7 @@ import os
 
 from ..helpers import *
 from models import BenefitPlan
-from database.mongo import benefit_repo, employee_repo  # type: ignore
+from database.mongo import benefit_repo, employee_repo
 from option import Result, Ok
 
 if sys.version_info >= (3, 11):
@@ -132,7 +132,7 @@ class MenuBenefits:
         # add the benefit plan to the company
         self.__company.benefits.append(benefit)
         if os.getenv("HRMGR_DB") == "TRUE":
-            benefit_repo.insert_one(benefit.dict(by_alias=True))  # type: ignore
+            benefit_repo.insert_one(benefit.dict(by_alias=True))
 
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} added successfully!"
 

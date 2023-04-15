@@ -4,7 +4,7 @@ import os
 
 from ..helpers import *
 from models import Employee, validate, hash
-from database.mongo import employee_repo  # type: ignore
+from database.mongo import employee_repo
 from getpass import getpass
 
 if sys.version_info >= (3, 11):
@@ -104,5 +104,5 @@ class MenuLoginSignup:
             self.__company.logged_in_employee = owner
 
             if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.insert_one(owner.dict(by_alias=True))  # type: ignore
+                employee_repo.insert_one(owner.dict(by_alias=True))
             return True

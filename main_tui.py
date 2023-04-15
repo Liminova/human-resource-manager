@@ -8,7 +8,7 @@ from frontend.helpers import *
 from frontend.menu import *
 from models import Company, Employee, BenefitPlan, Department
 from dotenv import load_dotenv
-from database.mongo import employee_repo, department_repo, benefit_repo  # type: ignore
+from database.mongo import employee_repo, department_repo, benefit_repo
 from option import Result, Ok
 
 load_dotenv()
@@ -22,19 +22,19 @@ def initialize_data():
     if not employee_repo.find({}):
         pass
     else:
-        for employee in employee_repo.find({}):  # type: ignore
+        for employee in employee_repo.find({}):
             the_company.employees.append(Employee.parse_obj(employee))
 
     if not department_repo.find({}):
         pass
     else:
-        for department in department_repo.find({}):  # type: ignore
+        for department in department_repo.find({}):
             the_company.departments.append(Department.parse_obj(department))
 
     if not benefit_repo.find({}):
         pass
     else:
-        for benefit in benefit_repo.find({}):  # type: ignore
+        for benefit in benefit_repo.find({}):
             the_company.benefits.append(BenefitPlan.parse_obj(benefit))
 
 
@@ -183,7 +183,7 @@ def main_tui():
                 case _:
                     last_msg: str = FCOLORS.RED + "Invalid choice!" + FCOLORS.END
         try:
-            respond.unwrap()  # type: ignore
+            respond.unwrap()
         except (ValueError, TypeError) as e:
             last_msg: str = str(e)
 

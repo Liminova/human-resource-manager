@@ -1,4 +1,3 @@
-# type: ignore
 import customtkinter
 import tkinter
 from tkinter import messagebox
