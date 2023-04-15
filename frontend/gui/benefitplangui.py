@@ -8,7 +8,7 @@ from ..menu import *
 from .homepage import Homepage
 from .signup import Signup
 from models import Company, BenefitPlan, Department
-from database.mongo import department_repo, employee_repo
+from database.mongo import department_repo, employee_repo, benefit_repo
 
 the_company = Company() 
 
@@ -114,20 +114,16 @@ class BenefitPlanGui(ctk.CTk):
                     messagebox.showerror("Error", "Cost must be a number")
                 else:
                     # assign values to the benefit plan object
-                    input_fields = [
-                        name,
-                        description,
-                        cost,
-                    ]
-                    benefit.set_fields(input_fields)
-                    # add the benefit plan to the company
-                    is_added = the_company.append(benefit)
+                    benefit.name = name
+                    benefit.description = description
+                    benefit.cost = cost
+        
+                    # add the benefit plan to the company and database
+                    the_company.benefits.append(benefit)
+            
                     if os.getenv("HRMGR_DB") == "TRUE":
-                        benefit_repo.insert_one(benefit.dict(by_alias=True))    
-                    if is_added:
-                        messagebox.showinfo("Success", "Benefit Plan Added")
-                    else:
-                        messagebox.showerror("Error", "Benefit Plan Not Added")
+                        benefit_repo.insert_one(benefit.dict(by_alias=True))
+                    messagebox.showinfo("Success","Benefit Plan added successfully")
                                       
         def remove_benefit_plan(self):
             self.button2_frame = ctk.CTkFrame(master=self.right_frame)
