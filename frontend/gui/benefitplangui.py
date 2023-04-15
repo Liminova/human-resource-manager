@@ -1,6 +1,16 @@
 import customtkinter as ctk
 import tkinter
+import os
 from tkinter import messagebox
+
+from ..menu import *
+
+from .homepage import Homepage
+from .signup import Signup
+from models import Company, BenefitPlan, Department
+from database.mongo import department_repo, employee_repo
+
+the_company = Company()
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
@@ -91,6 +101,9 @@ class BenefitPlanGui(ctk.CTk):
                 name = self.entry1.get()
                 description = self.entry2.get()
                 cost = self.entry3.get()
+                # create a blank benefit plan object
+                benefit = BenefitPlan()           
+                is_added = False
                 if name == "" or description == "" or cost == "":
                     messagebox.showerror("Error", "Please fill in all the fields")
                 elif not name.isalpha():
@@ -100,8 +113,22 @@ class BenefitPlanGui(ctk.CTk):
                 elif not cost.isdigit():
                     messagebox.showerror("Error", "Cost must be a number")
                 else:
-                    messagebox.showinfo("Success", "Benefit Plan added successfully")
-
+                    # assign values to the benefit plan object
+                    input_fields = [
+                        name,
+                        description,
+                        cost,
+                    ]
+                    benefit.set_fields(input_fields)
+                    # add the benefit plan to the company
+                    is_added = the_company.append(benefit)
+                    if os.getenv("HRMGR_DB") == "TRUE":
+                        benefit_repo.insert_one(benefit.dict(by_alias=True))    
+                    if is_added:
+                        messagebox.showinfo("Success", "Benefit Plan Added")
+                    else:
+                        messagebox.showerror("Error", "Benefit Plan Not Added")
+                                      
         def remove_benefit_plan(self):
             self.button2_frame = ctk.CTkFrame(master=self.right_frame)
 
@@ -114,16 +141,22 @@ class BenefitPlanGui(ctk.CTk):
 
             self.label1 = ctk.CTkLabel(
                 master=self.right_frame,
-                text="Benefit name: ",
+                text="Select a benefit plan: ",
                 font=("Century Gothic", 20, "italic"),
             )
             self.label1.place(relx=0.145, rely=0.15, anchor=tkinter.CENTER)
 
-            self.entry1 = ctk.CTkEntry(
-                master=self.right_frame, placeholder_text="Enter Name"
+            self.entry1 = ctk.CTkCombobox(master=self.right_frame)
+            self.entry1.configure(
+                width=400, height=30, font=("Century Gothic", 14), corner_radius=10
             )
-            entry_size(self.entry1)
             self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+
+            benefits = the_company.benefits
+            # a list containing the string representation of each benefit
+            benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+            # set the combobox values to the list of benefit items
+            self.entry1["values"] = benefit_items
 
             self.button = ctk.CTkButton(
                 master=self.right_frame,
@@ -142,13 +175,26 @@ class BenefitPlanGui(ctk.CTk):
             self.button2_frame.pack(pady=20)
 
             def remove_successfully(self):
-                name = self.entry1.get()
-                if name == "" or id == "" or department == "":
-                    messagebox.showerror("Error", "Please fill in all the fields")
-                elif not name.isalpha():
-                    messagebox.showerror("Error", "Please enter a valid name")
-                else:
-                    messagebox.showinfo("Success", "Benefit Plan removed successfully")
+                # get user selection
+                selection = self.entry1.get()
+                
+                benefits = the_company.benefits
+                employees = the_company.employees
+                # a list containing the string representation of each benefit
+                benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+                # get the index of the benefit selected by the user
+                benefit_index = benefit_items.index(selection)
+                # get the benefit object
+                benefit = benefits[benefit_index]
+                # remove the benefit from all employees
+                for employee in employees:
+                    employee.benefits.remove(benefit)
+                # remove the benefit from the company
+                the_company.benefits.remove(benefit)
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    benefit_repo.delete_one(benefit.dict(by_alias=True))
+                # remove the benefit from the database
+                messagebox.showinfo("Success", "Benefit Plan Removed")
 
         def update_benefit_plan(self):
             self.button3_frame = ctk.CTkFrame(master=self.right_frame)
@@ -162,23 +208,22 @@ class BenefitPlanGui(ctk.CTk):
 
             self.label0 = ctk.CTkLabel(
                 master=self.right_frame,
-                text="(You are currently update the information of: ) ",
+                text="(Select a Benefit Plan: ) ",
                 font=("Century Gothic", 14, "italic"),
             )
             self.label0.place(relx=0.5, rely=0.095, anchor=tkinter.CENTER)
 
-            self.label1 = ctk.CTkLabel(
-                master=self.right_frame,
-                text="Old Name: ",
-                font=("Century Gothic", 20, "italic"),
+            self.entry0 = ctk.CTkCombobox(master=self.right_frame)
+            self.entry0.configure(
+                width=400, height=30, font=("Century Gothic", 14), corner_radius=10
             )
-            self.label1.place(relx=0.135, rely=0.15, anchor=tkinter.CENTER)
-
-            self.entry1 = ctk.CTkEntry(
-                master=self.right_frame, placeholder_text="Enter old name"
-            )
-            entry_size(self.entry1)
-            self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+            self.entry0.place(relx=0.325, rely=0.14, anchor=tkinter.CENTER)
+        
+            benefits = the_company.benefits
+            # a list containing the string representation of each benefit
+            benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+            # set the combobox values to the list of benefit items
+            self.entry0["values"] = benefit_items
 
             self.label2 = ctk.CTkLabel(
                 master=self.right_frame,
@@ -236,23 +281,28 @@ class BenefitPlanGui(ctk.CTk):
             self.button3_frame.pack(pady=20)
 
             def update_successfully(self):
-                name = self.entry1.get()
+                selection = self.entry0.get()
+                benefits = the_company.benefits
+                # a list containing the string representation of each benefit
+                benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+                # get the index of the benefit selected by the user
+                benefit_index = benefit_items.index(selection)
+                # get the benefit object
+                benefit = benefits[benefit_index]
+        
+                # get new entries
                 new_name = self.entry2.get()
                 new_description = self.entry3.get()
                 new_cost = self.entry4.get()
-                if (
-                    name == ""
-                    or new_name == ""
-                    or new_description == ""
-                    or new_cost == ""
-                ):
-                    messagebox.showerror("Error", "Please fill in all the fields")
-                elif not name.isalpha() or not new_name.isalpha():
-                    messagebox.showerror("Error", "Please enter a valid value")
-                elif not new_cost.isdigit():
-                    messagebox.showerror("Error", "Please enter a valid cost")
-                else:
-                    messagebox.showinfo("Success", "Benefit Plan updated successfully")
+                
+                # update the benefit
+                benefit.name = new_name
+                benefit.description = new_description
+                benefit.cost = new_cost
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    benefit_repo.update_one(benefit.dict(by_alias=True))
+                # show a success message   
+                messagebox.showinfo("Success", "Benefit Plan Updated")
 
         def apply_benefit_plan(self):
             self.button5_frame = ctk.CTkFrame(master=self.right_frame)
@@ -266,16 +316,22 @@ class BenefitPlanGui(ctk.CTk):
 
             self.label1 = ctk.CTkLabel(
                 master=self.right_frame,
-                text="Benefit Plan Name: ",
+                text="Select Benefit Plan: ",
                 font=("Century Gothic", 20, "italic"),
             )
             self.label1.place(relx=0.175, rely=0.15, anchor=tkinter.CENTER)
 
-            self.entry1 = ctk.CTkEntry(
-                master=self.right_frame, placeholder_text="Enter name"
+            self.entry1 = ctk.CTkCombobox(master=self.right_frame)
+            self.entry1.configure(
+                width=400, height=30, font=("Century Gothic", 14), corner_radius=10
             )
-            entry_size(self.entry1)
             self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        
+            benefits = the_company.benefits
+            # a list containing the string representation of each benefit
+            benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+            # set the combobox values to the list of benefit items
+            self.entry1["values"] = benefit_items
 
             self.label2 = ctk.CTkLabel(
                 master=self.right_frame,
@@ -307,14 +363,25 @@ class BenefitPlanGui(ctk.CTk):
             self.button5_frame.pack(pady=20)
 
             def apply_successfully(self):
-                name = self.entry1.get()
-                id = self.entry2.get()
-                if name == "" or id == "":
-                    messagebox.showerror("Error", "Please fill in all the fields")
-                elif not name.isalpha():
-                    messagebox.showerror("Error", "Please enter a valid name")
-                else:
-                    messagebox.showinfo("Success", "Benefit Plan applied successfully")
+                selection = self.entry1.get()
+                benefits = the_company.benefits
+                # a list containing the string representation of each benefit
+                benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+                # get the index of the benefit selected by the user
+                benefit_index = benefit_items.index(selection)
+                # get the benefit object
+                benefit = benefits[benefit_index]
+        
+                # get new entries
+                employee_id = self.entry2.get()
+                # get the employee object
+                employee = the_company.get_employee(employee_id)
+                # apply the benefit to the employee
+                employee.benefits.append(benefit)
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one(employee.dict(by_alias=True))
+                # show a success message   
+                messagebox.showinfo("Success", "Benefit Plan Applied")
 
         def view_benefit_plan(self):
             self.button2_frame = ctk.CTkFrame(master=self.right_frame)
@@ -328,17 +395,23 @@ class BenefitPlanGui(ctk.CTk):
 
             self.label1 = ctk.CTkLabel(
                 master=self.right_frame,
-                text="Benefit name: ",
+                text="Select a Benefit Plan: ",
                 font=("Century Gothic", 20, "italic"),
             )
             self.label1.place(relx=0.145, rely=0.15, anchor=tkinter.CENTER)
 
-            self.entry1 = ctk.CTkEntry(
-                master=self.right_frame, placeholder_text="Enter Name"
+            self.entry1 = ctk.CTkCombobox(master=self.right_frame) 
+            self.entry1.configure(
+                width=400, height=30, font=("Century Gothic", 14), corner_radius=10
             )
-            entry_size(self.entry1)
             self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
+    
+            benefits = the_company.benefits
+            # a list containing the string representation of each benefit
+            benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+            # set the combobox values to the list of benefit items
+            self.entry1["values"] = benefit_items
+    
             self.button = ctk.CTkButton(
                 master=self.right_frame, text="View", fg_color="purple"
             )
@@ -351,6 +424,17 @@ class BenefitPlanGui(ctk.CTk):
             self.button.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
 
             self.button2_frame.pack(pady=20)
+            def view_benefit(self):
+                selection = self.entry1.get()
+                benefits = the_company.benefits
+                # a list containing the string representation of each benefit
+                benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+                # get the index of the benefit selected by the user
+                benefit_index = benefit_items.index(selection)
+                # get the benefit object
+                benefit = benefits[benefit_index]
+                # show a success message
+                messagebox.showinfo("Benefit Plan", f"{benefit}")
 
         def destroy_all_frames(self):
             for widget in self.right_frame.winfo_children():
