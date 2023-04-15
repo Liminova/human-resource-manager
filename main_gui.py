@@ -50,7 +50,6 @@ def main_gui():
         messagebox.showinfo("Error", "It seems like your environment variables are not set up. The program will now run in memory-only mode. Press OK to continue", type="ok")
     else:
         initialize_data()
-    from database.mongo import department_repo, employee_repo
     # ======================
     # Welcome to the GUI
     # ======================
