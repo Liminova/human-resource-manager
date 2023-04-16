@@ -90,7 +90,7 @@ class MenuBenefits:
                 "[4] Back",
             ]
             choice = get_user_option_from_menu(
-                "Benefit plan management for" + logged_in_employee.name,
+                "Benefit plan management for " + logged_in_employee.name,
                 benefit_plan_menu,
             )
             match choice:
