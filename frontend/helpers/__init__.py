@@ -7,7 +7,7 @@ from .loop_til_valid_input import loop_til_valid_input
 
 
 def styling(x, y):
-    return f"- {FCOLORS.CYAN}{x}{FCOLORS.END}: {FCOLORS.GREEN}{y}{FCOLORS.END}"
+    return f"- {FCOLORS.CYAN}{x}{FCOLORS.END} {FCOLORS.GREEN}{y}{FCOLORS.END}"
 
 
 def __error_msg(x):
