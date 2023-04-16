@@ -145,10 +145,10 @@ class MenuPayroll:
 
         clrscr()
         print(
-            f"== Payroll for employee {FCOLORS.GREEN}{self.__logged_in_employee.name}{FCOLORS.END} =="
+            f"== Payroll for employee {FCOLORS.GREEN}{the_company.logged_in_employee.name}{FCOLORS.END} =="
         )
-        if not self.__logged_in_employee.is_admin:
-            print(self.__logged_in_employee.payroll)
+        if not the_company.logged_in_employee.is_admin:
+            print(the_company.logged_in_employee.payroll)
         else:
             empl_items = [f"{e.name} ({e.employee_id})" for e in empls]
             selected_empl_index = get_user_option_from_list(

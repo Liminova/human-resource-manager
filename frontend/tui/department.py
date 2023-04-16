@@ -95,12 +95,12 @@ class MenuDepartment:
             department_repo.insert_one(dept.dict(by_alias=True))
 
         # add the department to the company
-        self.__company.departments.append(dept)
+        the_company.departments.append(dept)
         return f"Department {FCOLORS.GREEN}{dept.name}{FCOLORS.END} added successfully!"
 
     def __remove(self) -> str:
-        depts = self.__company.departments
-        empls = self.__company.employees
+        depts = the_company.departments
+        empls = the_company.employees
 
         # a list containing the string representation of each department
         dept_items = [f"{dept.name} ({dept.dept_id})" for dept in depts]
@@ -135,7 +135,7 @@ class MenuDepartment:
         return f"Department {FCOLORS.RED}{dept_name}{FCOLORS.END} ({FCOLORS.RED}{dept_id}{FCOLORS.END}) removed successfully!"
 
     def __update(self) -> str:
-        depts = self.__company.departments
+        depts = the_company.departments
 
         # a list containing the string representation of each department
         dept_items = [f"{dept.name} ({dept.dept_id})" for dept in depts]
@@ -170,8 +170,8 @@ class MenuDepartment:
         )
 
     def __add_employee(self) -> str:
-        depts = self.__company.departments
-        empls = self.__company.employees
+        depts = the_company.departments
+        empls = the_company.employees
 
         # a list containing the string representation of each department
         dept_items = [f"{dept.name} ({dept.dept_id})" for dept in depts]
@@ -199,7 +199,7 @@ class MenuDepartment:
             case -2:
                 return ""
 
-        if not self.__company.can_modify("department", empls[employee_selected_index]):
+        if not the_company.can_modify("department", empls[employee_selected_index]):
             return "You do not have permission to modify this employee's department!"
 
         # add the employee to the department, department ID to the employee
@@ -223,8 +223,8 @@ class MenuDepartment:
         return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.id}{FCOLORS.END}) added to department {FCOLORS.GREEN}{department.name}{FCOLORS.END} ({FCOLORS.GREEN}{department.id}{FCOLORS.END}) successfully!"
 
     def __remove_employee(self) -> str:
-        depts = self.__company.departments
-        empls = self.__company.employees
+        depts = the_company.departments
+        empls = the_company.employees
 
         # a list containing the string representation of each department
         dept_items = [f"{dept.name} ({dept.dept_id})" for dept in depts]
@@ -255,7 +255,7 @@ class MenuDepartment:
         elif employee_selected_index == -2:
             return ""
 
-        if not self.__company.can_modify("department", empls[employee_selected_index]):
+        if not the_company.can_modify("department", empls[employee_selected_index]):
             return "Only the company owner can manage admins! You can only manage employees."
 
         employee = empls[employee_selected_index + 1]
@@ -278,7 +278,7 @@ class MenuDepartment:
         return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.employee_id}{FCOLORS.END}) removed from department {FCOLORS.GREEN}{department.name}{FCOLORS.END} ({FCOLORS.GREEN}{department.dept_id}{FCOLORS.END}) successfully!"
 
     def __view(self) -> str:
-        depts = self.__company.departments
+        depts = the_company.departments
 
         if not the_company.logged_in_employee.is_admin:
             dept = [
@@ -304,11 +304,12 @@ class MenuDepartment:
 
             # print the department info
             print(depts[dept_selected_index])
+
         input(ENTER_TO_CONTINUE_MSG)
 
     def __view_all(self) -> str:
         dept_items = [
-            f"{dept.name} ({dept.dept_id})" for dept in self.__company.departments
+            f"{dept.name} ({dept.dept_id})" for dept in the_company.departments
         ]
         if len(dept_items) == 0:
             return NO_DEPARTMENT_MSG
@@ -318,7 +319,7 @@ class MenuDepartment:
     def __view_employees_not_belong_to_any_department(self) -> str:
         employee_items = [
             f"{employee.name} ({employee.employee_id})"
-            for employee in self.__company.employees
+            for employee in the_company.employees
             if employee.department_id == ""
         ]
         if len(employee_items) == 0:
