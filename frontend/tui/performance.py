@@ -145,8 +145,12 @@ class MenuPerformance:
         selected_empl.performance.total_cost += sale.cost
         selected_empl.performance.total_profit += sale.profit
 
-        rating_sum = sum([sale.client_rating for sale in selected_empl.performance.sale_list])
-        selected_empl.performance.average_rating = rating_sum / len(selected_empl.performance.sale_list)
+        rating_sum = sum(
+            [sale.client_rating for sale in selected_empl.performance.sale_list]
+        )
+        selected_empl.performance.average_rating = rating_sum / len(
+            selected_empl.performance.sale_list
+        )
 
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one(
@@ -215,8 +219,12 @@ class MenuPerformance:
         selected_empl.performance.total_cost -= sale.cost
         selected_empl.performance.total_profit -= sale.profit
 
-        rating_sum = sum([sale.client_rating for sale in selected_empl.performance.sale_list])
-        selected_empl.performance.average_rating = rating_sum / len(selected_empl.performance.sale_list)
+        rating_sum = sum(
+            [sale.client_rating for sale in selected_empl.performance.sale_list]
+        )
+        selected_empl.performance.average_rating = rating_sum / len(
+            selected_empl.performance.sale_list
+        )
 
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one(
@@ -320,7 +328,9 @@ class MenuPerformance:
 
     def __find__by_client_id(self, sales: list[Sale]) -> None:
         client_id = input("Enter client ID: ")
-        found_sales = [sale.one_line_str() for sale in sales if sale.client_id == client_id]
+        found_sales = [
+            sale.one_line_str() for sale in sales if sale.client_id == client_id
+        ]
         if not found_sales:
             return None
 
@@ -336,7 +346,9 @@ class MenuPerformance:
         except:
             return None
 
-        found_sales = [sale.one_line_str() for sale in sales if sale.client_rating == rating]
+        found_sales = [
+            sale.one_line_str() for sale in sales if sale.client_rating == rating
+        ]
         if not found_sales:
             return None
 
@@ -357,7 +369,9 @@ class MenuPerformance:
             return None
 
         display_sales = [sale.one_line_str() for sale in found_sales]
-        listing("All sales for date " + datetime.strftime(date, "%Y-%m-%d"), display_sales)
+        listing(
+            "All sales for date " + datetime.strftime(date, "%Y-%m-%d"), display_sales
+        )
 
     def __find__by_employee(self, sales: list[Sale]) -> None:
         empl_items = [
@@ -373,6 +387,8 @@ class MenuPerformance:
             return None
         selected_empl = the_company.employees[empl_selected_index]
 
-        found_sales = [sale.one_line_str() for sale in selected_empl.performance.sale_list]
+        found_sales = [
+            sale.one_line_str() for sale in selected_empl.performance.sale_list
+        ]
 
         listing("Sales of employee " + selected_empl.name, found_sales)

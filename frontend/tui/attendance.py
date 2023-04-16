@@ -98,7 +98,11 @@ class MenuAttendance:
             # as an admin checking attendance for other employee
             if not the_company.can_modify("attendance", the_company.logged_in_employee):
                 date_str = input("Enter date (YYYY-MM-DD, leave blank for today): ")
-                date = datetime.strptime(date_str, "%Y-%m-%d") if date_str else datetime.now()
+                date = (
+                    datetime.strptime(date_str, "%Y-%m-%d")
+                    if date_str
+                    else datetime.now()
+                )
                 is_present = input("Is employee present? (y/n): ")
                 presence: bool = False
                 if is_present.lower() == "y":
@@ -146,7 +150,11 @@ class MenuAttendance:
         try:
             if not the_company.can_modify("attendance", self.__employee):
                 # parse the date, if the date is empty, use today's date
-                date = datetime.strptime(date_str, "%Y-%m-%d") if date_str else datetime.now()
+                date = (
+                    datetime.strptime(date_str, "%Y-%m-%d")
+                    if date_str
+                    else datetime.now()
+                )
 
                 # check if attendance exists for that date
                 if date not in attendances.attendances:
