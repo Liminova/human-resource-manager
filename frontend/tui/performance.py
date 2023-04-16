@@ -39,9 +39,9 @@ class MenuPerformance:
                 case 3:
                     last_msg: str = self.__get_info()
                 case 4:
-                    last_msg: str = self.__view_all()
-                case 5:
                     last_msg: str = self.__find_submenu_admin()
+                case 5:
+                    last_msg: str = self.__view_all()
                 case 6:
                     return Ok(None)
                 case _:
