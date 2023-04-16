@@ -2,6 +2,8 @@ from ..helpers import *
 from datetime import datetime
 from option import Result, Ok, Err
 from models import Company
+from database.mongo import employee_repo
+import os
 
 the_company: Company = Company()
 
@@ -95,13 +97,20 @@ class MenuAttendance:
         try:
             # as an admin checking attendance for other employee
             if not the_company.can_modify("attendance", the_company.logged_in_employee):
-                date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
-                date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
+                date_str = input("Enter date (YYYY-MM-DD, leave blank for today): ")
+                date = datetime.strptime(date_str, "%Y-%m-%d") if date_str else datetime.now()
                 is_present = input("Is employee present? (y/n): ")
                 presence: bool = False
                 if is_present.lower() == "y":
                     is_present = True
                 attendances.add_attendance(date, presence).unwrap()
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one(
+                        {"_id": employee.id},
+                        {"$set": employee.dict(include={"is_admin"})},
+                        upsert=True,
+                    )
+
                 if not is_present:
                     reason = input("Enter reason for absent: ")
                     attendances.add_absent_day(date, reason).unwrap()
@@ -116,6 +125,12 @@ class MenuAttendance:
                 ):
                     return "You are already present!"
                 attendances.add_attendance(datetime.now(), True).unwrap()
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one(
+                        {"_id": employee.id},
+                        {"$set": employee.dict(include={"is_admin"})},
+                        upsert=True,
+                    )
                 return "You are present now!"
 
         except (ValueError, TypeError) as e:
@@ -127,11 +142,11 @@ class MenuAttendance:
         attendances = employee.attendance
         payroll = employee.payroll
 
-        date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
+        date_str = input("Enter date (YYYY-MM-DD, leave blank for today): ")
         try:
             if not the_company.can_modify("attendance", self.__employee):
                 # parse the date, if the date is empty, use today's date
-                date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
+                date = datetime.strptime(date_str, "%Y-%m-%d") if date_str else datetime.now()
 
                 # check if attendance exists for that date
                 if date not in attendances.attendances:
@@ -145,12 +160,23 @@ class MenuAttendance:
 
                 # update the attendance
                 attendances.add_attendance(date, presence).unwrap()
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one(
+                        {"_id": employee.id},
+                        {"$set": employee.dict(include={"is_admin"})},
+                        upsert=True,
+                    )
 
                 # if the employee is absent, ask for the reason
                 if not presence:
                     reason = input("Enter reason for absent: ")
                     attendances.add_absent_day(date, reason).unwrap()
-                    payroll.set_punish("10")
+                    if os.getenv("HRMGR_DB") == "TRUE":
+                        employee_repo.update_one(
+                            {"_id": employee.id},
+                            {"$set": employee.dict(include={"is_admin"})},
+                            upsert=True,
+                        )
 
                     if attendances.get_allowed_absent_days(date.year).unwrap() < 0:
                         payroll.set_punish("10")
