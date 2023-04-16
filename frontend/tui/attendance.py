@@ -105,7 +105,8 @@ class MenuAttendance:
                 if not is_present:
                     reason = input("Enter reason for absent: ")
                     attendances.add_absent_day(date, reason).unwrap()
-                    payroll.set_punish("10")
+                    if attendances.get_allowed_absent_days(date.year).unwrap() < 0:
+                        payroll.set_punish("10")
 
             # as an employee or admin updating their own attendance
             else:
@@ -150,6 +151,9 @@ class MenuAttendance:
                     reason = input("Enter reason for absent: ")
                     attendances.add_absent_day(date, reason).unwrap()
                     payroll.set_punish("10")
+
+                    if attendances.get_allowed_absent_days(date.year).unwrap() < 0:
+                        payroll.set_punish("10")
         except (ValueError, TypeError) as e:
             return str(e)
         return ""
