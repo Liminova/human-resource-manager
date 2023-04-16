@@ -2,6 +2,9 @@ from datetime import datetime
 from ..helpers import *
 from models import Sale, Company
 from option import Result, Ok
+from database.mongo import employee_repo
+
+import os
 
 the_company: Company = Company()
 
@@ -137,6 +140,12 @@ class MenuPerformance:
 
         # add the sale to the employee's performance
         selected_empl.performance.sale_list.append(sale)
+        if os.getenv("HRMGR_DB") == "TRUE":
+            employee_repo.update_one(
+                {"_id": selected_empl.id},
+                {"$set": selected_empl.dict(include={"performance"})},
+                upsert=True,
+            )
 
         return f"Sale for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} added successfully!"
 
@@ -190,6 +199,12 @@ class MenuPerformance:
 
         # remove the sale
         del selected_empl.performance.sale_list[selected_sale_index]
+        if os.getenv("HRMGR_DB") == "TRUE":
+            employee_repo.update_one(
+                {"_id": selected_empl.id},
+                {"$set": selected_empl.dict(include={"performance"})},
+                upsert=True,
+            )
         return ""
 
     def __get_info(self) -> str:
