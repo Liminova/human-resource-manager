@@ -1,6 +1,5 @@
 from models import Department, Employee
 import unittest
-import datetime as dt
 
 
 class TestEmployee(unittest.TestCase):
