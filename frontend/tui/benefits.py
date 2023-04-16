@@ -173,7 +173,7 @@ class MenuBenefits:
             return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} already has benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} applied to them!"
 
         # apply the benefit to the employee
-        employee.benefits.append(benefit)
+        employee.benefits.append(benefit.name)
         benefit.enrolled_employees.append(employee)
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one(
@@ -211,7 +211,7 @@ class MenuBenefits:
         # remove the benefit plan from all employees that have it applied to them
         for employee in employees:
             if benefit.name in employee.benefits:
-                employee.benefits.remove(benefit)
+                employee.benefits.remove(benefit.name)
                 if os.getenv("HRMGR_DB") == "TRUE":
                     employee_repo.update_one(
                         {"_id": employee.id},
@@ -416,7 +416,7 @@ class MenuBenefits:
         # if the user approved the request, add the employee to the enrolled employees list and update the benefit plan for the employee
         if decision == 0:
             benefit.enrolled_employees.append(employee)
-            employee.benefits.append(benefit)
+            employee.benefits.append(benefit.name)
 
         if os.getenv("HRMGR_DB") == "TRUE":
             benefit_repo.update_one(
