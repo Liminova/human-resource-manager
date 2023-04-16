@@ -1,22 +1,17 @@
-from __future__ import annotations
-import sys
 from datetime import datetime
 from ..helpers import *
-from models import Sale
+from models import Sale, Company
 from option import Result, Ok
 
-if sys.version_info >= (3, 11):
-    from typing import TYPE_CHECKING
-else:
-    from typing_extensions import TYPE_CHECKING
-if TYPE_CHECKING:
-    from models import Company
+the_company: Company = Company()
 
 
 class MenuPerformance:
-    def __init__(self, company: Company):
-        self.__company = company
-        self.__logged_in_employee = company.logged_in_employee
+    def __init__(self) -> None:
+        if the_company.logged_in_employee.is_admin:
+            self.mainloop = self.admin
+        else:
+            self.mainloop = self.employee
 
     def admin(self) -> Result[None, str]:
         last_msg: str = ""
@@ -83,7 +78,7 @@ class MenuPerformance:
     def __add(self) -> str:
         empl_items = [
             f"{employee.name} ({employee.employee_id})"
-            for employee in self.__company.employees
+            for employee in the_company.employees
         ]
         empl_selected_index = get_user_option_from_list(
             "Select an employee to add a sale for", empl_items
@@ -92,7 +87,7 @@ class MenuPerformance:
             return NO_EMPLOYEE_MSG
         elif empl_selected_index == -2:
             return ""
-        selected_empl = self.__company.employees[empl_selected_index]
+        selected_empl = the_company.employees[empl_selected_index]
 
         if selected_empl.is_admin:
             return "An admin don't sell anything!"
@@ -151,7 +146,7 @@ class MenuPerformance:
         else:
             sales = [
                 sale
-                for employee in self.__company.employees
+                for employee in the_company.employees
                 for sale in employee.performance.sale_list
             ]
         if not sales:
@@ -164,7 +159,7 @@ class MenuPerformance:
     def __remove(self) -> str:
         empl_items = [
             f"{employee.name} ({employee.employee_id})"
-            for employee in self.__company.employees
+            for employee in the_company.employees
         ]
         empl_selected_index = get_user_option_from_list(
             "Select an employee to remove a sale for", empl_items
@@ -173,7 +168,7 @@ class MenuPerformance:
             return NO_EMPLOYEE_MSG
         elif empl_selected_index == -2:
             return ""
-        selected_empl = self.__company.employees[empl_selected_index]
+        selected_empl = the_company.employees[empl_selected_index]
 
         if selected_empl.is_admin:
             return "An admin don't sell anything!"
@@ -203,7 +198,7 @@ class MenuPerformance:
         else:
             all_sales = [
                 sale
-                for employee in self.__company.employees
+                for employee in the_company.employees
                 for sale in employee.performance.sale_list
             ]
         sale_items = [sale.one_line_str() for sale in all_sales]
@@ -234,7 +229,7 @@ class MenuPerformance:
         )
         all_sales: list[Sale] = [
             sale
-            for employee in self.__company.employees
+            for employee in the_company.employees
             for sale in employee.performance.sale_list
         ]
         match search_selection:
@@ -328,7 +323,7 @@ class MenuPerformance:
     def __find__by_employee(self, sales: list[Sale]) -> None:
         empl_items = [
             f"{employee.name} ({employee.employee_id})"
-            for employee in self.__company.employees
+            for employee in the_company.employees
         ]
         empl_selected_index = get_user_option_from_list(
             "Select an employee to view sales for", empl_items
@@ -337,7 +332,7 @@ class MenuPerformance:
             return None
         elif empl_selected_index == -2:
             return None
-        selected_empl = self.__company.employees[empl_selected_index]
+        selected_empl = the_company.employees[empl_selected_index]
 
         sales = [sale.one_line_str() for sale in selected_empl.performance.sale_list]
 

@@ -3,7 +3,7 @@ import sys
 import os
 
 from ..helpers import *
-from models import BenefitPlan
+from models import BenefitPlan, Company
 from database.mongo import benefit_repo, employee_repo
 from option import Result, Ok
 
@@ -13,12 +13,17 @@ else:
     from typing_extensions import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from models import Company, Employee
+    from models import Employee
+
+the_company: Company = Company()
 
 
 class MenuBenefits:
-    def __init__(self, company: Company):
-        self.__company = company
+    def __init__(self):
+        if the_company.logged_in_employee.is_admin:
+            self.mainloop = self.admin
+        else:
+            self.mainloop = self.employee
 
     def admin(self) -> Result[None, str]:
         last_msg: str = ""
@@ -44,7 +49,7 @@ class MenuBenefits:
                 pending_request_count := len(
                     [
                         employee
-                        for benefit in self.__company.benefits
+                        for benefit in the_company.benefits
                         for employee in benefit.pending_requests
                     ]
                 )
@@ -76,7 +81,7 @@ class MenuBenefits:
                     last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
-        logged_in_employee = self.__company.logged_in_employee
+        logged_in_employee = the_company.logged_in_employee
         last_msg: str = ""
         while True:
             clrscr()
@@ -120,15 +125,15 @@ class MenuBenefits:
                 return msg
 
         # add the benefit plan to the company
-        self.__company.benefits.append(benefit)
+        the_company.benefits.append(benefit)
         if os.getenv("HRMGR_DB") == "TRUE":
             benefit_repo.insert_one(benefit.dict(by_alias=True))
 
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} added successfully!"
 
     def __apply(self) -> str:
-        employees = self.__company.employees
-        benefits = self.__company.benefits
+        employees = the_company.employees
+        benefits = the_company.benefits
 
         # a list containing the string representation of each employee
         employee_items = [f"{e.name} ({e.employee_id})" for e in employees]
@@ -145,7 +150,7 @@ class MenuBenefits:
         # get the actual employee object
         employee = employees[employee_index_selected]
 
-        if not self.__company.can_modify("benefits", employee):
+        if not the_company.can_modify("benefits", employee):
             return "Only other admins can manage your benefits!"
 
         # a list containing the string representation of each benefit
@@ -185,8 +190,8 @@ class MenuBenefits:
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} applied to employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} successfully!"
 
     def __remove(self) -> str:
-        benefits = self.__company.benefits
-        employees = self.__company.employees
+        benefits = the_company.benefits
+        employees = the_company.employees
 
         # a list containing the string representation of each benefit
         benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
@@ -224,7 +229,7 @@ class MenuBenefits:
         )
 
     def __update(self) -> str:
-        benefits = self.__company.benefits
+        benefits = the_company.benefits
 
         # a list containing the string representation of each benefit
         benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
@@ -263,7 +268,7 @@ class MenuBenefits:
         )
 
     def __view(self) -> str:
-        logged_in_employee = self.__company.logged_in_employee
+        logged_in_employee = the_company.logged_in_employee
 
         # a list containing the string representation of each benefit
         benefits: list[BenefitPlan] = []
@@ -271,14 +276,13 @@ class MenuBenefits:
             # restore the benefit objects from the benefit names
             benefits = [
                 benefit
-                for benefit in self.__company.benefits
+                for benefit in the_company.benefits
                 if benefit.name in logged_in_employee.benefits
             ]
             benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
         else:
             benefit_items = [
-                f"{benefit.name} ({benefit.cost})"
-                for benefit in self.__company.benefits
+                f"{benefit.name} ({benefit.cost})" for benefit in the_company.benefits
             ]
 
         # get the index of the benefit selected by the user
@@ -300,8 +304,8 @@ class MenuBenefits:
         return ""
 
     def __view_all(self) -> str:
-        logged_in_employee = self.__company.logged_in_employee
-        benefits = self.__company.benefits
+        logged_in_employee = the_company.logged_in_employee
+        benefits = the_company.benefits
 
         if not logged_in_employee.is_admin:
             # restore the benefit objects from the benefit names
@@ -319,8 +323,8 @@ class MenuBenefits:
         return ""
 
     def __request_enroll(self) -> str:
-        logged_in_employee = self.__company.logged_in_employee
-        benefits = self.__company.benefits
+        logged_in_employee = the_company.logged_in_employee
+        benefits = the_company.benefits
 
         benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
         selected_benefit_index = get_user_option_from_list(
@@ -350,7 +354,7 @@ class MenuBenefits:
 
     def __resolve_pending_requests(self):
         custom_pending_requests: dict[BenefitPlan, list[Employee]] = {}
-        benefits = self.__company.benefits
+        benefits = the_company.benefits
 
         for benefit in benefits:
             if len(benefit.pending_requests) > 0:
@@ -388,7 +392,7 @@ class MenuBenefits:
         # get the actual employee object
         employee = custom_pending_requests[benefit][employee_index_selected]
 
-        if not self.__company.can_modify("benefits", employee):
+        if not the_company.can_modify("benefits", employee):
             return "You cannot approve or deny your own request!"
 
         empl_name = FCOLORS.GREEN + employee.name + FCOLORS.END

@@ -1,21 +1,16 @@
-from __future__ import annotations
-import sys
 from ..helpers import *
-from models import Payroll
+from models import Payroll, Company
 from option import Result, Ok
 
-if sys.version_info >= (3, 11):
-    from typing import TYPE_CHECKING
-else:
-    from typing_extensions import TYPE_CHECKING
-if TYPE_CHECKING:
-    from models import Company
+the_company: Company = Company()
 
 
 class MenuPayroll:
-    def __init__(self, company: Company):
-        self.__company = company
-        self.__logged_in_employee = self.__company.logged_in_employee
+    def __init__(self) -> None:
+        if the_company.logged_in_employee.is_admin:
+            self.mainloop = self.admin
+        else:
+            self.mainloop = self.employee
 
     def admin(self) -> Result[None, str]:
         last_msg: str = ""
@@ -61,7 +56,7 @@ class MenuPayroll:
                     last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __create(self) -> str:
-        empl_items = [f"{e.name} ({e.employee_id})" for e in self.__company.employees]
+        empl_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees]
         selected_empl_index = get_user_option_from_list(
             "Select an employee to create payroll for", empl_items
         )
@@ -69,9 +64,9 @@ class MenuPayroll:
             return NO_EMPLOYEE_MSG
         elif selected_empl_index == -2:
             return ""
-        selected_empl = self.__company.employees[selected_empl_index]
+        selected_empl = the_company.employees[selected_empl_index]
 
-        if not self.__company.can_modify("payroll", selected_empl):
+        if not the_company.can_modify("payroll", selected_empl):
             return "Only the owner can create payroll for admins!"
 
         if selected_empl.payroll.salary != 0:
@@ -101,7 +96,7 @@ class MenuPayroll:
         return f"Payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} created successfully!"
 
     def __update(self) -> str:
-        empls = self.__company.employees
+        empls = the_company.employees
 
         empl_items = [f"{e.name} ({e.employee_id})" for e in empls]
         selected_empl_index = get_user_option_from_list(
@@ -113,7 +108,7 @@ class MenuPayroll:
             return ""
         selected_empl = empls[selected_empl_index]
 
-        if self.__company.can_modify("payroll", selected_empl):
+        if the_company.can_modify("payroll", selected_empl):
             return "Only the owner can update payroll for admins!"
 
         if selected_empl.payroll.salary == 0:
@@ -140,13 +135,13 @@ class MenuPayroll:
     def __view_all(self) -> str:
         empl_payroll_items = [
             f"{e.name} ({e.employee_id}) | Salary: {e.payroll.salary} | Bonus: {e.payroll.bonus} | Tax: {e.payroll.tax} | Punishment: {e.payroll.punish}"
-            for e in self.__company.employees
+            for e in the_company.employees
         ]
         listing("All employees payroll", empl_payroll_items)
         return ""
 
     def __view(self) -> str:
-        empls = self.__company.employees
+        empls = the_company.employees
 
         clrscr()
         print(

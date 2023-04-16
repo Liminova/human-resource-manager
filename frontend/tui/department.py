@@ -1,25 +1,19 @@
-from __future__ import annotations
-import sys
 import os
 
 from ..helpers import *
-from models import Department
+from models import Department, Company
 from database.mongo import department_repo, employee_repo
 from option import Result, Ok
 
-if sys.version_info >= (3, 11):
-    from typing import TYPE_CHECKING
-else:
-    from typing_extensions import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from models import Company
+the_company: Company = Company()
 
 
 class MenuDepartment:
-    def __init__(self, company: Company) -> None:
-        self.__company = company
-        self.__logged_in_employee = company.logged_in_employee
+    def __init__(self) -> None:
+        if the_company.logged_in_employee.is_admin:
+            self.mainloop = self.admin
+        else:
+            self.mainloop = self.employee
 
     def admin(self) -> Result[None, str]:
         last_msg: str = ""
@@ -286,11 +280,11 @@ class MenuDepartment:
     def __view(self) -> str:
         depts = self.__company.departments
 
-        if not self.__logged_in_employee.is_admin:
+        if not the_company.logged_in_employee.is_admin:
             dept = [
                 dept
                 for dept in depts
-                if dept.dept_id == self.__logged_in_employee.department_id
+                if dept.dept_id == the_company.logged_in_employee.department_id
             ]
             if len(dept) == 0:
                 return NO_DEPARTMENT_MSG

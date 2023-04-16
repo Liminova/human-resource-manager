@@ -1,25 +1,15 @@
 from __future__ import annotations
-import sys
 import os
 
 from ..helpers import *
-from models import Employee, validate, hash
+from models import Employee, Company, validate, hash
 from database.mongo import employee_repo
 from getpass import getpass
 
-if sys.version_info >= (3, 11):
-    from typing import TYPE_CHECKING
-else:
-    from typing_extensions import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from models import Company
+the_company: Company = Company()
 
 
 class MenuLoginSignup:
-    def __init__(self, company: Company):
-        self.__company: Company = company
-
     def login(self) -> bool:
         last_msg: str = ""
         while True:
@@ -37,7 +27,7 @@ class MenuLoginSignup:
 
             # key = employee_id, value = employee object
             employees: dict[str, Employee] = {}
-            for employee in self.__company.employees:
+            for employee in the_company.employees:
                 employees[employee.employee_id] = employee
 
             if employee_id not in employees.keys():
@@ -56,12 +46,12 @@ class MenuLoginSignup:
                 continue
 
             # login
-            self.__company.logged_in_employee = employees[employee_id]
+            the_company.logged_in_employee = employees[employee_id]
             return True
 
     def signup_admin(self) -> bool:
         # the admin is the first employee to be added to the company so no need to check if there are any employees
-        if self.__company.employees:
+        if the_company.employees:
             return False
 
         last_msg: str = ""
@@ -96,8 +86,8 @@ class MenuLoginSignup:
             owner.is_admin = True
             owner.name = "Owner"
 
-            self.__company.employees.append(owner)
-            self.__company.logged_in_employee = owner
+            the_company.employees.append(owner)
+            the_company.logged_in_employee = owner
 
             if os.getenv("HRMGR_DB") == "TRUE":
                 employee_repo.insert_one(owner.dict(by_alias=True))

@@ -1,24 +1,18 @@
-from __future__ import annotations
-import sys
 import os
-
 from ..helpers import *
-from models import Employee, hash
+from models import Employee, Company, hash
 from database.mongo import employee_repo, benefit_repo, department_repo
 from option import Result, Ok
 
-if sys.version_info >= (3, 11):
-    from typing import TYPE_CHECKING
-else:
-    from typing_extensions import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from models import Company
+the_company: Company = Company()
 
 
 class MenuEmployee:
-    def __init__(self, company: Company):
-        self.__company = company
+    def __init__(self) -> None:
+        if the_company.logged_in_employee.is_admin:
+            self.mainloop = self.admin
+        else:
+            self.mainloop = self.employee
 
     def admin(self) -> Result[None, str]:
         last_msg: str = ""
@@ -64,7 +58,6 @@ class MenuEmployee:
                     last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
-        logged_in_employee = self.__company.logged_in_employee
         last_msg: str = ""
         while True:
             clrscr()
@@ -78,7 +71,8 @@ class MenuEmployee:
                 "[3] Back",
             ]
             choice = get_user_option_from_menu(
-                "Employee management for " + logged_in_employee.name, employee_menu
+                "Employee management for " + the_company.logged_in_employee.name,
+                employee_menu,
             )
             match choice:
                 case 1:
@@ -91,7 +85,7 @@ class MenuEmployee:
                     last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
-        depts = self.__company.departments
+        depts = the_company.departments
 
         # create a new, empty employee
         employee = Employee()
@@ -137,7 +131,7 @@ class MenuEmployee:
             employee.set_department(depts[dept_index].dept_id).unwrap()
 
         # append the employee to the company's employees
-        self.__company.employees.append(employee)
+        the_company.employees.append(employee)
 
         # add employee to mongodb database
         if os.getenv("HRMGR_DB") == "TRUE":
@@ -149,7 +143,7 @@ class MenuEmployee:
         # a list containing the string representation of each employee that isn't an admin
         employee_items = [
             f"{e.name} ({e.employee_id})"
-            for e in self.__company.employees
+            for e in the_company.employees
             if not e.is_admin
         ]
 
@@ -163,14 +157,14 @@ class MenuEmployee:
             return ""
 
         # get the actual employee
-        employee = self.__company.employees[employee_index]
+        employee = the_company.employees[employee_index]
 
-        # if employee.is_admin and not self.__company.owner:
-        if not self.__company.can_modify("employee", employee):
+        # if employee.is_admin and not the_company.owner:
+        if not the_company.can_modify("employee", employee):
             return "Only the owner can remove admins!"
 
         # remove employee from the department they're in
-        for dept in self.__company.departments:
+        for dept in the_company.departments:
             if employee in dept.members:
                 dept.members.remove(employee)
                 if os.getenv("HRMGR_DB") == "TRUE":
@@ -181,7 +175,7 @@ class MenuEmployee:
                     )
 
         # remove employee from the benefits they're enrolled in
-        for benefit in self.__company.benefits:
+        for benefit in the_company.benefits:
             if employee in benefit.enrolled_employees:
                 benefit.enrolled_employees.remove(employee)
                 if os.getenv("HRMGR_DB") == "TRUE":
@@ -194,15 +188,13 @@ class MenuEmployee:
         # remove from the company
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.delete_one({"_id": employee.id})
-        del self.__company.employees[employee_index]
+        del the_company.employees[employee_index]
 
         return f"Employee {FCOLORS.RED}{employee.name}{FCOLORS.END} ({FCOLORS.RED}{employee.employee_id}{FCOLORS.END}) removed successfully!"
 
     def __update(self) -> str:
         # a list containing the string representation of each employee
-        employee_items = [
-            f"{e.name} ({e.employee_id})" for e in self.__company.employees
-        ]
+        employee_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees]
 
         # get the employee to update
         selected_employee_index = get_user_option_from_list(
@@ -214,7 +206,7 @@ class MenuEmployee:
             return ""
 
         # get the actual employee object
-        employee = self.__company.employees[selected_employee_index]
+        employee = the_company.employees[selected_employee_index]
 
         # get the new data
         fields_data = [
@@ -239,9 +231,9 @@ class MenuEmployee:
         return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.employee_id}{FCOLORS.END}) updated successfully!"
 
     def __view(self) -> str:
-        empls = self.__company.employees
+        empls = the_company.employees
 
-        logged_in_employee = self.__company.logged_in_employee
+        logged_in_employee = the_company.logged_in_employee
         if not logged_in_employee.is_admin:
             print(logged_in_employee)
             input(ENTER_TO_CONTINUE_MSG)
@@ -266,19 +258,17 @@ class MenuEmployee:
 
     def __view_all(self) -> str:
         # a list containing the string representation of each employee
-        employee_items = [
-            f"{e.name} ({e.employee_id})" for e in self.__company.employees
-        ]
+        employee_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees]
 
         # print the list
         listing("Employees", employee_items)
         return ""
 
     def __change_password(self) -> str:
-        empls = self.__company.employees
+        empls = the_company.employees
 
         # as an admin
-        logged_in_employee = self.__company.logged_in_employee
+        logged_in_employee = the_company.logged_in_employee
         if logged_in_employee.is_admin:
             # return "You must be logged in to change your password"
             empl_items = [
@@ -295,7 +285,7 @@ class MenuEmployee:
             # get the employee
             employee = empls[empl_index]
 
-            if not self.__company.can_modify("password", employee):
+            if not the_company.can_modify("password", employee):
                 return "Only the owner or an admin can change another admin's password"
 
             # get the new password
@@ -379,12 +369,10 @@ class MenuEmployee:
                 )
 
     def __grant_admin_rights(self):
-        empls = self.__company.employees
+        empls = the_company.employees
 
         # check if logged in user is an owner
-        if not self.__company.can_modify(
-            "grant_admin", self.__company.logged_in_employee
-        ):
+        if not the_company.can_modify("grant_admin", the_company.logged_in_employee):
             return "Only the owner can grant admin rights"
 
         # a list containing the string representation of each employee
@@ -422,12 +410,10 @@ class MenuEmployee:
         return f"Admin rights granted to {employee.name}"
 
     def __revoke_admin_rights(self):
-        empls = self.__company.employees
+        empls = the_company.employees
 
         # check if logged in user is an owner
-        if not self.__company.can_modify(
-            "revoke_admin", self.__company.logged_in_employee
-        ):
+        if not the_company.can_modify("revoke_admin", the_company.logged_in_employee):
             return "Only the owner can revoke admin rights"
 
         # a list containing the string representation of each employee
