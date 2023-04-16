@@ -88,8 +88,9 @@ class MenuAttendance:
                     last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __check(self) -> str:
-        attendances = the_company.logged_in_employee.attendance
-        payroll = the_company.logged_in_employee.payroll
+        employee = the_company.logged_in_employee
+        attendances = employee.attendance
+        payroll = employee.payroll
 
         try:
             # as an admin checking attendance for other employee
@@ -121,8 +122,9 @@ class MenuAttendance:
         return ""
 
     def __update(self) -> str:
-        attendances = the_company.logged_in_employee.attendance
-        payroll = the_company.logged_in_employee.payroll
+        employee = the_company.logged_in_employee
+        attendances = employee.attendance
+        payroll = employee.payroll
 
         date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
         try:
