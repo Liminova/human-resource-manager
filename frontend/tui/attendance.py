@@ -96,12 +96,12 @@ class MenuAttendance:
             if not the_company.can_modify("attendance", the_company.logged_in_employee):
                 date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
                 date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
-                is_presence = input("Is employee present? (y/n): ")
+                is_present = input("Is employee present? (y/n): ")
                 presence: bool = False
-                if is_presence.lower() == "y":
-                    is_presence = True
+                if is_present.lower() == "y":
+                    is_present = True
                 attendances.add_attendance(date, presence).unwrap()
-                if not is_presence:
+                if not is_present:
                     reason = input("Enter reason for absent: ")
                     attendances.add_absent_day(date, reason).unwrap()
                     payroll.set_punish("10")
@@ -135,9 +135,9 @@ class MenuAttendance:
                     return "No attendance found for that date!"
 
                 # get the attendance object
-                is_presence = input("Is employee present? (y/n): ")
+                is_present = input("Is employee present? (y/n): ")
                 presence: bool = False
-                if is_presence.lower() == "y":
+                if is_present.lower() == "y":
                     presence = True
 
                 # update the attendance
