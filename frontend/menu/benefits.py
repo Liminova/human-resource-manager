@@ -53,10 +53,6 @@ class MenuBenefits:
                 title += f" ({FCOLORS.BLUE}{pending_request_count}{FCOLORS.END} pending requests)"
 
             choice = get_user_option_from_menu(title, benefit_plan_menu)
-            if (choice not in [1, 6]) and (not self.__company.benefits):
-                last_msg: str = NO_BENEFIT_MSG
-                continue
-
             match choice:
                 case 1:
                     last_msg: str = self.__add()
@@ -81,7 +77,6 @@ class MenuBenefits:
 
     def employee(self) -> Result[None, str]:
         logged_in_employee = self.__company.logged_in_employee
-        benefits = self.__company.benefits
         last_msg: str = ""
         while True:
             clrscr()
@@ -98,11 +93,6 @@ class MenuBenefits:
                 "Benefit plan management for" + logged_in_employee.name,
                 benefit_plan_menu,
             )
-
-            if (choice not in [1, 2]) and (not benefits):
-                last_msg: str = NO_BENEFIT_MSG
-                continue
-
             match choice:
                 case 1:
                     last_msg: str = self.__view()

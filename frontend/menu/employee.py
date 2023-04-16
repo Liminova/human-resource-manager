@@ -41,10 +41,6 @@ class MenuEmployee:
             ]
             choice = get_user_option_from_menu("Employee management", employee_menu)
 
-            if (choice not in [1, 6]) and (not self.__company.employees):
-                last_msg: str = NO_EMPLOYEE_MSG
-                continue
-
             match choice:
                 case 1:
                     last_msg: str = self.__add()

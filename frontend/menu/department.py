@@ -41,10 +41,6 @@ class MenuDepartment:
             ]
 
             choice = get_user_option_from_menu("Department management", department_menu)
-            if (choice in range(2, 6)) and (not self.__company.departments):
-                last_msg: str = NO_DEPARTMENT_MSG
-                continue
-
             match choice:
                 case 1:
                     last_msg: str = self.__add()
@@ -81,10 +77,6 @@ class MenuDepartment:
             ]
 
             choice = get_user_option_from_menu("Department management", department_menu)
-            if (choice == 1) and (not self.__company.departments):
-                last_msg: str = NO_DEPARTMENT_MSG
-                continue
-
             match choice:
                 case 1:
                     last_msg: str = self.__view()
