@@ -49,10 +49,6 @@ class MenuLoginSignup:
                 return False
 
             # validate password
-            # if not password.validate(
-            #         input_username=employee_id,
-            #         input_password=input_password,
-            #         hashed_password=employees[employee_id].hashed_password):
             if not validate(
                 employee_id, input_password, employees[employee_id].hashed_password
             ):
