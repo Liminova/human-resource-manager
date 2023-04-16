@@ -5,7 +5,7 @@ import os
 import textwrap
 
 from frontend.helpers import *
-from frontend.menu import *
+from frontend.tui import *
 from models import Company, Employee, BenefitPlan, Department
 from dotenv import load_dotenv
 from database.mongo import employee_repo, department_repo, benefit_repo
@@ -38,7 +38,7 @@ def initialize_data():
             the_company.benefits.append(BenefitPlan.parse_obj(benefit))
 
 
-def main_tui():
+def main():
     last_msg: str = ""
     if (
         not os.getenv("MONGO_USER")
@@ -110,7 +110,7 @@ def main_tui():
     #       LOGIN/SIGNUP
     # ==========================
 
-    menu_login_signup = MenuLoginSignup(the_company)
+    menu_login_signup = MenuLoginSignup()
     is_logged_in = False
     if len(the_company.employees) == 0:
         is_logged_in = menu_login_signup.signup_admin()
@@ -144,44 +144,24 @@ def main_tui():
             last_msg: str = NO_EMPLOYEE_MSG
             continue
 
-        respond: Result[bool, str] = Ok(None)
-
-        if the_company.logged_in_employee.is_admin:
-            match user_choice:
-                case 1:
-                    respond = MenuEmployee(the_company).admin()
-                case 2:
-                    respond = MenuBenefits(the_company).admin()
-                case 3:
-                    respond = MenuAttendance(the_company).admin()
-                case 4:
-                    respond = MenuPayroll(the_company).admin()
-                case 5:
-                    respond = MenuDepartment(the_company).admin()
-                case 6:
-                    respond = MenuPerformance(the_company).admin()
-                case 7:
-                    break
-                case _:
-                    last_msg: str = FCOLORS.RED + "Invalid choice!" + FCOLORS.END
-        else:
-            match user_choice:
-                case 1:
-                    respond = MenuEmployee(the_company).employee()
-                case 2:
-                    respond = MenuBenefits(the_company).employee()
-                case 3:
-                    respond = MenuAttendance(the_company).employee()
-                case 4:
-                    respond = MenuPayroll(the_company).employee()
-                case 5:
-                    respond = MenuDepartment(the_company).employee()
-                case 6:
-                    respond = MenuPerformance(the_company).employee()
-                case 7:
-                    break
-                case _:
-                    last_msg: str = FCOLORS.RED + "Invalid choice!" + FCOLORS.END
+        respond: Result[None, str] = Ok(None)
+        match user_choice:
+            case 1:
+                respond = MenuEmployee().mainloop()
+            case 2:
+                respond = MenuBenefits().mainloop()
+            case 3:
+                respond = MenuAttendance().mainloop()
+            case 4:
+                respond = MenuPayroll().mainloop()
+            case 5:
+                respond = MenuDepartment().mainloop()
+            case 6:
+                respond = MenuPerformance().mainloop()
+            case 7:
+                break
+            case _:
+                last_msg: str = FCOLORS.RED + "Invalid choice!" + FCOLORS.END
         try:
             respond.unwrap()
         except (ValueError, TypeError) as e:
@@ -190,6 +170,6 @@ def main_tui():
 
 if __name__ == "__main__":
     try:
-        main_tui()
+        main()
     except KeyboardInterrupt:
         sys.exit(0)

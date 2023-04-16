@@ -1,5 +1,12 @@
+from __future__ import annotations
 from option import Result, Ok, Err
 from .password import hash
+import sys
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 # example class for employee (i.e. consider adding this to models/employee.py)
@@ -33,11 +40,11 @@ class Login:
         self.employees: list[Employee] = []
         self.admins: list[Admin] = []
 
-    def add_employee(self, employee: Employee) -> None:
+    def add_employee(self, employee: Employee) -> Result[Self, str]:
         self.employees.append(employee)
         return Ok(self)
 
-    def add_admin(self, admin: Admin) -> None:
+    def add_admin(self, admin: Admin) -> Result[Self, str]:
         self.admins.append(admin)
         return Ok(self)
 

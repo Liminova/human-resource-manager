@@ -1,28 +1,23 @@
-from __future__ import annotations
-import sys
 from ..helpers import *
 from datetime import datetime
 from option import Result, Ok, Err
+from models import Company
+from database.mongo import employee_repo
+import os
 
-if sys.version_info >= (3, 11):
-    from typing import TYPE_CHECKING
-else:
-    from typing_extensions import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from models import Company
+the_company: Company = Company()
 
 
 class MenuAttendance:
-    def __init__(self, company: Company) -> None:
-        self.__company = company
-        self.__logged_in_employee = company.logged_in_employee
+    def __init__(self) -> None:
+        if the_company.logged_in_employee.is_admin:
+            self.mainloop = self.admin
+        else:
+            self.mainloop = self.employee
 
     def admin(self) -> Result[None, str]:
         # a list containing the string representation of each employee
-        employee_items = [
-            f"{e.name} ({e.employee_id})" for e in self.__company.employees
-        ]
+        employee_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees]
 
         # get the index of the selected employee
         selected_employee_index = get_user_option_from_list(
@@ -34,9 +29,9 @@ class MenuAttendance:
             return Ok(None)
 
         # get the employee object from the index
-        self.__employee = self.__company.employees[selected_employee_index]
+        self.__employee = the_company.employees[selected_employee_index]
 
-        if not self.__company.can_modify("attendance", self.__employee):
+        if not the_company.can_modify("attendance", self.__employee):
             return Err(
                 "You do not have permission to modify this employee's attendance!"
             )
@@ -81,7 +76,7 @@ class MenuAttendance:
                 "[3] Back",
             ]
             choice = get_user_option_from_menu(
-                "Attendance management for " + self.__logged_in_employee.name,
+                "Attendance management for " + the_company.logged_in_employee.name,
                 attendance_menu,
             )
             match choice:
@@ -95,26 +90,47 @@ class MenuAttendance:
                     last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __check(self) -> str:
-        attendances = self.__logged_in_employee.attendance
-        payroll = self.__logged_in_employee.payroll
+        employee = the_company.logged_in_employee
+        attendances = employee.attendance
+        payroll = employee.payroll
 
         try:
             # as an admin checking attendance for other employee
-            if not self.__company.can_modify("attendance", self.__logged_in_employee):
-                date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
-                date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
-                is_presence = input("Is employee present? (y/n): ")
-                attendances.add_attendance(date, is_presence).unwrap()
-                if not is_presence:
+            if not the_company.can_modify("attendance", the_company.logged_in_employee):
+                date_str = input("Enter date (YYYY-MM-DD, leave blank for today): ")
+                date = datetime.strptime(date_str, "%Y-%m-%d") if date_str else datetime.now()
+                is_present = input("Is employee present? (y/n): ")
+                presence: bool = False
+                if is_present.lower() == "y":
+                    is_present = True
+                attendances.add_attendance(date, presence).unwrap()
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one(
+                        {"_id": employee.id},
+                        {"$set": employee.dict(include={"is_admin"})},
+                        upsert=True,
+                    )
+
+                if not is_present:
                     reason = input("Enter reason for absent: ")
                     attendances.add_absent_day(date, reason).unwrap()
-                    payroll.set_punish(10)
+                    if attendances.get_allowed_absent_days(date.year).unwrap() < 0:
+                        payroll.set_punish("10")
 
             # as an employee or admin updating their own attendance
             else:
-                if datetime.strftime(datetime.now(), "%Y-%m-%d") in attendances:
+                if (
+                    datetime.strftime(datetime.now(), "%Y-%m-%d")
+                    in attendances.attendances
+                ):
                     return "You are already present!"
                 attendances.add_attendance(datetime.now(), True).unwrap()
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one(
+                        {"_id": employee.id},
+                        {"$set": employee.dict(include={"is_admin"})},
+                        upsert=True,
+                    )
                 return "You are present now!"
 
         except (ValueError, TypeError) as e:
@@ -122,36 +138,54 @@ class MenuAttendance:
         return ""
 
     def __update(self) -> str:
-        attendances = self.__logged_in_employee.attendance
-        payroll = self.__logged_in_employee.payroll
+        employee = the_company.logged_in_employee
+        attendances = employee.attendance
+        payroll = employee.payroll
 
-        date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
+        date_str = input("Enter date (YYYY-MM-DD, leave blank for today): ")
         try:
-            if not self.__company.can_modify("attendance", self.__employee):
+            if not the_company.can_modify("attendance", self.__employee):
                 # parse the date, if the date is empty, use today's date
-                date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
+                date = datetime.strptime(date_str, "%Y-%m-%d") if date_str else datetime.now()
 
                 # check if attendance exists for that date
-                if date not in attendances:
+                if date not in attendances.attendances:
                     return "No attendance found for that date!"
 
                 # get the attendance object
-                is_presence = input("Is employee present? (y/n): ")
+                is_present = input("Is employee present? (y/n): ")
+                presence: bool = False
+                if is_present.lower() == "y":
+                    presence = True
 
                 # update the attendance
-                attendances.add_attendance(date, is_presence).unwrap()
+                attendances.add_attendance(date, presence).unwrap()
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one(
+                        {"_id": employee.id},
+                        {"$set": employee.dict(include={"is_admin"})},
+                        upsert=True,
+                    )
 
                 # if the employee is absent, ask for the reason
-                if not is_presence:
+                if not presence:
                     reason = input("Enter reason for absent: ")
                     attendances.add_absent_day(date, reason).unwrap()
-                    payroll.set_punish(10)
+                    if os.getenv("HRMGR_DB") == "TRUE":
+                        employee_repo.update_one(
+                            {"_id": employee.id},
+                            {"$set": employee.dict(include={"is_admin"})},
+                            upsert=True,
+                        )
+
+                    if attendances.get_allowed_absent_days(date.year).unwrap() < 0:
+                        payroll.set_punish("10")
         except (ValueError, TypeError) as e:
             return str(e)
         return ""
 
     def __report(self) -> str:
-        attendances = self.__logged_in_employee.attendance
+        attendances = the_company.logged_in_employee.attendance
 
         if self.__employee.is_admin:
             # check if there are any attendance data available
@@ -174,7 +208,11 @@ class MenuAttendance:
                 return ""
 
             # print the attendance report
-            print(attendances.get_report(available_years[selected_year_index]))
+            print(
+                attendances.get_report(
+                    datetime.strptime(year_items[selected_year_index], "%Y")
+                )
+            )
         else:
             year_items = [str(year) for year in attendances.get_available_years()]
             selected_year_index = get_user_option_from_list(
@@ -186,7 +224,11 @@ class MenuAttendance:
                 return ""
 
             # print the attendance report
-            print(attendances.get_report(year_items[selected_year_index]))
+            print(
+                attendances.get_report(
+                    datetime.strptime(year_items[selected_year_index], "%Y")
+                )
+            )
 
         input(ENTER_TO_CONTINUE_MSG)
         return ""

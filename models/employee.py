@@ -28,7 +28,7 @@ from .password import hash
 class Employee(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str = Field(default_factory=str)
-    dob: datetime = Field(default_factory=datetime.now)
+    dob: str = Field(default_factory=str)
     email: str = Field(default_factory=str)
     employee_id: str = Field(default_factory=str)
     phone: str = Field(default_factory=str)
@@ -50,7 +50,7 @@ class Employee(BaseModel):
 
     def set_dob(self, dob: str) -> Result[Self, str]:
         try:
-            dob = datetime.strptime(dob, "%Y-%m-%d")
+            dob = datetime.strftime(datetime.strptime(dob, "%Y-%m-%d"), "%Y-%m-%d")
         except ValueError:
             return Err("Invalid date of birth format!")
         self.dob = dob
@@ -104,7 +104,7 @@ class Employee(BaseModel):
         data = textwrap.dedent(
             f"""\
             {styling('Name', self.name)}
-            {styling('DoB', self.dob.strftime("%Y-%m-%d"))}
+            {styling('DoB', self.dob)}
             {styling('ID', self.employee_id)}
             {styling('Phone', self.phone)}
             {styling('Department ID', self.department_id)}

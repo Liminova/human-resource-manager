@@ -32,7 +32,7 @@ class Admin(Employee):
         # add employee to benefit plan
         benefit.enrolled_employees.append(employee)
         # add benefit plan to employee
-        employee.benefits.append(benefit)
+        employee.benefits.append(benefit.name)
         # return success message
         return "You are accepted into this benefit plan."
 
@@ -47,6 +47,6 @@ class Admin(Employee):
         # remove employee from benefit plan
         benefit.enrolled_employees.remove(employee)
         # remove benefit plan from employee
-        employee.benefits.remove(benefit)
+        employee.benefits.remove(benefit.name)
         # return success message
         return "You are removed from this benefit plan."

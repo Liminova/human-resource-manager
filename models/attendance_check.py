@@ -11,7 +11,7 @@ else:
 
 
 class Attendance(BaseModel):
-    start_date: datetime = Field(default_factory=datetime.now)
+    start_date: str = Field(default_factory=str)
     allowed_absent_days: dict[int, int] = Field(default_factory=dict)
     attendances: dict[str, bool] = Field(default_factory=dict)
     absents: dict[str, str] = Field(default_factory=dict)
@@ -34,7 +34,7 @@ class Attendance(BaseModel):
         return Err("Year not found.")
 
     def set_start_date(self, start_date: datetime) -> Result[Self, str]:
-        self.start_date = start_date.strftime("%Y-%m-%d")
+        self.start_date = datetime.strftime(start_date, "%Y-%m-%d")
         return Ok(self)
 
     def add_attendance(self, date: datetime, is_present: bool) -> Result[Self, str]:
@@ -46,12 +46,12 @@ class Attendance(BaseModel):
         return Ok(self)
 
     def add_absent_day(self, date: datetime, reason: str) -> Result[Self, str]:
-        date_str = date
+        date_str = datetime.strftime(date, "%Y-%m-%d")
         if not reason:
             return Err("Reason cannot be empty.")
         self.absents[date_str] = reason
         self.allowed_absent_days[date.year] -= 1
-        return Ok(Self)
+        return Ok(self)
 
     def get_available_years(self) -> list[int]:
         """For user to choose in the attendance report menu."""
@@ -73,7 +73,9 @@ class Attendance(BaseModel):
                 if is_present:
                     data += f"{datetime.strftime(date, '%d %b %Y')} - Present\n"
                 else:
-                    absent_reason = self.absents.get(date, "No reason")
+                    absent_reason = self.absents.get(
+                        date.strftime("%Y-%m-%d"), "No reason"
+                    )
                     data += f"{datetime.strftime(date, '%d %b %Y')} - Absent ({absent_reason})\n"
         return data
 

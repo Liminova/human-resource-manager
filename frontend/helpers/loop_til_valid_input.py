@@ -1,7 +1,8 @@
 from .COLORS import FCOLORS
+from typing import Callable
 
 
-def loop_til_valid_input(prompt: str, validator: callable) -> str:
+def loop_til_valid_input(prompt: str, validator: Callable) -> str:
     """Takes a prompt and a validator function and keeps asking for input until the validator returns True"""
     user_input = input(f"{prompt}, leave blank to cancel: ")
     if user_input == "":

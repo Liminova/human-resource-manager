@@ -1,6 +1,5 @@
 from models import Department, Employee
 import unittest
-import datetime as dt
 
 
 class TestEmployee(unittest.TestCase):
@@ -22,7 +21,7 @@ class TestEmployee(unittest.TestCase):
         )
 
         self.assertEqual(employee.name, "Rylie")
-        self.assertEqual(employee.dob, dt.datetime(2003, 8, 22))
+        self.assertEqual(employee.dob, "2003-08-22")
         self.assertEqual(employee.employee_id, "727")
         self.assertEqual(employee.phone, "0123456727")
         self.assertEqual(employee.department_id, "SLP")
