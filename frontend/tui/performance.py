@@ -164,6 +164,7 @@ class MenuPerformance:
         # a list containing the string representation of each sale
         sale_items = [sale.one_line_str() for sale in sales]
         listing("All sales", sale_items)
+        return ""
 
     def __remove(self) -> str:
         empl_items = [
@@ -261,6 +262,8 @@ class MenuPerformance:
             case _:
                 return ""
 
+        return ""
+
     def __find_submenu_employee(self) -> str:
         if the_company.logged_in_employee.is_admin:
             return "An admin don't sell anything!"
@@ -287,22 +290,25 @@ class MenuPerformance:
             case _:
                 return ""
 
+        return ""
+
     def __find__by_sale_id(self, sales: list[Sale]) -> None:
         sale_id = input("Enter sale ID: ")
-        sales = [sale for sale in sales if sale.sale_id == sale_id][0]
-        if not sales:
+        sale = [sale for sale in sales if sale.sale_id == sale_id][0]
+        if not sale:
             return None
-        print(sales)
+        print(sale)
         input(ENTER_TO_CONTINUE_MSG)
 
     def __find__by_client_id(self, sales: list[Sale]) -> None:
         client_id = input("Enter client ID: ")
-        sales = [sale for sale in sales if sale.client_id == client_id]
-        if not sales:
+        found_sales = [sale.one_line_str() for sale in sales if sale.client_id == client_id]
+        if not found_sales:
             return None
 
         listing(
             "All sales for client " + client_id,
+            found_sales,
         )
 
     def __find__by_client_rating(self, sales: list[Sale]) -> None:
@@ -312,11 +318,11 @@ class MenuPerformance:
         except:
             return None
 
-        sales = [sale.one_line_str() for sale in sales if sale.client_rating == rating]
-        if not sales:
+        found_sales = [sale.one_line_str() for sale in sales if sale.client_rating == rating]
+        if not found_sales:
             return None
 
-        for sale in sales:
+        for sale in found_sales:
             print(sale, end="\n\n")
 
     def __find__by_date(self, sales: list[Sale]) -> None:
@@ -326,14 +332,14 @@ class MenuPerformance:
         except:
             return None
 
-        sales = [
-            sale for sale in sales if datetime.strptime(sale.date, "%Y-%m-%d") == date
+        found_sales = [
+            sale for sale in sales if datetime.strftime(sale.date, "%Y-%m-%d") == date
         ]
         if not sales:
             return None
 
-        sales = [sale.one_line_str() for sale in sales]
-        listing("All sales for date " + datetime.strftime(date, "%Y-%m-%d"), sales)
+        display_sales = [sale.one_line_str() for sale in found_sales]
+        listing("All sales for date " + datetime.strftime(date, "%Y-%m-%d"), display_sales)
 
     def __find__by_employee(self, sales: list[Sale]) -> None:
         empl_items = [
@@ -349,6 +355,6 @@ class MenuPerformance:
             return None
         selected_empl = the_company.employees[empl_selected_index]
 
-        sales = [sale.one_line_str() for sale in selected_empl.performance.sale_list]
+        found_sales = [sale.one_line_str() for sale in selected_empl.performance.sale_list]
 
-        listing("Sales of employee " + selected_empl.name, sales)
+        listing("Sales of employee " + selected_empl.name, found_sales)
