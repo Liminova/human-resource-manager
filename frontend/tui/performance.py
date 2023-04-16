@@ -141,8 +141,8 @@ class MenuPerformance:
         return f"Sale for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} added successfully!"
 
     def __view_all(self) -> str:
-        if not self.__logged_in_employee.is_admin:
-            sales = self.__logged_in_employee.performance.sale_list
+        if not the_company.logged_in_employee.is_admin:
+            sales = the_company.logged_in_employee.performance.sale_list
         else:
             sales = [
                 sale
@@ -193,8 +193,8 @@ class MenuPerformance:
         return ""
 
     def __get_info(self) -> str:
-        if not self.__logged_in_employee.is_admin:
-            all_sales = self.__logged_in_employee.performance.sale_list
+        if not the_company.logged_in_employee.is_admin:
+            all_sales = the_company.logged_in_employee.performance.sale_list
         else:
             all_sales = [
                 sale
@@ -247,7 +247,7 @@ class MenuPerformance:
                 return ""
 
     def __find_submenu_employee(self) -> str:
-        if self.__logged_in_employee.is_admin:
+        if the_company.logged_in_employee.is_admin:
             return "An admin don't sell anything!"
         search_fields = [
             "[1] Sale ID",
@@ -259,7 +259,7 @@ class MenuPerformance:
         search_selection = get_user_option_from_menu(
             "Find all sales by...", search_fields
         )
-        all_sales: list[Sale] = self.__logged_in_employee.performance.sale_list
+        all_sales: list[Sale] = the_company.logged_in_employee.performance.sale_list
         match search_selection:
             case 1:
                 self.__find__by_sale_id(all_sales)
