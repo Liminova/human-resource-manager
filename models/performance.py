@@ -54,6 +54,7 @@ class Sale(BaseModel):
         return Ok(self)
 
     def set_client_id(self, client_id: str) -> Result[Self, str]:
+        self.client_id = client_id
         return Ok(self) if client_id != "" else Err("Client ID cannot be empty.")
 
     def set_client_rating(self, _client_rating: str) -> Result[Self, str]:
