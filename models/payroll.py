@@ -23,20 +23,20 @@ class Payroll(BaseModel):
     punish: int = Field(default_factory=int)
     total: int = Field(default_factory=int)
 
-    def set_salary(self, salary: str) -> Result[Self, str]:
-        salary = int(salary)
+    def set_salary(self, _salary: str) -> Result[Self, str]:
+        salary = int(_salary)
         self.salary = salary
         self.calculate_total()
         return Ok(self) if salary >= 0 else Err("Salary cannot be negative.")
 
-    def set_bonus(self, bonus: str) -> Result[Self, str]:
-        bonus = int(bonus)
+    def set_bonus(self, _bonus: str) -> Result[Self, str]:
+        bonus = int(_bonus)
         self.bonus = bonus
         self.calculate_total()
         return Ok(self) if bonus >= 0 else Err("Bonus cannot be negative.")
 
-    def set_tax(self, tax: str) -> Result[Self, str]:
-        tax = int(tax)
+    def set_tax(self, _tax: str) -> Result[Self, str]:
+        tax = int(_tax)
         self.tax = tax
         self.calculate_total()
         return Ok(self) if tax >= 0 else Err("Tax cannot be negative.")
@@ -54,15 +54,15 @@ class Payroll(BaseModel):
         )
 
         for i in range(top_10):
-            employees[i].payroll.set_bonus(bonus_budget * 0.5 / top_10)
+            employees[i].payroll.set_bonus(str(bonus_budget * 0.5 / top_10))
         for i in range(top_10, top_10 + middle_80):
-            employees[i].payroll.set_bonus(bonus_budget * 0.5 / middle_80)
+            employees[i].payroll.set_bonus(str(bonus_budget * 0.5 / middle_80))
         for i in range(top_10 + middle_80, num_employees):
-            employees[i].payroll.set_bonus(0)
+            employees[i].payroll.set_bonus(str(0))
         return None
 
-    def set_punish(self, punish: str) -> Result[Self, str]:
-        punish = int(punish)
+    def set_punish(self, _punish: str) -> Result[Self, str]:
+        punish = int(_punish)
         self.punish = punish
         self.calculate_total()
         return Ok(self) if punish >= 0 else Err("Punish cannot be negative.")

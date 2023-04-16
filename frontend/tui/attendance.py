@@ -97,15 +97,21 @@ class MenuAttendance:
                 date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
                 date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
                 is_presence = input("Is employee present? (y/n): ")
-                attendances.add_attendance(date, is_presence).unwrap()
+                presence: bool = False
+                if is_presence.lower() == "y":
+                    is_presence = True
+                attendances.add_attendance(date, presence).unwrap()
                 if not is_presence:
                     reason = input("Enter reason for absent: ")
                     attendances.add_absent_day(date, reason).unwrap()
-                    payroll.set_punish(10)
+                    payroll.set_punish("10")
 
             # as an employee or admin updating their own attendance
             else:
-                if datetime.strftime(datetime.now(), "%Y-%m-%d") in attendances:
+                if (
+                    datetime.strftime(datetime.now(), "%Y-%m-%d")
+                    in attendances.attendances
+                ):
                     return "You are already present!"
                 attendances.add_attendance(datetime.now(), True).unwrap()
                 return "You are present now!"
@@ -125,20 +131,23 @@ class MenuAttendance:
                 date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
 
                 # check if attendance exists for that date
-                if date not in attendances:
+                if date not in attendances.attendances:
                     return "No attendance found for that date!"
 
                 # get the attendance object
                 is_presence = input("Is employee present? (y/n): ")
+                presence: bool = False
+                if is_presence.lower() == "y":
+                    presence = True
 
                 # update the attendance
-                attendances.add_attendance(date, is_presence).unwrap()
+                attendances.add_attendance(date, presence).unwrap()
 
                 # if the employee is absent, ask for the reason
-                if not is_presence:
+                if not presence:
                     reason = input("Enter reason for absent: ")
                     attendances.add_absent_day(date, reason).unwrap()
-                    payroll.set_punish(10)
+                    payroll.set_punish("10")
         except (ValueError, TypeError) as e:
             return str(e)
         return ""
@@ -167,7 +176,11 @@ class MenuAttendance:
                 return ""
 
             # print the attendance report
-            print(attendances.get_report(available_years[selected_year_index]))
+            print(
+                attendances.get_report(
+                    datetime.strptime(year_items[selected_year_index], "%Y")
+                )
+            )
         else:
             year_items = [str(year) for year in attendances.get_available_years()]
             selected_year_index = get_user_option_from_list(
@@ -179,7 +192,11 @@ class MenuAttendance:
                 return ""
 
             # print the attendance report
-            print(attendances.get_report(year_items[selected_year_index]))
+            print(
+                attendances.get_report(
+                    datetime.strptime(year_items[selected_year_index], "%Y")
+                )
+            )
 
         input(ENTER_TO_CONTINUE_MSG)
         return ""

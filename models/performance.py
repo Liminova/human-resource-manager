@@ -27,27 +27,27 @@ class Sale(BaseModel):
         self.sale_id = sale_id
         return Ok(self) if sale_id != "" else Err("Sale ID cannot be empty.")
 
-    def set_date(self, date: str) -> Result[Self, str]:
-        date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
+    def set_date(self, _date: str) -> Result[Self, str]:
+        date = datetime.strptime(_date, "%Y-%m-%d") if _date else datetime.now()
         self.date = date
         return Ok(self)
 
-    def set_revenue(self, revenue: str) -> Result[Self, str]:
-        revenue = float(revenue)
+    def set_revenue(self, _revenue: str) -> Result[Self, str]:
+        revenue = float(_revenue)
         if revenue < 0:
             return Err("Revenue cannot be negative.")
         self.revenue = revenue
         return Ok(self)
 
-    def set_cost(self, cost: str) -> Result[Self, str]:
-        cost = float(cost)
+    def set_cost(self, _cost: str) -> Result[Self, str]:
+        cost = float(_cost)
         if cost < 0:
             return Err("Cost cannot be negative.")
         self.cost = cost
         return Ok(self)
 
-    def set_profit(self, profit: str) -> Result[Self, str]:
-        profit = float(profit)
+    def set_profit(self, _profit: str) -> Result[Self, str]:
+        profit = float(_profit)
         if profit < 0:
             return Err("Profit cannot be negative.")
         self.profit = profit
@@ -56,8 +56,8 @@ class Sale(BaseModel):
     def set_client_id(self, client_id: str) -> Result[Self, str]:
         return Ok(self) if client_id != "" else Err("Client ID cannot be empty.")
 
-    def set_client_rating(self, client_rating: str) -> Result[Self, str]:
-        client_rating = float(client_rating)
+    def set_client_rating(self, _client_rating: str) -> Result[Self, str]:
+        client_rating = float(_client_rating)
         if client_rating < 1 or client_rating > 5:
             return Err("Client rating must be between 1 and 5.")
         self.client_rating = client_rating

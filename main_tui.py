@@ -144,7 +144,7 @@ def main():
             last_msg: str = NO_EMPLOYEE_MSG
             continue
 
-        respond: Result[bool, str] = Ok(None)
+        respond: Result[None, str] = Ok(None)
         match user_choice:
             case 1:
                 respond = MenuEmployee().mainloop()
