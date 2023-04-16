@@ -93,7 +93,7 @@ class MenuPerformance:
         selected_empl = the_company.employees[empl_selected_index]
 
         if selected_empl.is_admin:
-            return "An admin don't sell anything!"
+            return "An admin doesn't sell anything!"
 
         # create a new, empty sale object
         sale = Sale()
