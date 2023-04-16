@@ -306,6 +306,7 @@ class MenuDepartment:
             print(depts[dept_selected_index])
 
         input(ENTER_TO_CONTINUE_MSG)
+        return ""
 
     def __view_all(self) -> str:
         dept_items = [

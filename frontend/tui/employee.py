@@ -368,6 +368,8 @@ class MenuEmployee:
                     upsert=True,
                 )
 
+        return ""
+
     def __grant_admin_rights(self):
         empls = the_company.employees
 
