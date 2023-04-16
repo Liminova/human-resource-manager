@@ -140,6 +140,14 @@ class MenuPerformance:
 
         # add the sale to the employee's performance
         selected_empl.performance.sale_list.append(sale)
+        selected_empl.performance.sales_count += 1
+        selected_empl.performance.total_revenue += sale.revenue
+        selected_empl.performance.total_cost += sale.cost
+        selected_empl.performance.total_profit += sale.profit
+
+        rating_sum = sum([sale.client_rating for sale in selected_empl.performance.sale_list])
+        selected_empl.performance.average_rating = rating_sum / len(selected_empl.performance.sale_list)
+
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one(
                 {"_id": selected_empl.id},
@@ -198,8 +206,18 @@ class MenuPerformance:
         elif selected_sale_index == -2:
             return ""
 
+        sale = selected_empl.performance.sale_list[selected_sale_index]
+
         # remove the sale
         del selected_empl.performance.sale_list[selected_sale_index]
+        selected_empl.performance.sales_count -= 1
+        selected_empl.performance.total_revenue -= sale.revenue
+        selected_empl.performance.total_cost -= sale.cost
+        selected_empl.performance.total_profit -= sale.profit
+
+        rating_sum = sum([sale.client_rating for sale in selected_empl.performance.sale_list])
+        selected_empl.performance.average_rating = rating_sum / len(selected_empl.performance.sale_list)
+
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one(
                 {"_id": selected_empl.id},
