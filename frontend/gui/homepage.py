@@ -31,7 +31,7 @@ class Homepage(ctk.CTk):
         self.label1.bind("<Button-1>", lambda event: self.sign_out())
 
         self.label2 = ctk.CTkLabel(
-            master=self.frame1, input=f"You are currently sign in as: {the_company.logged_in_employee.name}", font=("Century Gothic", 14)
+            master=self.frame1, text=f"You are currently sign in as: {the_company.logged_in_employee.name}", font=("Century Gothic", 14)
         )
         self.label2.place(relx=0.825, rely=0.935, anchor=tkinter.CENTER)
 
