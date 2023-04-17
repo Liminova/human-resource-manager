@@ -112,3 +112,15 @@ class Company(metaclass=CompanyMeta):
             if employee.id == id:
                 return True
         return False
+
+    def get_empl_by_id(self, id: str) -> Result[Employee, str]:
+        for employee in self.employees:
+            if employee.employee_id == id:
+                return Ok(employee)
+        return Err("Employee not found!")
+
+    def get_dept_by_id(self, id: str) -> Result[Department, str]:
+        for department in self.departments:
+            if department.dept_id == id:
+                return Ok(department)
+        return Err("Department not found!")
