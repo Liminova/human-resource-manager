@@ -45,7 +45,7 @@ def get_user_option_from_list(title: str, options: list[str]) -> int:  # type: i
             case _:  # assume user entered a number
                 try:
                     user_choice = int(user_choice)
-                    if user_choice not in range(1, 10):
+                    if user_choice not in range(1, len(entries) + 1):
                         raise ValueError
                     clrscr()
                     return (current_cluster * 9) + (user_choice - 1)
