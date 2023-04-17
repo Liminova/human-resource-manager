@@ -1,6 +1,8 @@
 from ..helpers import *
 from models import Payroll, Company
 from option import Result, Ok
+from database.mongo import employee_repo
+import os
 
 the_company: Company = Company()
 
@@ -92,7 +94,14 @@ class MenuPayroll:
                 return msg
 
         # add the payroll object to the employee
-        selected_empl.payroll = payroll
+        the_company.employees[selected_empl_index].payroll = payroll
+        if os.getenv("HRMGR_DB") == "TRUE":
+            employee_repo.update_one(
+                {"_id": selected_empl.id},
+                {"$set": {"payroll": payroll.dict()}},
+                upsert=True,
+            )
+
         return f"Payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} created successfully!"
 
     def __update(self) -> str:
