@@ -16,6 +16,11 @@ class Attendance(BaseModel):
     attendances: dict[str, bool] = Field(default_factory=dict)
     absents: dict[str, str] = Field(default_factory=dict)
 
+    def default(self) -> Self:
+        self.start_date = datetime.now().strftime("%Y-%m-%d")
+        self.allowed_absent_days[str(datetime.now().year)] = 3
+        return self
+
     def get_attendance(self, date: datetime) -> Result[bool, str]:
         date_str = date.strftime("%Y-%m-%d")
         if date_str in self.attendances:
