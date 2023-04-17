@@ -1,4 +1,3 @@
-from .admin import Admin
 from .attendance_check import Attendance
 from .benefits import BenefitPlan
 from .company import Company
@@ -9,7 +8,6 @@ from .payroll import Payroll
 from .performance import Performance, Sale
 
 __all__ = [
-    "Admin",
     "Attendance",
     "BenefitPlan",
     "Company",
