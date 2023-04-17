@@ -1,6 +1,5 @@
 {
   "python.analysis.typeCheckingMode": "basic",
-  "python.formatting.provider": "black",
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,
@@ -10,5 +9,8 @@
     "**/Thumbs.db": true,
     "**/node_modules": true,
     "**/__pycache__": true,
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
   }
 }
