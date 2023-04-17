@@ -138,11 +138,11 @@ class PayrollGui(ctk.CTk):
         self.button1_frame.pack(pady=20)
 
         def create_successfully(self):
-            salary = self.entry1.get()
-            bonus = self.entry2.get()
-            tax = self.entry3.get()
-            punishment = self.entry4.get()
-            input_id = self.entry5.get()
+            input_id = self.entry1.get()
+            salary = self.entry2.get()
+            bonus = self.entry3.get()
+            tax = self.entry4.get()
+            punishment = self.entry5.get()
             if salary == "" or bonus == "" or tax == "" or punishment == "":
                 messagebox.showerror("Error", "Please fill in all the fields")
             elif not (salary.isdigit()) or not (bonus.isdigit()) or not (tax.isdigit()) or not (punishment.isdigit()):
@@ -158,7 +158,7 @@ class PayrollGui(ctk.CTk):
                         messagebox.showinfo("Success", "Payroll created successfully")
                     else:
                         messagebox.showerror("Error", "Employee ID not found")
-
+                        
     def __admin_update_payroll(self):
         self.button2_frame = ctk.CTkFrame(master=self.right_frame)
 
@@ -207,11 +207,11 @@ class PayrollGui(ctk.CTk):
         self.button2_frame.pack(pady=20)
 
         def update_successfully(self):
-            salary = self.entry1.get()
-            bonus = self.entry2.get()
-            tax = self.entry3.get()
-            punishment = self.entry4.get()
-            input_id = self.entry5.get()
+            input_id = self.entry1.get()
+            salary = self.entry2.get()
+            bonus = self.entry3.get()
+            tax = self.entry4.get()
+            punishment = self.entry5.get()
             if salary == "" or bonus == "" or tax == "" or punishment == "":
                 messagebox.showerror("Error", "Please fill in all the fields")
             elif not (salary.isdigit()) or not (bonus.isdigit()) or not (tax.isdigit()) or not (punishment.isdigit()):
