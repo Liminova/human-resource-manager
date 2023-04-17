@@ -196,7 +196,6 @@ class MenuAttendance:
             return str(e)
         return ""
 
-    # FIXME: very broken, doesn't print anything. - Rylie
     def __report(self) -> str:
         attendances = the_company.logged_in_employee.attendance
 
