@@ -111,7 +111,7 @@ class MenuAttendance:
                 if os.getenv("HRMGR_DB") == "TRUE":
                     employee_repo.update_one(
                         {"_id": employee.id},
-                        {"$set": employee.dict(include={"is_admin"})},
+                        {"$set": employee.dict(include={"attendance"})},
                         upsert=True,
                     )
 
@@ -132,7 +132,7 @@ class MenuAttendance:
                 if os.getenv("HRMGR_DB") == "TRUE":
                     employee_repo.update_one(
                         {"_id": employee.id},
-                        {"$set": employee.dict(include={"is_admin"})},
+                        {"$set": employee.dict(include={"attendance"})},
                         upsert=True,
                     )
                 return "You are present now!"
@@ -171,7 +171,7 @@ class MenuAttendance:
                 if os.getenv("HRMGR_DB") == "TRUE":
                     employee_repo.update_one(
                         {"_id": employee.id},
-                        {"$set": employee.dict(include={"is_admin"})},
+                        {"$set": employee.dict(include={"attendance"})},
                         upsert=True,
                     )
 
@@ -182,7 +182,7 @@ class MenuAttendance:
                     if os.getenv("HRMGR_DB") == "TRUE":
                         employee_repo.update_one(
                             {"_id": employee.id},
-                            {"$set": employee.dict(include={"is_admin"})},
+                            {"$set": employee.dict(include={"attendance"})},
                             upsert=True,
                         )
 
