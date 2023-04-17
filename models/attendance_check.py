@@ -12,7 +12,7 @@ else:
 
 class Attendance(BaseModel):
     start_date: str = Field(default_factory=str)
-    allowed_absent_days: dict[int, int] = Field(default_factory=dict)
+    allowed_absent_days: dict[str, int] = Field(default_factory=dict)
     attendances: dict[str, bool] = Field(default_factory=dict)
     absents: dict[str, str] = Field(default_factory=dict)
 
@@ -41,7 +41,7 @@ class Attendance(BaseModel):
         date_str = date.strftime("%Y-%m-%d")
         # Check the "allowed_absent_days" first, if it doesn't contain current year, add it and set to 3
         if date.year not in self.allowed_absent_days:
-            self.allowed_absent_days[date.year] = 3
+            self.allowed_absent_days[str(date.year)] = 3
         self.attendances[date_str] = is_present
         return Ok(self)
 
@@ -50,7 +50,7 @@ class Attendance(BaseModel):
         if not reason:
             return Err("Reason cannot be empty.")
         self.absents[date_str] = reason
-        self.allowed_absent_days[date.year] -= 1
+        self.allowed_absent_days[str(date.year)] -= 1
         return Ok(self)
 
     def get_available_years(self) -> list[int]:
