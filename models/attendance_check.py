@@ -12,9 +12,14 @@ else:
 
 class Attendance(BaseModel):
     start_date: str = Field(default_factory=str)
-    allowed_absent_days: dict[int, int] = Field(default_factory=dict)
+    allowed_absent_days: dict[str, int] = Field(default_factory=dict)
     attendances: dict[str, bool] = Field(default_factory=dict)
     absents: dict[str, str] = Field(default_factory=dict)
+
+    def default(self) -> Self:
+        self.start_date = datetime.now().strftime("%Y-%m-%d")
+        self.allowed_absent_days[str(datetime.now().year)] = 3
+        return self
 
     def get_attendance(self, date: datetime) -> Result[bool, str]:
         date_str = date.strftime("%Y-%m-%d")
@@ -29,8 +34,8 @@ class Attendance(BaseModel):
         return Err("Date not found.")
 
     def get_allowed_absent_days(self, year: int) -> Result[int, str]:
-        if year in self.allowed_absent_days:
-            return Ok(self.allowed_absent_days[year])
+        if str(year) in self.allowed_absent_days:
+            return Ok(self.allowed_absent_days[str(year)])
         return Err("Year not found.")
 
     def set_start_date(self, start_date: datetime) -> Result[Self, str]:
@@ -41,7 +46,7 @@ class Attendance(BaseModel):
         date_str = date.strftime("%Y-%m-%d")
         # Check the "allowed_absent_days" first, if it doesn't contain current year, add it and set to 3
         if date.year not in self.allowed_absent_days:
-            self.allowed_absent_days[date.year] = 3
+            self.allowed_absent_days[str(date.year)] = 3
         self.attendances[date_str] = is_present
         return Ok(self)
 
@@ -50,7 +55,7 @@ class Attendance(BaseModel):
         if not reason:
             return Err("Reason cannot be empty.")
         self.absents[date_str] = reason
-        self.allowed_absent_days[date.year] -= 1
+        self.allowed_absent_days[str(date.year)] -= 1
         return Ok(self)
 
     def get_available_years(self) -> list[int]:
@@ -65,10 +70,10 @@ class Attendance(BaseModel):
     def get_report(self, year: datetime) -> str:
         """Get the attendance report for a specific year."""
         data = ""  # temporary variable to store the report data
-        for date, is_present in self.attendances.items():
+        for date_str, is_present in self.attendances.items():
             # only get the attendance data for the specified year
-            date = datetime.strptime(date, "%Y-%m-%d")
-            if date.year == year:
+            date = datetime.strptime(date_str, "%Y-%m-%d")
+            if date.year == year.year:
                 # different message if the employee is present or absent
                 if is_present:
                     data += f"{datetime.strftime(date, '%d %b %Y')} - Present\n"

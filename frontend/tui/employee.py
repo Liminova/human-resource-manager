@@ -1,6 +1,6 @@
 import os
 from ..helpers import *
-from models import Employee, Company, hash
+from models import Attendance, Employee, Company, hash
 from database.mongo import employee_repo, benefit_repo, department_repo
 from option import Result, Ok
 
@@ -103,6 +103,7 @@ class MenuEmployee:
             if (msg := loop_til_valid_input(field, setter)) != "":
                 return msg
         employee.is_admin = False
+        employee.attendance = Attendance().default()
 
         # a list containing the string representation of each department
         dept_items = [f"{dept.name} ({dept.dept_id})" for dept in depts]
@@ -157,7 +158,7 @@ class MenuEmployee:
             return ""
 
         # get the actual employee
-        employee = the_company.employees[employee_index]
+        employee = the_company.employees[employee_index + 1]
 
         # if employee.is_admin and not the_company.owner:
         if not the_company.can_modify("employee", employee):
