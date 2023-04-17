@@ -72,8 +72,8 @@ class Attendance(BaseModel):
         data = ""  # temporary variable to store the report data
         for date_str, is_present in self.attendances.items():
             # only get the attendance data for the specified year
-            if date.year == year:
             date = datetime.strptime(date_str, "%Y-%m-%d")
+            if date.year == year.year:
                 # different message if the employee is present or absent
                 if is_present:
                     data += f"{datetime.strftime(date, '%d %b %Y')} - Present\n"
