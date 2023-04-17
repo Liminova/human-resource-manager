@@ -89,7 +89,7 @@ class EmployeeGui(ctk.CTk):
             master=self.left_frame, text="Change Password", command=merge_callable(self.__destroy_all_frames, self.__employee_change_password)
         )
         self.__button_style(self.button6)
-        self.button6.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
+        self.button6.place(relx=0.5, rely=0.55, anchor=tkinter.CENTER)
 
         self.button7 = ctk.CTkButton(master=self.left_frame, text="Back", fg_color="red", command=lambda self=self: self.__back_to_homepage())
         self.button7.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
@@ -157,7 +157,7 @@ class EmployeeGui(ctk.CTk):
         self.label6 = ctk.CTkLabel(master=self.right_frame, text="Password: ", font=("Century Gothic", 20, "italic"))
         self.label6.place(relx=0.125, rely=0.775, anchor=tkinter.CENTER)
 
-        self.entry6 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Password")
+        self.entry6 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Password", show="*")
         self.__style_input_box(self.entry6)
         self.entry6.place(relx=0.325, rely=0.82, anchor=tkinter.CENTER)
 
@@ -205,16 +205,16 @@ class EmployeeGui(ctk.CTk):
         self.label.pack()
 
         self.label1 = ctk.CTkLabel(master=self.right_frame, text="Employee's name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
+        self.label1.place(relx=0.175, rely=0.15, anchor=tkinter.CENTER)
 
         self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter employee's name")
         self.__style_input_box(self.entry1)
         self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
 
         self.label2 = ctk.CTkLabel(master=self.right_frame, text="Employee's ID: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.0715, rely=0.275, anchor=tkinter.CENTER)
+        self.label2.place(relx=0.145, rely=0.275, anchor=tkinter.CENTER)
 
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="enter employee's ID")
+        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter employee's ID")
         self.__style_input_box(self.entry2)
         self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
 
@@ -249,10 +249,12 @@ class EmployeeGui(ctk.CTk):
             msgbox.showinfo("Success", "Employee removed successfully")
 
     def __admin_update_employee(self):
-        self.button3_frame = ctk.CTkFrame(master=self.right_frame)
+        self.label0 = ctk.CTkLabel(master=self.right_frame, text="Enter ID: ", font=("Century Gothic", 20, "italic"))
+        self.label0.place(relx=0.1, rely=0.1, anchor=tkinter.CENTER)
 
-        self.label = ctk.CTkLabel(master=self.button3_frame, text="Information", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        self.entry0 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
+        self.entry0.configure(width=110, height=30, font=("Century Gothic", 15), corner_radius=10)
+        self.entry0.place(relx=0.24, rely=0.1, anchor=tkinter.CENTER)
 
         self.label1 = ctk.CTkLabel(master=self.right_frame, text="Name: ", font=("Century Gothic", 20, "italic"))
         self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
@@ -292,7 +294,7 @@ class EmployeeGui(ctk.CTk):
         self.label6 = ctk.CTkLabel(master=self.right_frame, text="Password: ", font=("Century Gothic", 20, "italic"))
         self.label6.place(relx=0.125, rely=0.775, anchor=tkinter.CENTER)
 
-        self.entry6 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Password")
+        self.entry6 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Password", show="*")
         self.__style_input_box(self.entry6)
         self.entry6.place(relx=0.325, rely=0.82, anchor=tkinter.CENTER)
 
@@ -300,54 +302,49 @@ class EmployeeGui(ctk.CTk):
         self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
         self.button.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
 
-        self.button1_frame.pack(pady=20)
-
         def update_successfully(self):
             name = self.entry1.get()
             dob = self.entry2.get()
             id = self.entry3.get()
             phone = self.entry4.get()
             email = self.entry5.get()
-            employee = Employee()
             password = self.entry6.get()
             if name == "" or dob == "" or id == "" or phone == "" or email == "":
                 msgbox.showerror("Error", "Please fill in all the fields")
-            elif not name.isalpha():
+            if not name.isalpha():
                 msgbox.showerror("Error", "Please enter a valid name")
-            elif not phone.isdigit() and len(phone) != 10:
+            if not phone.isdigit() and len(phone) != 10:
                 msgbox.showerror("Error", "Please enter a valid phone number")
-            elif "@" not in email:
+                return
+            if "@" not in email:
                 msgbox.showerror("Error", "Please enter a valid email")
-            elif "-" not in dob:
+                return
+            if "-" not in dob:
                 msgbox.showerror("Error", "Please enter a valid date of birth")
-            else:
-                employee.name = name
-                employee.dob = dob
-                employee.employee_id = id
-                employee.phone = phone
-                employee.email = email
-                employee.hashed_password = hash(username=employee.employee_id, password=password)
+                return
+            try:
+                # fmt:off
+                (the_company
+                    .get_empl_by_id(id)
+                    .unwrap()
+                    .set_name(name)
+                    .unwrap()
+                    .set_dob(dob)
+                    .unwrap()
+                    .set_phone(phone)
+                    .unwrap()
+                    .set_email(email)
+                    .unwrap()
+                    .set_password(password)
+                    .unwrap()
+                ) 
+                # fmt:on
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one({"_id": the_company.get_empl_by_id(id).unwrap().id}, {"$set": the_company.get_empl_by_id(id).unwrap().dict(exclude={"id"}, by_alias=True)}, upsert=True)
 
-                for i in the_company.employees:
-                    if (
-                        i.name == employee.name
-                        and i.employee_id == employee.employee_id
-                        and i.dob == employee.dob
-                        and i.phone == employee.phone
-                        and i.email == employee.email
-                        and i.hashed_password == employee.hashed_password
-                    ):
-                        i.name = name
-                        i.employee_id = id
-                        i.phone = phone
-                        i.email = email
-                        i.hashed_password = hash(username=employee.employee_id, password=password)
-
-                        if os.getenv("HRMGR_DB") == "TRUE":
-                            employee_repo.update_one(
-                                {"_id": employee.id}, {"$set": {"employee": employee.dict(exclude={"id"}, by_alias=True)}}, upsert=True
-                            )
                 msgbox.showinfo("Success", "Employee updated successfully")
+            except ValueError as e:
+                msgbox.showerror("Error", str(e))
 
     def __admin_view_employee(self):
         self.button2_frame = ctk.CTkFrame(master=self.right_frame)
@@ -407,21 +404,21 @@ class EmployeeGui(ctk.CTk):
         self.label1 = ctk.CTkLabel(master=self.right_frame, text="Old Password: ", font=("Century Gothic", 20, "italic"))
         self.label1.place(relx=0.15, rely=0.15, anchor=tkinter.CENTER)
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Old Password")
+        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Old Password", show="*")
         self.__style_input_box(self.entry1)
         self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
 
         self.label2 = ctk.CTkLabel(master=self.right_frame, text="New Password: ", font=("Century Gothic", 20, "italic"))
         self.label2.place(relx=0.15, rely=0.275, anchor=tkinter.CENTER)
 
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter New Password")
+        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter New Password", show="*")
         self.__style_input_box(self.entry2)
         self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
 
         self.label3 = ctk.CTkLabel(master=self.right_frame, text="Confirm Password: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.15, rely=0.4, anchor=tkinter.CENTER)
+        self.label3.place(relx=0.175, rely=0.4, anchor=tkinter.CENTER)
 
-        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Confirm New Password")
+        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Confirm New Password", show="*")
         self.__style_input_box(self.entry3)
         self.entry3.place(relx=0.325, rely=0.445, anchor=tkinter.CENTER)
 
@@ -492,21 +489,21 @@ class EmployeeGui(ctk.CTk):
         self.label1 = ctk.CTkLabel(master=self.right_frame, text="Old Password: ", font=("Century Gothic", 20, "italic"))
         self.label1.place(relx=0.15, rely=0.15, anchor=tkinter.CENTER)
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Old Password")
+        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Old Password", show="*")
         self.__style_input_box(self.entry1)
         self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
 
         self.label2 = ctk.CTkLabel(master=self.right_frame, text="New Password: ", font=("Century Gothic", 20, "italic"))
         self.label2.place(relx=0.15, rely=0.275, anchor=tkinter.CENTER)
 
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter New Password")
+        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter New Password", show="*")
         self.__style_input_box(self.entry2)
         self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
 
         self.label3 = ctk.CTkLabel(master=self.right_frame, text="Confirm Password: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.15, rely=0.4, anchor=tkinter.CENTER)
+        self.label3.place(relx=0.175, rely=0.4, anchor=tkinter.CENTER)
 
-        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Confirm New Password")
+        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Confirm New Password", show="*")
         self.__style_input_box(self.entry3)
         self.entry3.place(relx=0.325, rely=0.445, anchor=tkinter.CENTER)
 
@@ -521,15 +518,27 @@ class EmployeeGui(ctk.CTk):
         self.button.place(relx=0.5, rely=0.545, anchor=tkinter.CENTER)
 
         def change_password_successfully(self):
+            employee = the_company.logged_in_employee
+
             old_password = self.entry1.get()
             new_password = self.entry2.get()
             confirm_password = self.entry3.get()
 
             if old_password == "" or new_password == "" or confirm_password == "":
                 msgbox.showerror("Error", "Please enter a valid password")
-            elif new_password != confirm_password:
-                msgbox.showerror("Error", "Passwords do not match")
-            else:
-                msgbox.showinfo("Success", "Password changed successfully")
+                return
+            if new_password != confirm_password:
+                msgbox.showerror("Error", "New password and confirm password do not match")
+                return
+
+            if hash(employee.employee_id, old_password) != employee.hashed_password:
+                msgbox.showerror("Error", "Incorrect current password")
+                return
+
+            employee.hashed_password = hash(employee.employee_id, new_password)
+            if os.getenv("HRMGR_DB") == "TRUE":
+                employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"hashed_password"})}, upsert=True)
+
+            msgbox.showinfo("Success", "Password changed successfully")
 
     # endregion
