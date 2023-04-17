@@ -1,6 +1,8 @@
 from ..helpers import *
 from models import Payroll, Company
 from option import Result, Ok
+from database.mongo import employee_repo
+import os
 
 the_company: Company = Company()
 
@@ -92,7 +94,14 @@ class MenuPayroll:
                 return msg
 
         # add the payroll object to the employee
-        selected_empl.payroll = payroll
+        the_company.employees[selected_empl_index].payroll = payroll
+        if os.getenv("HRMGR_DB") == "TRUE":
+            employee_repo.update_one(
+                {"_id": selected_empl.id},
+                {"$set": {"payroll": payroll.dict()}},
+                upsert=True,
+            )
+
         return f"Payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} created successfully!"
 
     def __update(self) -> str:
@@ -108,7 +117,7 @@ class MenuPayroll:
             return ""
         selected_empl = empls[selected_empl_index]
 
-        if the_company.can_modify("payroll", selected_empl):
+        if not the_company.can_modify("payroll", selected_empl):
             return "Only the owner can update payroll for admins!"
 
         if selected_empl.payroll.salary == 0:
@@ -121,14 +130,20 @@ class MenuPayroll:
 
         # assigning values to the payroll object
         fields_data = [
-            ("Enter payroll salary", selected_empl.payroll.set_salary),
-            ("Enter payroll bonus", selected_empl.payroll.set_bonus),
-            ("Enter payroll tax", selected_empl.payroll.set_tax),
-            ("Enter payroll punishment", selected_empl.payroll.set_punish),
+            ("Enter payroll salary", empls[selected_empl_index].payroll.set_salary),
+            ("Enter payroll bonus", empls[selected_empl_index].payroll.set_bonus),
+            ("Enter payroll tax", empls[selected_empl_index].payroll.set_tax),
+            ("Enter payroll punishment", empls[selected_empl_index].payroll.set_punish),
         ]
         for field, setter in fields_data:
             if (msg := loop_til_valid_input(field, setter)) != "":
                 return msg
+        if os.getenv("HRMGR_DB") == "TRUE":
+            employee_repo.update_one(
+                {"_id": selected_empl.id},
+                {"$set": empls[selected_empl_index].dict(include={"payroll"})},
+                upsert=True,
+            )
 
         return f"Payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} updated successfully!"
 
