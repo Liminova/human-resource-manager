@@ -4,7 +4,7 @@ from .get_user_option_from_list import get_user_option_from_list
 from .get_user_option_from_menu import get_user_option_from_menu
 from .listing import listing
 from .loop_til_valid_input import loop_til_valid_input
-
+from .merge_callable import merge_callable
 
 def styling(x, y):
     return f"- {FCOLORS.CYAN}{x}{FCOLORS.END} {FCOLORS.GREEN}{y}{FCOLORS.END}"
@@ -45,6 +45,7 @@ __all__ = [
     "listing",
     "loop_til_valid_input",
     "styling",
+    "merge_callable",
     "NO_ATTENDANCE_MSG",
     "NO_BENEFIT_MSG",
     "NO_DEPARTMENT_MSG",
