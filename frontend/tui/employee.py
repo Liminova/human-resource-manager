@@ -158,7 +158,7 @@ class MenuEmployee:
             return ""
 
         # get the actual employee
-        employee = the_company.employees[employee_index]
+        employee = the_company.employees[employee_index + 1]
 
         # if employee.is_admin and not the_company.owner:
         if not the_company.can_modify("employee", employee):
