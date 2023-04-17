@@ -39,9 +39,7 @@ class MenuLoginSignup:
                 return False
 
             # validate password
-            if not validate(
-                employee_id, input_password, employees[employee_id].hashed_password
-            ):
+            if not validate(employee_id, input_password, employees[employee_id].hashed_password):
                 last_msg: str = FCOLORS.RED + "Invalid password!" + FCOLORS.END
                 continue
 

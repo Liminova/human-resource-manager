@@ -35,6 +35,7 @@ NO_SALES_MSG: str = __error_msg(
 
 ENTER_TO_CONTINUE_MSG: str = FCOLORS.PURPLE + "Press Enter to continue..." + FCOLORS.END
 
+# fmt: off
 __all__ = [
     "clrscr",
     "BCOLORS",
@@ -52,3 +53,4 @@ __all__ = [
     "NO_SALES_MSG",
     "ENTER_TO_CONTINUE_MSG",
 ]
+# fmt: on

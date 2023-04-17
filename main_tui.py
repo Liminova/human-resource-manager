@@ -40,6 +40,7 @@ def initialize_data():
 
 def main():
     last_msg: str = ""
+    # fmt: off
     if (
         not os.getenv("MONGO_USER")
         or not os.getenv("MONGO_PASS")
@@ -56,6 +57,7 @@ def main():
         )
     else:
         initialize_data()
+    # fmt: on
 
     # ======================
     #    WELCOME SCREEN

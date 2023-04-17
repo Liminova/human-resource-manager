@@ -49,9 +49,7 @@ class Payroll(BaseModel):
         top_10 = int(num_employees * 0.1)
         middle_80 = int(num_employees * 0.8)
 
-        employees.sort(
-            key=lambda employee: employee.performance.sales_count, reverse=True
-        )
+        employees.sort(key=lambda employee: employee.performance.sales_count, reverse=True)
 
         for i in range(top_10):
             employees[i].payroll.set_bonus(str(bonus_budget * 0.5 / top_10))
