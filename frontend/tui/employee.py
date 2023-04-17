@@ -65,15 +65,8 @@ class MenuEmployee:
                 print(last_msg)
                 last_msg: str = ""
 
-            employee_menu = [
-                "[1] View details",
-                "[2] Change password",
-                "[3] Back",
-            ]
-            choice = get_user_option_from_menu(
-                "Employee management for " + the_company.logged_in_employee.name,
-                employee_menu,
-            )
+            employee_menu = ["[1] View details", "[2] Change password", "[3] Back"]
+            choice = get_user_option_from_menu("Employee management for " + the_company.logged_in_employee.name, employee_menu)
             match choice:
                 case 1:
                     last_msg: str = self.__view()
@@ -110,9 +103,7 @@ class MenuEmployee:
 
         if len(dept_items) > 0:
             # get the index of the department to add the employee to
-            dept_index = get_user_option_from_list(
-                "Select a department to add the employee to", dept_items
-            )
+            dept_index = get_user_option_from_list("Select a department to add the employee to", dept_items)
             dept = depts[dept_index]
             if dept_index == -1:
                 return NO_DEPARTMENT_MSG
@@ -122,11 +113,7 @@ class MenuEmployee:
             # add the employee to the department's members
             dept.members.append(employee)
             if os.getenv("HRMGR_DB") == "TRUE":
-                department_repo.update_one(
-                    {"_id": dept.id},
-                    {"$set": dept.dict(include={"members"})},
-                    upsert=True,
-                )
+                department_repo.update_one({"_id": dept.id}, {"$set": dept.dict(include={"members"})}, upsert=True)
 
             # add the department id to the employee's department_id
             employee.set_department(depts[dept_index].dept_id).unwrap()
@@ -142,16 +129,10 @@ class MenuEmployee:
 
     def __remove(self) -> str:
         # a list containing the string representation of each employee that isn't an admin
-        employee_items = [
-            f"{e.name} ({e.employee_id})"
-            for e in the_company.employees
-            if not e.is_admin
-        ]
+        employee_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees if not e.is_admin]
 
         # get the index of the employee to remove
-        employee_index = get_user_option_from_list(
-            "Select an employee to remove", employee_items
-        )
+        employee_index = get_user_option_from_list("Select an employee to remove", employee_items)
         if employee_index == -1:
             return NO_EMPLOYEE_MSG
         elif employee_index == -2:
@@ -169,22 +150,14 @@ class MenuEmployee:
             if employee in dept.members:
                 dept.members.remove(employee)
                 if os.getenv("HRMGR_DB") == "TRUE":
-                    department_repo.update_one(
-                        {"_id": dept.id},
-                        {"$set": dept.dict(include={"members"})},
-                        upsert=True,
-                    )
+                    department_repo.update_one({"_id": dept.id}, {"$set": dept.dict(include={"members"})}, upsert=True)
 
         # remove employee from the benefits they're enrolled in
         for benefit in the_company.benefits:
             if employee in benefit.enrolled_employees:
                 benefit.enrolled_employees.remove(employee)
                 if os.getenv("HRMGR_DB") == "TRUE":
-                    benefit_repo.update_one(
-                        {"_id": benefit.id},
-                        {"$set": benefit.dict(include={"enrolled_employees"})},
-                        upsert=True,
-                    )
+                    benefit_repo.update_one({"_id": benefit.id}, {"$set": benefit.dict(include={"enrolled_employees"})}, upsert=True)
 
         # remove from the company
         if os.getenv("HRMGR_DB") == "TRUE":
@@ -198,9 +171,7 @@ class MenuEmployee:
         employee_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees]
 
         # get the employee to update
-        selected_employee_index = get_user_option_from_list(
-            "Select an employee to update", employee_items
-        )
+        selected_employee_index = get_user_option_from_list("Select an employee to update", employee_items)
         if selected_employee_index == -1:
             return NO_EMPLOYEE_MSG
         elif selected_employee_index == -2:
@@ -224,11 +195,7 @@ class MenuEmployee:
 
         the_company.employees[selected_employee_index] = employee
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one(
-                {"_id": employee.id},
-                {"$set": employee.dict(exclude={"id"}, by_alias=True)},
-                upsert=True,
-            )
+            employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(exclude={"id"}, by_alias=True)}, upsert=True)
 
         return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.employee_id}{FCOLORS.END}) updated successfully!"
 
@@ -245,9 +212,7 @@ class MenuEmployee:
         employee_items = [f"{e.name} ({e.employee_id})" for e in empls]
 
         # get the employee to view
-        selected_employee_index = get_user_option_from_list(
-            "Select an employee to view", employee_items
-        )
+        selected_employee_index = get_user_option_from_list("Select an employee to view", employee_items)
         if selected_employee_index == -1:
             return NO_EMPLOYEE_MSG
         elif selected_employee_index == -2:
@@ -273,12 +238,8 @@ class MenuEmployee:
         logged_in_employee = the_company.logged_in_employee
         if logged_in_employee.is_admin:
             # return "You must be logged in to change your password"
-            empl_items = [
-                f"{e.name} ({e.employee_id})" for e in empls if not e.is_admin
-            ]
-            empl_index = get_user_option_from_list(
-                "Select an employee to change the password of", empl_items
-            )
+            empl_items = [f"{e.name} ({e.employee_id})" for e in empls if not e.is_admin]
+            empl_index = get_user_option_from_list("Select an employee to change the password of", empl_items)
             if empl_index == -1:
                 return NO_EMPLOYEE_MSG
             elif empl_index == -2:
@@ -296,9 +257,7 @@ class MenuEmployee:
                 return ""
 
             # re-enter the new password
-            new_password_verify = input(
-                "Re-enter new password, or leave blank to cancel"
-            )
+            new_password_verify = input("Re-enter new password, or leave blank to cancel")
             if new_password_verify == "":
                 return ""
 
@@ -307,22 +266,13 @@ class MenuEmployee:
                 return "Passwords do not match"
 
             # confirm
-            if (
-                input(
-                    f"Are you sure you want to change {employee.name}'s password? (y/n): "
-                ).lower()
-                != "y"
-            ):
+            if input(f"Are you sure you want to change {employee.name}'s password? (y/n): ").lower() != "y":
                 return ""
 
             # change the password
             employee.set_password(new_password)
             if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.update_one(
-                    {"_id": employee.id},
-                    {"$set": employee.dict(include={"hashed_password"})},
-                    upsert=True,
-                )
+                employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"hashed_password"})}, upsert=True)
 
         # as an employee
         else:
@@ -342,9 +292,7 @@ class MenuEmployee:
                 return ""
 
             # re-enter the new password
-            new_password_verify = input(
-                "Re-enter new password, or leave blank to cancel"
-            )
+            new_password_verify = input("Re-enter new password, or leave blank to cancel")
             if new_password_verify == "":
                 return ""
 
@@ -353,22 +301,13 @@ class MenuEmployee:
                 return "Passwords do not match"
 
             # confirm
-            if (
-                input("Are you sure you want to change your password? (y/n): ").lower()
-                != "y"
-            ):
+            if input("Are you sure you want to change your password? (y/n): ").lower() != "y":
                 return ""
 
             # change the password
-            logged_in_employee.hashed_password = hash(
-                logged_in_employee.employee_id, new_password
-            )
+            logged_in_employee.hashed_password = hash(logged_in_employee.employee_id, new_password)
             if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.update_one(
-                    {"_id": logged_in_employee.id},
-                    {"$set": logged_in_employee.dict(include={"hashed_password"})},
-                    upsert=True,
-                )
+                employee_repo.update_one({"_id": logged_in_employee.id}, {"$set": logged_in_employee.dict(include={"hashed_password"})}, upsert=True)
 
         return ""
 
@@ -381,9 +320,7 @@ class MenuEmployee:
 
         # a list containing the string representation of each employee
         employee_items = [f"{e.name} ({e.employee_id})" for e in empls]
-        selected_employee_index = get_user_option_from_list(
-            "Select an employee to grant admin rights to", employee_items
-        )
+        selected_employee_index = get_user_option_from_list("Select an employee to grant admin rights to", employee_items)
         if selected_employee_index == -1:
             return NO_EMPLOYEE_MSG
         elif selected_employee_index == -2:
@@ -395,22 +332,13 @@ class MenuEmployee:
             return f"{employee.name} already has admin rights"
 
         # confirm
-        if (
-            input(
-                f"Are you sure you want to grant {employee.name} admin rights? (y/n): "
-            ).lower()
-            != "y"
-        ):
+        if input(f"Are you sure you want to grant {employee.name} admin rights? (y/n): ").lower() != "y":
             return ""
 
         # grant admin rights
         employee.is_admin = True
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one(
-                {"_id": employee.id},
-                {"$set": employee.dict(include={"is_admin"})},
-                upsert=True,
-            )
+            employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"is_admin"})}, upsert=True)
         return f"Admin rights granted to {employee.name}"
 
     def __revoke_admin_rights(self):
@@ -422,9 +350,7 @@ class MenuEmployee:
 
         # a list containing the string representation of each employee
         employee_items = [f"{e.name} ({e.employee_id})" for e in empls]
-        selected_employee_index = get_user_option_from_list(
-            "Select an employee to revoke admin rights from", employee_items
-        )
+        selected_employee_index = get_user_option_from_list("Select an employee to revoke admin rights from", employee_items)
         if selected_employee_index == -1:
             return NO_EMPLOYEE_MSG
         elif selected_employee_index == -2:
@@ -436,20 +362,11 @@ class MenuEmployee:
             return f"{employee.name} does not have admin rights"
 
         # confirm
-        if (
-            input(
-                f"Are you sure you want to revoke {employee.name}'s admin rights? (y/n): "
-            ).lower()
-            != "y"
-        ):
+        if input(f"Are you sure you want to revoke {employee.name}'s admin rights? (y/n): ").lower() != "y":
             return ""
 
         # revoke admin rights
         employee.is_admin = False
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one(
-                {"_id": employee.id},
-                {"$set": employee.dict(include={"is_admin"})},
-                upsert=True,
-            )
+            employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"is_admin"})}, upsert=True)
         return f"Admin rights revoked from {employee.name}"

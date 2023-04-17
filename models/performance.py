@@ -66,9 +66,7 @@ class Sale(BaseModel):
 
     def set_client_comment(self, client_comment: str) -> Result[Self, str]:
         self.client_comment = client_comment
-        return (
-            Ok(self) if client_comment != "" else Err("Client comment cannot be empty.")
-        )
+        return Ok(self) if client_comment != "" else Err("Client comment cannot be empty.")
 
     def __str__(self) -> str:
         data = textwrap.dedent(

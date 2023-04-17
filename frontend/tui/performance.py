@@ -31,9 +31,7 @@ class MenuPerformance:
                 "[5] View sales performance of all employees",
                 "[6] Back",
             ]
-            choice = get_user_option_from_menu(
-                "Performance management", performance_menu
-            )
+            choice = get_user_option_from_menu("Performance management", performance_menu)
             match choice:
                 case 1:
                     last_msg: str = self.__add()
@@ -57,15 +55,8 @@ class MenuPerformance:
             if last_msg:
                 print(last_msg)
                 last_msg: str = ""
-            performance_menu = [
-                "[1] View sales performance",
-                "[2] View info about a sale",
-                "[3] Find sale(s) by...",
-                "[4] Back",
-            ]
-            choice = get_user_option_from_menu(
-                "Performance management", performance_menu
-            )
+            performance_menu = ["[1] View sales performance", "[2] View info about a sale", "[3] Find sale(s) by...", "[4] Back"]
+            choice = get_user_option_from_menu("Performance management", performance_menu)
             match choice:
                 case 1:
                     last_msg: str = self.__view_all()
@@ -79,13 +70,8 @@ class MenuPerformance:
                     last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
-        empl_items = [
-            f"{employee.name} ({employee.employee_id})"
-            for employee in the_company.employees
-        ]
-        empl_selected_index = get_user_option_from_list(
-            "Select an employee to add a sale for", empl_items
-        )
+        empl_items = [f"{employee.name} ({employee.employee_id})" for employee in the_company.employees]
+        empl_selected_index = get_user_option_from_list("Select an employee to add a sale for", empl_items)
         if empl_selected_index == -1:
             return NO_EMPLOYEE_MSG
         elif empl_selected_index == -2:
@@ -116,9 +102,7 @@ class MenuPerformance:
 
         while True:
             # sale date has a default value, can't use the loop_til_valid_input function
-            sale_date = input(
-                "Enter sale date (YYYY-MM-DD, 't' for today, leave blank to cancel): "
-            )
+            sale_date = input("Enter sale date (YYYY-MM-DD, 't' for today, leave blank to cancel): ")
             if sale_date == "":
                 confirm = input("Are you sure you want to cancel? (Y/n): ")
                 if confirm.lower() != "n":
@@ -128,11 +112,7 @@ class MenuPerformance:
                 sale.set_date(datetime.strftime(sale_date, "%Y-%m-%d")).unwrap()
                 break
             try:
-                sale_date = (
-                    datetime.strptime(sale_date, "%Y-%m-%d")
-                    if sale_date
-                    else datetime.now()
-                )
+                sale_date = datetime.strptime(sale_date, "%Y-%m-%d") if sale_date else datetime.now()
                 sale.set_date(datetime.strftime(sale_date, "%Y-%m-%d")).unwrap()
                 break
             except (ValueError, TypeError) as e:
@@ -145,19 +125,11 @@ class MenuPerformance:
         selected_empl.performance.total_cost += sale.cost
         selected_empl.performance.total_profit += sale.profit
 
-        rating_sum = sum(
-            [sale.client_rating for sale in selected_empl.performance.sale_list]
-        )
-        selected_empl.performance.average_rating = rating_sum / len(
-            selected_empl.performance.sale_list
-        )
+        rating_sum = sum([sale.client_rating for sale in selected_empl.performance.sale_list])
+        selected_empl.performance.average_rating = rating_sum / len(selected_empl.performance.sale_list)
 
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one(
-                {"_id": selected_empl.id},
-                {"$set": selected_empl.dict(include={"performance"})},
-                upsert=True,
-            )
+            employee_repo.update_one({"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"performance"})}, upsert=True)
 
         return f"Sale for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} added successfully!"
 
@@ -165,11 +137,7 @@ class MenuPerformance:
         if not the_company.logged_in_employee.is_admin:
             sales = the_company.logged_in_employee.performance.sale_list
         else:
-            sales = [
-                sale
-                for employee in the_company.employees
-                for sale in employee.performance.sale_list
-            ]
+            sales = [sale for employee in the_company.employees for sale in employee.performance.sale_list]
         if not sales:
             return NO_SALES_MSG
 
@@ -179,13 +147,8 @@ class MenuPerformance:
         return ""
 
     def __remove(self) -> str:
-        empl_items = [
-            f"{employee.name} ({employee.employee_id})"
-            for employee in the_company.employees
-        ]
-        empl_selected_index = get_user_option_from_list(
-            "Select an employee to remove a sale for", empl_items
-        )
+        empl_items = [f"{employee.name} ({employee.employee_id})" for employee in the_company.employees]
+        empl_selected_index = get_user_option_from_list("Select an employee to remove a sale for", empl_items)
         if empl_selected_index == -1:
             return NO_EMPLOYEE_MSG
         elif empl_selected_index == -2:
@@ -196,15 +159,10 @@ class MenuPerformance:
             return "An admin don't sell anything!"
 
         # a list containing the string representation of each sale
-        sale_items = [
-            f"{sale.sale_id} ({sale.client_id})"
-            for sale in selected_empl.performance.sale_list
-        ]
+        sale_items = [f"{sale.sale_id} ({sale.client_id})" for sale in selected_empl.performance.sale_list]
 
         # get the index of the sale to remove
-        selected_sale_index = get_user_option_from_list(
-            "Select a sale to remove", sale_items
-        )
+        selected_sale_index = get_user_option_from_list("Select a sale to remove", sale_items)
         if selected_sale_index == -1:
             return NO_SALES_MSG
         elif selected_sale_index == -2:
@@ -219,34 +177,20 @@ class MenuPerformance:
         selected_empl.performance.total_cost -= sale.cost
         selected_empl.performance.total_profit -= sale.profit
 
-        rating_sum = sum(
-            [sale.client_rating for sale in selected_empl.performance.sale_list]
-        )
-        selected_empl.performance.average_rating = rating_sum / len(
-            selected_empl.performance.sale_list
-        )
+        rating_sum = sum([sale.client_rating for sale in selected_empl.performance.sale_list])
+        selected_empl.performance.average_rating = rating_sum / len(selected_empl.performance.sale_list)
 
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one(
-                {"_id": selected_empl.id},
-                {"$set": selected_empl.dict(include={"performance"})},
-                upsert=True,
-            )
+            employee_repo.update_one({"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"performance"})}, upsert=True)
         return ""
 
     def __get_info(self) -> str:
         if not the_company.logged_in_employee.is_admin:
             all_sales = the_company.logged_in_employee.performance.sale_list
         else:
-            all_sales = [
-                sale
-                for employee in the_company.employees
-                for sale in employee.performance.sale_list
-            ]
+            all_sales = [sale for employee in the_company.employees for sale in employee.performance.sale_list]
         sale_items = [sale.one_line_str() for sale in all_sales]
-        selected_sale_index = get_user_option_from_list(
-            "Select a sale to view info", sale_items
-        )
+        selected_sale_index = get_user_option_from_list("Select a sale to view info", sale_items)
         if selected_sale_index == -1:
             return NO_SALES_MSG
         elif selected_sale_index == -2:
@@ -258,22 +202,9 @@ class MenuPerformance:
         return ""
 
     def __find_submenu_admin(self) -> str:
-        search_fields = [
-            "[1] Sale ID",
-            "[2] Client ID",
-            "[3] Client rating",
-            "[4] Date",
-            "[5] Employee",
-            "[else] Back",
-        ]
-        search_selection = get_user_option_from_menu(
-            "Find all sales by...", search_fields
-        )
-        all_sales: list[Sale] = [
-            sale
-            for employee in the_company.employees
-            for sale in employee.performance.sale_list
-        ]
+        search_fields = ["[1] Sale ID", "[2] Client ID", "[3] Client rating", "[4] Date", "[5] Employee", "[else] Back"]
+        search_selection = get_user_option_from_menu("Find all sales by...", search_fields)
+        all_sales: list[Sale] = [sale for employee in the_company.employees for sale in employee.performance.sale_list]
         match search_selection:
             case 1:
                 self.__find__by_sale_id(all_sales)
@@ -293,16 +224,8 @@ class MenuPerformance:
     def __find_submenu_employee(self) -> str:
         if the_company.logged_in_employee.is_admin:
             return "An admin don't sell anything!"
-        search_fields = [
-            "[1] Sale ID",
-            "[2] Client ID",
-            "[3] Client rating",
-            "[4] Date",
-            "[else] Back",
-        ]
-        search_selection = get_user_option_from_menu(
-            "Find all sales by...", search_fields
-        )
+        search_fields = ["[1] Sale ID", "[2] Client ID", "[3] Client rating", "[4] Date", "[else] Back"]
+        search_selection = get_user_option_from_menu("Find all sales by...", search_fields)
         all_sales: list[Sale] = the_company.logged_in_employee.performance.sale_list
         match search_selection:
             case 1:
@@ -328,16 +251,11 @@ class MenuPerformance:
 
     def __find__by_client_id(self, sales: list[Sale]) -> None:
         client_id = input("Enter client ID: ")
-        found_sales = [
-            sale.one_line_str() for sale in sales if sale.client_id == client_id
-        ]
+        found_sales = [sale.one_line_str() for sale in sales if sale.client_id == client_id]
         if not found_sales:
             return None
 
-        listing(
-            "All sales for client " + client_id,
-            found_sales,
-        )
+        listing("All sales for client " + client_id, found_sales)
 
     def __find__by_client_rating(self, sales: list[Sale]) -> None:
         rating = input("Enter client rating (integer 1-5): ")
@@ -346,9 +264,7 @@ class MenuPerformance:
         except:
             return None
 
-        found_sales = [
-            sale.one_line_str() for sale in sales if sale.client_rating == rating
-        ]
+        found_sales = [sale.one_line_str() for sale in sales if sale.client_rating == rating]
         if not found_sales:
             return None
 
@@ -362,33 +278,22 @@ class MenuPerformance:
         except:
             return None
 
-        found_sales = [
-            sale for sale in sales if datetime.strftime(sale.date, "%Y-%m-%d") == date
-        ]
+        found_sales = [sale for sale in sales if datetime.strftime(sale.date, "%Y-%m-%d") == date]
         if not sales:
             return None
 
         display_sales = [sale.one_line_str() for sale in found_sales]
-        listing(
-            "All sales for date " + datetime.strftime(date, "%Y-%m-%d"), display_sales
-        )
+        listing("All sales for date " + datetime.strftime(date, "%Y-%m-%d"), display_sales)
 
     def __find__by_employee(self, sales: list[Sale]) -> None:
-        empl_items = [
-            f"{employee.name} ({employee.employee_id})"
-            for employee in the_company.employees
-        ]
-        empl_selected_index = get_user_option_from_list(
-            "Select an employee to view sales for", empl_items
-        )
+        empl_items = [f"{employee.name} ({employee.employee_id})" for employee in the_company.employees]
+        empl_selected_index = get_user_option_from_list("Select an employee to view sales for", empl_items)
         if empl_selected_index == -1:
             return None
         elif empl_selected_index == -2:
             return None
         selected_empl = the_company.employees[empl_selected_index]
 
-        found_sales = [
-            sale.one_line_str() for sale in selected_empl.performance.sale_list
-        ]
+        found_sales = [sale.one_line_str() for sale in selected_empl.performance.sale_list]
 
         listing("Sales of employee " + selected_empl.name, found_sales)

@@ -1,0 +1,10 @@
+[tool.black]
+line-length = 150
+
+[tool.ruff]
+line-length = 150
+# ignore glob undefined names, bare excepts, line too long errors
+ignore = ["F405", "F403", "E501", "E722"]
+
+[tool.ruff.isort]
+split-on-trailing-comma = false

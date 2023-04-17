@@ -30,10 +30,7 @@ def print_menu(title: str, entries: list[str]) -> None:
     print(FCOLORS.GREEN + "╚" + "═" * (longest_entry - 1) + "╝" + FCOLORS.END)
 
 
-def get_user_option_from_menu(
-    title: str,
-    menu_list: list[str],
-) -> int:
+def get_user_option_from_menu(title: str, menu_list: list[str]) -> int:
     """Takes a list of menu entries and returns the user's choice | returns -1 if user cancels"""
     print_menu(title, menu_list)
     user_choice = 0

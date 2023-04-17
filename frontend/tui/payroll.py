@@ -21,12 +21,7 @@ class MenuPayroll:
             if last_msg:
                 print(last_msg)
                 last_msg: str = ""
-            payroll_menu = [
-                "[1] Create payroll",
-                "[2] Update payroll",
-                "[3] View all payrolls",
-                "[4] Back",
-            ]
+            payroll_menu = ["[1] Create payroll", "[2] Update payroll", "[3] View all payrolls", "[4] Back"]
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:
                 case 1:
@@ -59,9 +54,7 @@ class MenuPayroll:
 
     def __create(self) -> str:
         empl_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees]
-        selected_empl_index = get_user_option_from_list(
-            "Select an employee to create payroll for", empl_items
-        )
+        selected_empl_index = get_user_option_from_list("Select an employee to create payroll for", empl_items)
         if selected_empl_index == -1:
             return NO_EMPLOYEE_MSG
         elif selected_empl_index == -2:
@@ -75,9 +68,7 @@ class MenuPayroll:
             return f"Employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} already has a payroll!"
 
         clrscr()
-        print(
-            f"== Creating payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} =="
-        )
+        print(f"== Creating payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} ==")
 
         # create an empty payroll object
         payroll = Payroll()
@@ -96,11 +87,7 @@ class MenuPayroll:
         # add the payroll object to the employee
         the_company.employees[selected_empl_index].payroll = payroll
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one(
-                {"_id": selected_empl.id},
-                {"$set": {"payroll": payroll.dict()}},
-                upsert=True,
-            )
+            employee_repo.update_one({"_id": selected_empl.id}, {"$set": {"payroll": payroll.dict()}}, upsert=True)
 
         return f"Payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} created successfully!"
 
@@ -108,9 +95,7 @@ class MenuPayroll:
         empls = the_company.employees
 
         empl_items = [f"{e.name} ({e.employee_id})" for e in empls]
-        selected_empl_index = get_user_option_from_list(
-            "Select an employee to update payroll for", empl_items
-        )
+        selected_empl_index = get_user_option_from_list("Select an employee to update payroll for", empl_items)
         if selected_empl_index == -1:
             return NO_EMPLOYEE_MSG
         elif selected_empl_index == -2:
@@ -124,9 +109,7 @@ class MenuPayroll:
             return f"Employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} has no payroll!"
 
         clrscr()
-        print(
-            f"== Updating payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} =="
-        )
+        print(f"== Updating payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} ==")
 
         # assigning values to the payroll object
         fields_data = [
@@ -139,11 +122,7 @@ class MenuPayroll:
             if (msg := loop_til_valid_input(field, setter)) != "":
                 return msg
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one(
-                {"_id": selected_empl.id},
-                {"$set": empls[selected_empl_index].dict(include={"payroll"})},
-                upsert=True,
-            )
+            employee_repo.update_one({"_id": selected_empl.id}, {"$set": empls[selected_empl_index].dict(include={"payroll"})}, upsert=True)
 
         return f"Payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} updated successfully!"
 
@@ -159,16 +138,12 @@ class MenuPayroll:
         empls = the_company.employees
 
         clrscr()
-        print(
-            f"== Payroll for employee {FCOLORS.GREEN}{the_company.logged_in_employee.name}{FCOLORS.END} =="
-        )
+        print(f"== Payroll for employee {FCOLORS.GREEN}{the_company.logged_in_employee.name}{FCOLORS.END} ==")
         if not the_company.logged_in_employee.is_admin:
             print(the_company.logged_in_employee.payroll)
         else:
             empl_items = [f"{e.name} ({e.employee_id})" for e in empls]
-            selected_empl_index = get_user_option_from_list(
-                "Select an employee to view payroll for", empl_items
-            )
+            selected_empl_index = get_user_option_from_list("Select an employee to view payroll for", empl_items)
             if selected_empl_index == -1:
                 return NO_EMPLOYEE_MSG
             elif selected_empl_index == -2:

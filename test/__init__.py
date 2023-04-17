@@ -4,6 +4,7 @@ from .test_department import TestDepartment
 from .test_employee import TestEmployee
 from .test_payroll import TestPayroll
 
+# fmt: off
 __all__ = [
     "TestBenefit",
     "TestCompany",
@@ -11,3 +12,4 @@ __all__ = [
     "TestEmployee",
     "TestPayroll",
 ]
+# fmt: on

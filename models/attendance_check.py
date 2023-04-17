@@ -78,9 +78,7 @@ class Attendance(BaseModel):
                 if is_present:
                     data += f"{datetime.strftime(date, '%d %b %Y')} - Present\n"
                 else:
-                    absent_reason = self.absents.get(
-                        date.strftime("%Y-%m-%d"), "No reason"
-                    )
+                    absent_reason = self.absents.get(date.strftime("%Y-%m-%d"), "No reason")
                     data += f"{datetime.strftime(date, '%d %b %Y')} - Absent ({absent_reason})\n"
         return data
 

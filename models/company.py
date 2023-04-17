@@ -37,9 +37,7 @@ class Company(metaclass=CompanyMeta):
 
         # don't add these to database
         self.logged_in_employee: Employee = Employee()
-        self.admins: list[Employee] = [
-            employee for employee in self.employees if employee.is_admin
-        ]
+        self.admins: list[Employee] = [employee for employee in self.employees if employee.is_admin]
 
     @property
     def is_owner(self) -> bool:
