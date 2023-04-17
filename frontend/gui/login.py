@@ -43,7 +43,6 @@ class Login(ctk.CTk):
         # NOTE: we don't allow employees to sign up, they are added by the admin
         self.label2 = ctk.CTkLabel(master=self.frame, text="Contact the HR", text_color="cyan", font=("Century Gothic", 12, "underline"))
         self.label2.place(x=200, y=270)
-        self.label2.bind("<Button-1>", lambda event: self.signup())
 
         self.label3 = ctk.CTkLabel(master=self.frame, text="Don't have an account?", font=("Century Gothic", 12))
         self.label3.place(x=50, y=270)
@@ -65,9 +64,6 @@ class Login(ctk.CTk):
 
         # listen for enter key
         self.bind("<Return>", lambda event: self.login_button_handler())
-
-    def signup(self):
-        self.destroy()
 
     def login_button_handler(self):
         username = self.entry1.get()
