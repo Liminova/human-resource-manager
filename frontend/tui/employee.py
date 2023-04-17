@@ -103,6 +103,7 @@ class MenuEmployee:
             if (msg := loop_til_valid_input(field, setter)) != "":
                 return msg
         employee.is_admin = False
+        employee.attendance = Attendance().default()
 
         # a list containing the string representation of each department
         dept_items = [f"{dept.name} ({dept.dept_id})" for dept in depts]
