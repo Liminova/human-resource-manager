@@ -130,10 +130,10 @@ class MenuPayroll:
 
         # assigning values to the payroll object
         fields_data = [
-            ("Enter payroll salary", selected_empl.payroll.set_salary),
-            ("Enter payroll bonus", selected_empl.payroll.set_bonus),
-            ("Enter payroll tax", selected_empl.payroll.set_tax),
-            ("Enter payroll punishment", selected_empl.payroll.set_punish),
+            ("Enter payroll salary", empls[selected_empl_index].payroll.set_salary),
+            ("Enter payroll bonus", empls[selected_empl_index].payroll.set_bonus),
+            ("Enter payroll tax", empls[selected_empl_index].payroll.set_tax),
+            ("Enter payroll punishment", empls[selected_empl_index].payroll.set_punish),
         ]
         for field, setter in fields_data:
             if (msg := loop_til_valid_input(field, setter)) != "":
