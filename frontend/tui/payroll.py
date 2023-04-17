@@ -117,7 +117,7 @@ class MenuPayroll:
             return ""
         selected_empl = empls[selected_empl_index]
 
-        if the_company.can_modify("payroll", selected_empl):
+        if not the_company.can_modify("payroll", selected_empl):
             return "Only the owner can update payroll for admins!"
 
         if selected_empl.payroll.salary == 0:
