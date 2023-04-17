@@ -23,7 +23,7 @@ class TestCompany(unittest.TestCase):
         self.assertEqual(company.employees, [rylie])
 
     def test_multiple_company(self):
-        company_1 = Company()
+        company_1 = Company().set_name("Doofenshmirtz Evil Inc.").unwrap()
         company_2 = Company()
 
         # this should return the first instance of Company initialized
