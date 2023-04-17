@@ -7,6 +7,7 @@ from .password import hash, validate
 from .payroll import Payroll
 from .performance import Performance, Sale
 
+# fmt: off
 __all__ = [
     "Attendance",
     "BenefitPlan",
@@ -19,3 +20,4 @@ __all__ = [
     "Performance",
     "Sale",
 ]
+# fmt: on

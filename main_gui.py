@@ -1,22 +1,20 @@
 # Connect to MongoDB and run the GUI
 
-import pymongo
 import os
 import sys
-import tkinter
 
 from frontend.gui import Login, Signup
 from frontend.helpers import *
 from models import Company, Employee, BenefitPlan, Department
 from dotenv import load_dotenv
 from database.mongo import employee_repo, benefit_repo, department_repo
-from option import Result, Ok
 import tkinter.messagebox as msgbox
 
 
 load = load_dotenv()
 
 the_company = Company()
+
 
 def initialize_data():
     os.environ["HRMGR_DB"] = "TRUE"
@@ -46,7 +44,11 @@ def main_gui():
 
     if not os.getenv("MONGO_USER") or not os.getenv("MONGO_PASS") or not os.getenv("MONGO_URI"):
         os.environ["HRMGR_DB"] = "FALSE"
-        msgbox.showinfo("Error", "It seems like your environment variables are not set up. The program will now run in memory-only mode. Press OK to continue", type="ok")
+        msgbox.showinfo(
+            "Error",
+            "It seems like your environment variables are not set up. The program will now run in memory-only mode. Press OK to continue",
+            type="ok",
+        )
     else:
         initialize_data()
 
@@ -77,6 +79,7 @@ def main_gui():
         msgbox.showinfo("Welcome", "Welcome back to HR Manager! Please log in to continue.", type="ok")
         window = Login(the_company)
         window.mainloop()
+
 
 if __name__ == "__main__":
     try:
