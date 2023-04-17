@@ -100,7 +100,7 @@ class MenuAttendance:
                 date_str = input("Enter date (YYYY-MM-DD, leave blank for today): ")
                 date = (
                     datetime.strptime(date_str, "%Y-%m-%d")
-                    if date_str
+                    if date_str != ""
                     else datetime.now()
                 )
                 is_present = input("Is employee present? (y/n): ")
@@ -152,7 +152,7 @@ class MenuAttendance:
                 # parse the date, if the date is empty, use today's date
                 date = (
                     datetime.strptime(date_str, "%Y-%m-%d")
-                    if date_str
+                    if date_str != ""
                     else datetime.now()
                 )
 
