@@ -34,8 +34,8 @@ class Attendance(BaseModel):
         return Err("Date not found.")
 
     def get_allowed_absent_days(self, year: int) -> Result[int, str]:
-        if year in self.allowed_absent_days:
-            return Ok(self.allowed_absent_days[year])
+        if str(year) in self.allowed_absent_days:
+            return Ok(self.allowed_absent_days[str(year)])
         return Err("Year not found.")
 
     def set_start_date(self, start_date: datetime) -> Result[Self, str]:
