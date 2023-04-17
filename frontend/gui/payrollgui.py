@@ -145,7 +145,7 @@ class PayrollGui(ctk.CTk):
             input_id = self.entry5.get()
             if salary == "" or bonus == "" or tax == "" or punishment == "":
                 messagebox.showerror("Error", "Please fill in all the fields")
-            elif not salary.isdigit() or not bonus.isdigit() or not tax.isdigit() or not punishment.isdigit():
+            elif not (salary.isdigit()) or not (bonus.isdigit()) or not (tax.isdigit()) or not (punishment.isdigit()):
                 messagebox.showerror("Error", "Please enter a valid number")
             else:
                 for e in the_company.employees:
@@ -214,7 +214,7 @@ class PayrollGui(ctk.CTk):
             input_id = self.entry5.get()
             if salary == "" or bonus == "" or tax == "" or punishment == "":
                 messagebox.showerror("Error", "Please fill in all the fields")
-            elif not salary.isdigit() or not bonus.isdigit() or not tax.isdigit() or not punishment.isdigit():
+            elif not (salary.isdigit()) or not (bonus.isdigit()) or not (tax.isdigit()) or not (punishment.isdigit()):
                 messagebox.showerror("Error", "Please enter a valid number")
             else:
                 for e in the_company.employees:
@@ -254,8 +254,11 @@ class PayrollGui(ctk.CTk):
             else:
                 for e in the_company.employees:
                     if e.employee_id == input_id:
-                        messagebox.showinfo("Success", "Payroll created successfully")
-                    else:
+                        messagebox.showinfo(
+                            "Success", 
+                            f"Salary: {e.payroll.salary}\nBonus: {e.payroll.bonus}\nTax: {e.payroll.tax}\nPunishment: {e.payroll.punish}"
+                        )
+                    else:   
                         messagebox.showerror("Error", "Employee ID not found")
 
     # endregion
@@ -288,8 +291,11 @@ class PayrollGui(ctk.CTk):
             else:
                 for e in the_company.employees:
                     if e.employee_id == input_id:
-                        messagebox.showinfo("Success", "Payroll created successfully")
+                        messagebox.showinfo(
+                            "Success", 
+                            f"Salary: {e.payroll.salary}\nBonus: {e.payroll.bonus}\nTax: {e.payroll.tax}\nPunishment: {e.payroll.punish}"
+                        )
                     else:
                         messagebox.showerror("Error", "Employee ID not found")
-
+                        
     # endregion
