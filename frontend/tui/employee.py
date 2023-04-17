@@ -221,6 +221,7 @@ class MenuEmployee:
             if (msg := loop_til_valid_input(field, setter)) != "":
                 return msg
 
+        the_company.employees[selected_employee_index] = employee
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one(
                 {"_id": employee.id},
