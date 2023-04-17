@@ -138,6 +138,12 @@ class MenuPayroll:
         for field, setter in fields_data:
             if (msg := loop_til_valid_input(field, setter)) != "":
                 return msg
+        if os.getenv("HRMGR_DB") == "TRUE":
+            employee_repo.update_one(
+                {"_id": selected_empl.id},
+                {"$set": empls[selected_empl_index].dict(include={"payroll"})},
+                upsert=True,
+            )
 
         return f"Payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} updated successfully!"
 
