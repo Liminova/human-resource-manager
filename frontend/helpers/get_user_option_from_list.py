@@ -3,7 +3,7 @@ from .clrscr import clrscr
 from .clustering import clustering
 
 
-def get_user_option_from_list(title: str, options: list[str]) -> int:  # type: ignore
+def get_user_option_from_list(title: str, options: list[str]) -> int:
     """Takes a list of options and returns the users choice's index | returns -1 if options empty, -2 if user cancels"""
 
     if len(options) == 0:
@@ -56,3 +56,4 @@ def get_user_option_from_list(title: str, options: list[str]) -> int:  # type: i
                         f"{FCOLORS.RED}Invalid choice! Try again: {FCOLORS.END}"
                     )
                     continue
+    return -2
