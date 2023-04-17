@@ -103,22 +103,15 @@ class MenuAttendance:
                     else datetime.now()
                 )
                 is_present = input("Is employee present? (y/n): ")
-                presence: bool = False
                 if is_present.lower() == "y":
-                    presence = True
-                the_company.logged_in_employee.attendance.add_attendance(
-                    date, presence
-                ).unwrap()
-                if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.update_one(
-                        {"_id": employee.id},
-                        {"$set": employee.dict(include={"attendance"})},
-                        upsert=True,
-                    )
-                print(the_company.logged_in_employee.attendance.attendances)
-
-                if not is_present:
+                    the_company.logged_in_employee.attendance.add_attendance(
+                        date, True
+                    ).unwrap()
+                else:
                     reason = input("Enter reason for absent: ")
+                    the_company.logged_in_employee.attendance.add_attendance(
+                        date, False
+                    ).unwrap()
                     the_company.logged_in_employee.attendance.add_absent_day(
                         date, reason
                     ).unwrap()
@@ -129,6 +122,13 @@ class MenuAttendance:
                         < 0
                     ):
                         the_company.logged_in_employee.payroll.set_punish("10")
+
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one(
+                        {"_id": employee.id},
+                        {"$set": employee.dict(include={"attendance"})},
+                        upsert=True,
+                    )
 
             # as an employee or admin updating their own attendance
             else:
@@ -153,8 +153,6 @@ class MenuAttendance:
         return ""
 
     def __update(self) -> str:
-        employee = the_company.logged_in_employee
-
         date_str = input("Enter date (YYYY-MM-DD, leave blank for today): ")
         try:
             if the_company.can_modify("attendance", self.__employee):
@@ -166,46 +164,40 @@ class MenuAttendance:
                 )
 
                 # check if attendance exists for that date
-                if date not in the_company.logged_in_employee.attendance.attendances:
+                if date not in self.__employee.attendance.attendances:
                     return "No attendance found for that date!"
 
                 # get the attendance object
                 is_present = input("Is employee present? (y/n): ")
-                presence: bool = False
                 if is_present.lower() == "y":
-                    presence = True
-
-                # update the attendance
-                the_company.logged_in_employee.attendance.add_attendance(
-                    date, presence
-                ).unwrap()
-                if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.update_one(
-                        {"_id": employee.id},
-                        {"$set": employee.dict(include={"attendance"})},
-                        upsert=True,
-                    )
-
-                # if the employee is absent, ask for the reason
-                if not presence:
+                    # update the attendance
+                    self.__employee.attendance.add_attendance(
+                        date, True
+                    ).unwrap()
+                else:
+                    # if the employee is absent, ask for the reason
                     reason = input("Enter reason for absent: ")
-                    the_company.logged_in_employee.attendance.add_absent_day(
+                    self.__employee.attendance.add_attendance(
+                        date, False
+                    ).unwrap()
+                    self.__employee.attendance.add_absent_day(
                         date, reason
                     ).unwrap()
-                    if os.getenv("HRMGR_DB") == "TRUE":
-                        employee_repo.update_one(
-                            {"_id": employee.id},
-                            {"$set": employee.dict(include={"attendance"})},
-                            upsert=True,
-                        )
 
                     if (
-                        the_company.logged_in_employee.attendance.get_allowed_absent_days(
+                        self.__employee.attendance.get_allowed_absent_days(
                             date.year
                         ).unwrap()
                         < 0
                     ):
-                        the_company.logged_in_employee.payroll.set_punish("10")
+                        self.__employee.payroll.set_punish("10")
+
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one(
+                        {"_id": self.__employee.id},
+                        {"$set": self.__employee.dict(include={"attendance"})},
+                        upsert=True,
+                    )
         except (ValueError, TypeError) as e:
             return str(e)
         return ""
