@@ -1,6 +1,6 @@
 import os
 from ..helpers import *
-from models import Employee, Company, hash
+from models import Attendance, Employee, Company, hash
 from database.mongo import employee_repo, benefit_repo, department_repo
 from option import Result, Ok
 
