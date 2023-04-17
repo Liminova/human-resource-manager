@@ -171,18 +171,12 @@ class MenuAttendance:
                 is_present = input("Is employee present? (y/n): ")
                 if is_present.lower() == "y":
                     # update the attendance
-                    self.__employee.attendance.add_attendance(
-                        date, True
-                    ).unwrap()
+                    self.__employee.attendance.add_attendance(date, True).unwrap()
                 else:
                     # if the employee is absent, ask for the reason
                     reason = input("Enter reason for absent: ")
-                    self.__employee.attendance.add_attendance(
-                        date, False
-                    ).unwrap()
-                    self.__employee.attendance.add_absent_day(
-                        date, reason
-                    ).unwrap()
+                    self.__employee.attendance.add_attendance(date, False).unwrap()
+                    self.__employee.attendance.add_absent_day(date, reason).unwrap()
 
                     if (
                         self.__employee.attendance.get_allowed_absent_days(
