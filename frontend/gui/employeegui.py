@@ -249,50 +249,43 @@ class EmployeeGui(ctk.CTk):
             msgbox.showinfo("Success", "Employee removed successfully")
 
     def __admin_update_employee(self):
-        self.label0 = ctk.CTkLabel(master=self.right_frame, text="Enter ID: ", font=("Century Gothic", 20, "italic"))
-        self.label0.place(relx=0.1, rely=0.1, anchor=tkinter.CENTER)
+        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Enter the ID to make changes: ", font=("Century Gothic", 14, "italic"))
+        self.label1.place(relx=0.195, rely=0.15, anchor=tkinter.CENTER)
 
-        self.entry0 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.entry0.configure(width=110, height=30, font=("Century Gothic", 15), corner_radius=10)
-        self.entry0.place(relx=0.24, rely=0.1, anchor=tkinter.CENTER)
+        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
+        self.entry1.configure(width=100, font=("Century Gothic", 15, "italic"))
+        self.entry1.place(relx=0.45, rely=0.15, anchor=tkinter.CENTER)
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
+        self.label2 = ctk.CTkLabel(master=self.right_frame, text="New name: ", font=("Century Gothic", 20, "italic"))
+        self.label2.place(relx=0.135, rely=0.275, anchor=tkinter.CENTER)
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Name")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="Date of birth: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.145, rely=0.275, anchor=tkinter.CENTER)
-
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="YYYY-MM-DD")
+        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter name")
         self.__style_input_box(self.entry2)
         self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
 
-        self.label3 = ctk.CTkLabel(master=self.right_frame, text="ID: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.0715, rely=0.4, anchor=tkinter.CENTER)
+        self.label3 = ctk.CTkLabel(master=self.right_frame, text="New DOB: ", font=("Century Gothic", 20, "italic"))
+        self.label3.place(relx=0.1285, rely=0.4, anchor=tkinter.CENTER)
 
-        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
+        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="YYYY-MM-DD")
         self.__style_input_box(self.entry3)
         self.entry3.place(relx=0.325, rely=0.445, anchor=tkinter.CENTER)
 
-        self.label4 = ctk.CTkLabel(master=self.right_frame, text="Phone Number: ", font=("Century Gothic", 20, "italic"))
-        self.label4.place(relx=0.155, rely=0.525, anchor=tkinter.CENTER)
+        self.label4 = ctk.CTkLabel(master=self.right_frame, text="New Phone Number: ", font=("Century Gothic", 20, "italic"))
+        self.label4.place(relx=0.2, rely=0.525, anchor=tkinter.CENTER)
 
         self.entry4 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Phone Number")
         self.__style_input_box(self.entry4)
         self.entry4.place(relx=0.325, rely=0.57, anchor=tkinter.CENTER)
 
-        self.label5 = ctk.CTkLabel(master=self.right_frame, text="Email: ", font=("Century Gothic", 20, "italic"))
-        self.label5.place(relx=0.09, rely=0.65, anchor=tkinter.CENTER)
+        self.label5 = ctk.CTkLabel(master=self.right_frame, text="New Email: ", font=("Century Gothic", 20, "italic"))
+        self.label5.place(relx=0.135, rely=0.65, anchor=tkinter.CENTER)
 
         self.entry5 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Email")
         self.__style_input_box(self.entry5)
         self.entry5.place(relx=0.325, rely=0.695, anchor=tkinter.CENTER)
 
-        self.label6 = ctk.CTkLabel(master=self.right_frame, text="Password: ", font=("Century Gothic", 20, "italic"))
-        self.label6.place(relx=0.125, rely=0.775, anchor=tkinter.CENTER)
+        self.label6 = ctk.CTkLabel(master=self.right_frame, text="New Password: ", font=("Century Gothic", 20, "italic"))
+        self.label6.place(relx=0.165, rely=0.775, anchor=tkinter.CENTER)
 
         self.entry6 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Password", show="*")
         self.__style_input_box(self.entry6)
@@ -340,7 +333,11 @@ class EmployeeGui(ctk.CTk):
                 ) 
                 # fmt:on
                 if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.update_one({"_id": the_company.get_empl_by_id(id).unwrap().id}, {"$set": the_company.get_empl_by_id(id).unwrap().dict(exclude={"id"}, by_alias=True)}, upsert=True)
+                    employee_repo.update_one(
+                        {"_id": the_company.get_empl_by_id(id).unwrap().id},
+                        {"$set": the_company.get_empl_by_id(id).unwrap().dict(exclude={"id"}, by_alias=True)},
+                        upsert=True,
+                    )
 
                 msgbox.showinfo("Success", "Employee updated successfully")
             except ValueError as e:
@@ -367,31 +364,37 @@ class EmployeeGui(ctk.CTk):
 
         def view_employee(self):
             id = self.entry1.get()
+            employees = the_company.employees
+
             if id == "":
-                msgbox.showerror("Error", "Please enter a valid ID")
+                msgbox.showerror("Error", "Please enter an ID")
             else:
-                msgbox.showinfo("Success", "Employee found")
+                for employee in employees:
+                    if employee.employee_id == id:
+                        msgbox.showinfo(
+                            "Employee Details",
+                            f"Name: {employee.name}\nDate of Birth: {employee.dob}\nEmployee ID: {employee.employee_id}\nPhone Number: {employee.phone}\nEmail: {employee.email}",
+                        )
+                        break
+                else:
+                    msgbox.showerror("Error", "Employee not found")
 
     def __admin_list_all_employees(self):
         self.button3_frame = ctk.CTkFrame(master=self.right_frame)
 
-        self.label = ctk.CTkLabel(master=self.right_frame, text="Select options to list employees", font=("Century Gothic", 20, "bold"))
-        self.label.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
+        self.label = ctk.CTkLabel(master=self.button3_frame, text="Click to view the list of employees", font=("Century Gothic", 20, "bold"))
+        self.label.pack()
 
-        self.entry1 = ctk.CTkComboBox(
-            master=self.right_frame, values=["All", "Name", "ID", "Phone Number", "Email"], command=lambda self=self: choice_selected(self)
-        )
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="View", fg_color="purple", command=lambda self=self: choice_selected(self))
+        self.button = ctk.CTkButton(master=self.right_frame, text="View", fg_color="purple", command=lambda self=self: list_all_employees(self))
         self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
         self.button.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
 
-        def choice_selected(self):
-            choice = self.entry1.get()
-            if choice not in ["All", "Name", "ID", "Phone Number", "Email"]:
-                msgbox.showerror("Error", "Please select a valid option")
+        def list_all_employees(self):
+            employees = the_company.employees
+            if len(employees) == 0:
+                msgbox.showerror("Error", "No employees found")
+            else:
+                msgbox.showinfo("Employees", f"Employees:\n{[employee.name for employee in employees]}")
 
         self.button3_frame.pack(pady=20)
 
@@ -475,10 +478,20 @@ class EmployeeGui(ctk.CTk):
 
         def view_employee(self):
             id = self.entry1.get()
+            employees = the_company.employees
+
             if id == "":
-                msgbox.showerror("Error", "Please enter a valid ID")
+                msgbox.showerror("Error", "Please enter an ID")
             else:
-                msgbox.showinfo("Success", "Employee found")
+                for employee in employees:
+                    if employee.employee_id == id:
+                        msgbox.showinfo(
+                            "Employee Details",
+                            f"Name: {employee.name}\nDate of Birth: {employee.dob}\nEmployee ID: {employee.employee_id}\nPhone Number: {employee.phone}\nEmail: {employee.email}",
+                        )
+                        break
+                else:
+                    msgbox.showerror("Error", "Employee not found")
 
     def __employee_change_password(self):
         self.button4_frame = ctk.CTkFrame(master=self.right_frame)
