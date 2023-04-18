@@ -5,6 +5,7 @@ from .get_user_option_from_menu import get_user_option_from_menu
 from .listing import listing
 from .loop_til_valid_input import loop_til_valid_input
 from .merge_callable import merge_callable
+from .global_styling import *
 
 
 def styling(x, y):
