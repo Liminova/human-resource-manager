@@ -28,4 +28,4 @@ def init_benefit_repo(database: Database) -> Collection:
 db = init_database()
 employee_repo = init_employee_repo(db)
 department_repo = init_department_repo(db)
-benefit_repo = init_department_repo(db)
+benefit_repo = init_benefit_repo(db)
