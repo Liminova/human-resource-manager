@@ -39,7 +39,14 @@ class MenuAttendance:
             if last_msg:
                 print(last_msg)
                 last_msg: str = ""
-            attendance_menu = ["[1] Check attendance", "[2] Update attendance", "[3] Get attendance report", "[4] Back"]
+            # fmt: off
+            attendance_menu = [
+                "[1] Check attendance",
+                "[2] Update attendance",
+                "[3] Get attendance report",
+                "[4] Back"
+            ]
+            # fmt: on
             choice = get_user_option_from_menu("Attendance management for " + self.__employee.name, attendance_menu)
             match choice:
                 case 1:
@@ -60,7 +67,13 @@ class MenuAttendance:
             if last_msg:
                 print(last_msg)
                 last_msg: str = ""
-            attendance_menu = ["[1] Check attendance", "[2] Get attendance report", "[3] Back"]
+            # fmt: off
+            attendance_menu = [
+                "[1] Check attendance",
+                "[2] Get attendance report",
+                "[3] Back"
+            ]
+            # fmt: on
             choice = get_user_option_from_menu("Attendance management for " + the_company.logged_in_employee.name, attendance_menu)
             match choice:
                 case 1:
