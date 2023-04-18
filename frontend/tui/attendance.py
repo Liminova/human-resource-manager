@@ -78,8 +78,9 @@ class MenuAttendance:
         try:
             # as an admin checking attendance for other employee
             if the_company.can_modify("attendance", the_company.logged_in_employee):
-                date_str = input("Enter date (YYYY-MM-DD, leave blank for today): ")
-                date = datetime.strptime(date_str, "%Y-%m-%d") if date_str != "" else datetime.now()
+                if datetime.strftime(datetime.now(), "%Y-%m-%d") in the_company.logged_in_employee.attendance.attendances:
+                    return "This employee already has their attendance checked!"
+                date = datetime.now()
                 is_present = input("Is employee present? (y/n): ")
                 if is_present.lower() == "y":
                     the_company.logged_in_employee.attendance.add_attendance(date, True).unwrap()
