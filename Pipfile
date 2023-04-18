@@ -10,6 +10,7 @@ pymongo = "*"
 pydantic = "*"
 python-dotenv = "*"
 customtkinter = "*"
+faker = "*"
 
 [dev-packages]
 ruff = "*"
