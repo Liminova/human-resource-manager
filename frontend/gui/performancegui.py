@@ -57,7 +57,7 @@ class PerformanceGui(ctk.CTk):
         button_size(self.button5)
         self.button5.place(relx=0.5, rely=0.55, anchor=tkinter.CENTER)
 
-        self.button6 = ctk.CTkButton(master=self.left_frame, text="Back", fg_color="red", command=self._back_to_homepage)
+        self.button6 = ctk.CTkButton(master=self.left_frame, text="Back", fg_color="red", command=lambda self=self: self._back_to_homepage())
         self.button6.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
         self.button6.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
 
