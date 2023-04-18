@@ -9,12 +9,11 @@ from frontend.helpers import styling
 from database.pyobjectid import PyObjectId
 
 if sys.version_info >= (3, 11):
-    from typing import Self, TYPE_CHECKING
+    from typing import Self
 else:
-    from typing_extensions import Self, TYPE_CHECKING
+    from typing_extensions import Self
 
-if TYPE_CHECKING:
-    from .employee import Employee
+from .employee import Employee
 
 
 class BenefitPlan(BaseModel):
