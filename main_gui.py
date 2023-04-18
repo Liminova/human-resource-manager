@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from database.mongo import employee_repo, benefit_repo, department_repo
 import tkinter.messagebox as msgbox
 
+from test.randomize_db import generate_random_data_into_db
 
 load = load_dotenv()
 
@@ -83,6 +84,9 @@ def main_gui():
 
 if __name__ == "__main__":
     try:
+        confirm = msgbox.askyesno("Confirm", "Do you want to generate random data into the database?")
+        if confirm:
+            generate_random_data_into_db()
         main_gui()
     except KeyboardInterrupt:
         sys.exit(0)
