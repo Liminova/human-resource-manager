@@ -186,6 +186,27 @@ class PerformanceGui(ctk.CTk):
 
         self.label = ctk.CTkLabel(master=self.button2_frame, text="Sales performance", font=("Century Gothic", 30, "bold"))
         self.label.pack()
+        
+        self.label1 = ctk.CTkLabel(
+                        master=self.right_frame,
+                        text="Enter numerical order of employee you want to choose: ",
+                        font=("Century Gothic", 30, "bold"))
+        self.label1.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
+        
+        self.entry = ctk.CTkEntry(master=self.right_frame)
+        self.entry.configure(width=280, height=15, font=("Century Gothic", 15, "bold"))
+        self.entry.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
+
+        self.label2 = ctk.CTkLabel(
+            master=self.right_frame,
+            text="Enter numerical order of sale you want to choose: ",
+            font=("Century Gothic", 30, "bold"))
+        self.label2.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+
+        self.entry1 = ctk.CTkEntry(master=self.right_frame)
+        self.entry1.configure(width=280, height=15, font=("Century Gothic", 15, "bold"))
+        self.entry1.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+        
 
         self.button = ctk.CTkButton(
             master=self.right_frame, text="View", font=("Century Gothic", 20, "bold"), command=lambda self=self: view_sales_performance(self)
@@ -196,7 +217,15 @@ class PerformanceGui(ctk.CTk):
         self.button2_frame.pack(pady=20)
 
         def view_sales_performance(self):
-            pass
+             sales = [sale 
+                 for employee in the_company.employees
+                 for sale in employee.performance.sale_list]
+            
+            empl_idx = (int(self.entry.get()) - 1)
+            sale_idx = (int(self.entry1.get()) - 1)
+            empl = the_company.employees[empl_idx]
+            s = empl.performance.sale_list[sale_idx]
+            msgbox.showinfo("Sale:", f"Sale ID: {s.sale_id}, Employee ID: {s.employee_id}, Employee name: {s.employee_name}, Date: {s.date}, Revenue: {s.revenue}, Cost: {s.cost}, Profit: {s.profit}, Client ID: {s.client_id}, Client rating: {s.client_rating}, Client comment: {s.client_comment}")
 
     def __remove_sale(self):
         self.button3_frame = ctk.CTkFrame(master=self.right_frame)
