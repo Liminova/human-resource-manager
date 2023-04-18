@@ -356,6 +356,9 @@ class MenuEmployee:
         elif selected_employee_index == -2:
             return ""
 
+        if selected_employee_index == 0:
+            return "You cannot revoke your own admin rights"
+
         # get the employee
         employee = empls[selected_employee_index]
         if not employee.is_admin:

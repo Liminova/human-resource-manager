@@ -78,15 +78,20 @@ def main_gui():
             msgbox.showerror("Error", "There are more than one 'Owner' account! Contact the IT department immediately!")
             raise KeyboardInterrupt
         msgbox.showinfo("Welcome", "Welcome back to HR Manager! Please log in to continue.", type="ok")
+
+        if len(the_company.employees) < 10:
+            confirm = msgbox.askyesno("Confirm", "Do you want to generate random data into the database?")
+            if confirm:
+                generate_random_data_into_db()
+
         window = Login(the_company)
         window.mainloop()
 
 
 if __name__ == "__main__":
     try:
-        confirm = msgbox.askyesno("Confirm", "Do you want to generate random data into the database?")
-        if confirm:
-            generate_random_data_into_db()
         main_gui()
     except KeyboardInterrupt:
         sys.exit(0)
+    except ValueError as e:
+        msgbox.showerror("Error", f"{e}")
