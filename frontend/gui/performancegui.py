@@ -203,12 +203,46 @@ class PerformanceGui(ctk.CTk):
 
         self.label = ctk.CTkLabel(master=self.button3_frame, text="Remove sale", font=("Century Gothic", 30, "bold"))
         self.label.pack()
+        
+        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter employee name")
+        self.entry1.configure(width=280, height=15, font=("Century Gothic", 15, "bold"))
+        self.entry1.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
 
-        self.button = ctk.CTkButton(master=self.right_frame, text="Remove sale", font=("Century Gothic", 20, "bold"))
+        self.label3 = ctk.CTkLabel(master=self.right_frame, text="Employee ID: ", font=("Century Gothic", 20, "bold"))
+        self.label3.place(relx=0.5, rely=0.25, anchor=tkinter.CENTER)
+
+        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter employee ID")
+        self.entry2.configure(width=280, height=15, font=("Century Gothic", 15, "bold"))
+        self.entry2.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
+
+        self.label4 = ctk.CTkLabel(master=self.right_frame, text="Select the numerical order of sale you want to delete: ", font=("Century Gothic", 20, "bold"))
+        self.label4.place(relx=0.5, rely=0.35, anchor=tkinter.CENTER)
+
+        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter sale order:")
+        self.entry3.configure(width=280, height=15, font=("Century Gothic", 15, "bold"))
+        self.entry3.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+
+        self.button = ctk.CTkButton(master=self.right_frame, text="Remove sale", font=("Century Gothic", 20, "bold"), command = remove)
         self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
         self.button.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
-
+        
         self.button3_frame.pack(pady=20)
+        
+        def remove():
+            employee_name = self.entry1.get()
+            employee_id = self.entry2.get()
+            idx = int(self.entry3.get()) - 1
+            found = False
+            for employee in the_company.employees:
+                if employee.name == employee_name and employee.id == employee_id:
+                    found = True
+                    msgbox.showinfo("Success", "Employee " + employee_name + " with ID " + employee_id + " found")
+                    empl_idx = the_company.employees.index(employee)
+                    del the_company.employees[empl_idx].performance.sale_list[idx]  
+                    msgbox.showinfo("Success", "Sale removed successfully")
+                    break  
+
+                if found == False: msgbox.showinfo("Error", "Employee not found")
 
     def __get_sale_info(self):
         self.button4_frame = ctk.CTkFrame(master=self.right_frame)
