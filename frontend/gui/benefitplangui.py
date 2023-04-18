@@ -70,14 +70,28 @@ class BenefitPlanGui(ctk.CTk):
         self.button5.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
 
         self.button6 = ctk.CTkButton(
-            master=self.left_frame, text="List all", command=merge_callable(self.__destroy_all_frames, self.__admin_list_all_plans)
+            master=self.left_frame,
+            text="Resolve Benefit Request",
+            command=merge_callable(self.__destroy_all_frames, self.__admin_resolve_pending_request),
         )
         self.__button_style(self.button6)
-        self.button6.place(relx=0.5, rely=0.7, anchor=tkinter.CENTER)
+        self.button6.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
 
-        self.button7 = ctk.CTkButton(master=self.left_frame, text="Back", command=lambda self=self: self.__back_to_homepage())
-        self.button7.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
-        self.button7.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
+        self.button7 = ctk.CTkButton(
+            master=self.left_frame, text="List all", command=merge_callable(self.__destroy_all_frames, self.__admin_list_all_plans)
+        )
+        self.__button_style(self.button7)
+        self.button7.place(relx=0.5, rely=0.7, anchor=tkinter.CENTER)
+
+        self.button8 = ctk.CTkButton(
+            master=self.left_frame, text="Request to enroll", command=merge_callable(self.__destroy_all_frames, self.__admin_request_to_enroll)
+        )
+        self.__button_style(self.button8)
+        self.button8.place(relx=0.5, rely=0.8, anchor=tkinter.CENTER)
+
+        self.button9 = ctk.CTkButton(master=self.left_frame, text="Back", command=lambda self=self: self.__back_to_homepage())
+        self.button9.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
+        self.button9.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
 
     def employee(self):
         self.button1 = ctk.CTkButton(
@@ -92,9 +106,15 @@ class BenefitPlanGui(ctk.CTk):
         self.__button_style(self.button2)
         self.button2.place(relx=0.5, rely=0.25, anchor=tkinter.CENTER)
 
-        self.button3 = ctk.CTkButton(master=self.left_frame, text="Back", command=lambda self=self: self.__back_to_homepage())
-        self.button3.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
-        self.button3.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
+        self.button3 = ctk.CTkButton(
+            master=self.left_frame, text="Request to enroll", command=merge_callable(self.__destroy_all_frames, self.__employee_request_to_enroll)
+        )
+        self.__button_style(self.button3)
+        self.button3.place(relx=0.5, rely=0.35, anchor=tkinter.CENTER)
+
+        self.button4 = ctk.CTkButton(master=self.left_frame, text="Back", fg_color="red", command=lambda self=self: self.__back_to_homepage())
+        self.button4.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
+        self.button4.place(relx=0.5, rely=0.45, anchor=tkinter.CENTER)
 
     def __style_input_box(self, element):
         element.configure(width=400, height=30, font=("Century Gothic", 14), corner_radius=10)
@@ -193,7 +213,7 @@ class BenefitPlanGui(ctk.CTk):
 
         def remove_successfully(self):
             benefit_name = self.entry1.get()
-
+            
             if benefit_name == "":
                 msgbox.showerror("Error", "Please fill in all the fields")
 
@@ -205,7 +225,7 @@ class BenefitPlanGui(ctk.CTk):
                     msgbox.showinfo("Success", "Benefit Plan removed successfully")
                     break
             else:
-                msgbox.showerror("Error", "Benefit Plan not found")
+                msgbox.showerror("Error", "Benefit Plan not found")        
 
     def __admin_update_benefit_plan(self):
         self.button3_frame = ctk.CTkFrame(master=self.right_frame)
@@ -215,11 +235,11 @@ class BenefitPlanGui(ctk.CTk):
 
         self.label1 = ctk.CTkLabel(master=self.right_frame, text="Benefit Plan Name: ", font=("Century Gothic", 20, "italic"))
         self.label1.place(relx=0.175, rely=0.15, anchor=tkinter.CENTER)
-
+        
         self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter name")
         self.__style_input_box(self.entry1)
         self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
+                        
         self.label2 = ctk.CTkLabel(master=self.right_frame, text="New name: ", font=("Century Gothic", 20, "italic"))
         self.label2.place(relx=0.135, rely=0.275, anchor=tkinter.CENTER)
 
@@ -252,8 +272,8 @@ class BenefitPlanGui(ctk.CTk):
             new_name = self.entry2.get()
             new_description = self.entry3.get()
             new_cost = self.entry4.get()
-
-            if input_benefit_name == "" or new_name == "" or new_description == "" or new_cost == "":
+            
+            if input_benefit_name == "" or new_name == "" or new_description == "" or new_cost == "": 
                 msgbox.showerror("Error", "Please fill in all the fields")
             elif not new_name.isalpha():
                 msgbox.showerror("Error", "Please enter a valid name")
@@ -284,7 +304,7 @@ class BenefitPlanGui(ctk.CTk):
 
         self.label1 = ctk.CTkLabel(master=self.right_frame, text="Benefit Plan Name: ", font=("Century Gothic", 20, "italic"))
         self.label1.place(relx=0.175, rely=0.15, anchor=tkinter.CENTER)
-
+    
         self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter name")
         self.__style_input_box(self.entry1)
         self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
@@ -305,11 +325,11 @@ class BenefitPlanGui(ctk.CTk):
         def apply_successfully(self):
             input_benefit_id = self.entry1.get()
             input_employee_id = self.entry2.get()
-
+            
             if input_benefit_id == "" or input_employee_id == "":
                 msgbox.showerror("Error", "Please fill in all the fields")
                 return
-
+            
             for bp in the_company.benefits:
                 if bp.id != input_benefit_id:
                     continue
@@ -333,10 +353,10 @@ class BenefitPlanGui(ctk.CTk):
 
         self.label1 = ctk.CTkLabel(master=self.right_frame, text="Benefit Plan Name: ", font=("Century Gothic", 20, "italic"))
         self.label1.place(relx=0.175, rely=0.15, anchor=tkinter.CENTER)
-
+        
         self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Name")
         self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)    
 
         self.button = ctk.CTkButton(master=self.right_frame, text="View", fg_color="purple", command=(lambda: view_benefit(self)))
         self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
@@ -347,7 +367,7 @@ class BenefitPlanGui(ctk.CTk):
         def view_benefit(self):
             benefit_name = self.entry1.get()
             benefits = the_company.benefits
-
+            
             if benefit_name == "":
                 msgbox.showerror("Error", "Please fill in all the fields")
             else:
@@ -357,7 +377,7 @@ class BenefitPlanGui(ctk.CTk):
                         break
                 else:
                     msgbox.showerror("Error", "Benefit Plan does not exist")
-
+                
     def __admin_list_all_plans(self):
         self.button3_frame = ctk.CTkFrame(master=self.right_frame)
 
@@ -377,6 +397,88 @@ class BenefitPlanGui(ctk.CTk):
             else:
                 msgbox.showinfo("Benefit Plans", f"Benefit Plans: {[bp.name for bp in benefits]}")
 
+    def __admin_request_to_enroll(self):
+        self.button4_frame = ctk.CTkFrame(master=self.right_frame)
+
+        self.label = ctk.CTkLabel(master=self.button4_frame, text="Request to Enroll", font=("Century Gothic", 30, "bold"))
+        self.label.pack()
+
+        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Benefit Plan: ", font=("Century Gothic", 20, "italic"))
+        self.label1.place(relx=0.175, rely=0.15, anchor=tkinter.CENTER)
+    
+        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Name")
+        self.__style_input_box(self.entry1)
+        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+
+        self.button = ctk.CTkButton(master=self.right_frame, text="Request", fg_color="purple", command=lambda self=self: request_benefit(self))
+        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
+        self.button.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
+
+        self.button4_frame.pack(pady=20)
+
+        def request_benefit(self):
+            benefit_name = self.entry1.get()
+            benefits = the_company.benefits
+            if benefit_name == "":
+                msgbox.showerror("Error", "Please fill in all the fields")
+            else:
+                for bp in benefits:
+                    if bp.name == benefit_name:
+                        if bp.name in the_company.benefits:
+                            msgbox.showerror("Error", "You have already requested to enroll in this benefit plan")
+                        else:
+                            msgbox.showinfo("Success", "Request sent successfully")
+                else:
+                    msgbox.showerror("Error", "Benefit Plan does not exist")
+
+    def __admin_resolve_pending_request(self):
+        self.button5_frame = ctk.CTkFrame(master=self.right_frame)
+
+        self.label = ctk.CTkLabel(master=self.button5_frame, text="Resolve Pending Request", font=("Century Gothic", 30, "bold"))
+        self.label.pack()
+
+        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Select a Benefit Plan: ", font=("Century Gothic", 20, "italic"))
+        self.label1.place(relx=0.145, rely=0.15, anchor=tkinter.CENTER)
+
+        self.entry1 = ctk.CTkComboBox(master=self.right_frame)
+        self.entry1.configure(width=400, height=30, font=("Century Gothic", 14), corner_radius=10)
+        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+
+        benefits = the_company.benefits
+        # a list containing the name of each benefit
+        benefit_items = [f"{benefit.name}" for benefit in benefits]
+        # set the combobox values to the list of benefit items
+        self.entry1["values"] = benefit_items
+
+        self.button1 = ctk.CTkButton(master=self.right_frame, text="Approve", fg_color="purple")
+        self.button1.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
+        self.button1.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
+
+        self.button2 = ctk.CTkButton(master=self.right_frame, text="Deny", fg_color="purple")
+        self.button2.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
+        self.button2.place(relx=0.5, rely=0.395, anchor=tkinter.CENTER)
+
+        self.button5_frame.pack(pady=20)
+
+        def resolve_request(self):
+            selection = self.entry1.get()
+            benefits = the_company.benefits
+            # a list containing the name of each benefit
+            benefit_items = [f"{benefit.name}" for benefit in benefits]
+            # get the index of the benefit selected by the user
+            benefit_index = benefit_items.index(selection)
+            # get the benefit object
+            benefit = benefits[benefit_index]
+            # get the employee object
+            employee = benefit.pending_requests[0]
+            # remove the employee from the pending requests list
+            benefit.pending_requests.remove(employee)
+            # add the employee to the enrolled employees list if approved
+            if self.button1["text"] == "Approve":
+                benefit.enrolled_employees.append(employee)
+                # show a success message
+                msgbox.showinfo("Request", f"{employee.name} has been enrolled in {benefit.name}")
+
     # endregion
 
     # region: employee functions
@@ -389,10 +491,10 @@ class BenefitPlanGui(ctk.CTk):
 
         self.label1 = ctk.CTkLabel(master=self.right_frame, text="Benefit Plan Name: ", font=("Century Gothic", 20, "italic"))
         self.label1.place(relx=0.175, rely=0.15, anchor=tkinter.CENTER)
-
+        
         self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Name")
         self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)    
 
         self.button = ctk.CTkButton(master=self.right_frame, text="View", fg_color="purple", command=(lambda: view_benefit(self)))
         self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
@@ -403,7 +505,7 @@ class BenefitPlanGui(ctk.CTk):
         def view_benefit(self):
             benefit_name = self.entry1.get()
             benefits = the_company.benefits
-
+            
             if benefit_name == "":
                 msgbox.showerror("Error", "Please fill in all the fields")
             else:
@@ -432,5 +534,47 @@ class BenefitPlanGui(ctk.CTk):
                 msgbox.showerror("Error", "There are no benefit plans")
             else:
                 msgbox.showinfo("Benefit Plans", f"Benefit Plans: {[bp.name for bp in benefits]}")
+
+    def __employee_request_to_enroll(self):
+        self.button4_frame = ctk.CTkFrame(master=self.right_frame)
+
+        self.label = ctk.CTkLabel(master=self.button4_frame, text="Request to Enroll", font=("Century Gothic", 30, "bold"))
+        self.label.pack()
+
+        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Select a Benefit Plan: ", font=("Century Gothic", 20, "italic"))
+        self.label1.place(relx=0.145, rely=0.15, anchor=tkinter.CENTER)
+
+        self.entry1 = ctk.CTkComboBox(master=self.right_frame)
+        self.entry1.configure(width=400, height=30, font=("Century Gothic", 14), corner_radius=10)
+        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+
+        benefits = the_company.benefits
+        # a list containing the string representation of each benefit
+        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+        # set the combobox values to the list of benefit items
+        self.entry1["values"] = benefit_items
+
+        self.button = ctk.CTkButton(master=self.right_frame, text="Request", fg_color="purple")
+        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
+        self.button.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
+
+        self.button4_frame.pack(pady=20)
+
+        def request_benefit(self):
+            selection = self.entry1.get()
+            benefits = the_company.benefits
+            # a list containing the string representation of each benefit
+            benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+            # get the index of the benefit selected by the user
+            benefit_index = benefit_items.index(selection)
+            # get the benefit object
+            benefit = benefits[benefit_index]
+            # append request to pending_request
+            benefit.pending_requests.append(the_company.logged_in_employee)
+
+            if os.getenv("HRMGR_DB") == "TRUE":
+                benefit_repo.update_one({"_id": benefit.id}, {"$set": benefit.dict(include={"pending_requests"})}, upsert=True)
+            # show a success message
+            msgbox.showinfo("Request", f"Request to enroll in {benefit.name} has been sent to HR Manager")
 
     # endregion
