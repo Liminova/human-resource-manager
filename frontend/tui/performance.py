@@ -45,7 +45,13 @@ class MenuPerformance:
     def employee(self) -> Result[None, str]:
         last_msg = ""
         while True:
-            performance_menu = ["[1] View sales performance", "[2] View info about a sale", "[3] Find sale(s) by...", "[4] Back"]
+            last_msg = refresh(last_msg)
+            performance_menu = [
+                "[1] View sales performance",
+                "[2] View info about a sale",
+                "[3] Find sale(s) by...",
+                "[4] Back",
+            ]
             choice = get_user_option_from_menu("Performance management", performance_menu)
             match choice:
                 case 1:
@@ -72,8 +78,8 @@ class MenuPerformance:
 
         # create a new, empty sale object
         sale = Sale()
-        sale.employee_id = selected_empl.employee_id
-        sale.employee_name = selected_empl.name
+        sale.employee_id = empls[empl_idx_select].employee_id
+        sale.employee_name = empls[empl_idx_select].name
 
         # enter the sale data
         fields_data = [
@@ -107,20 +113,22 @@ class MenuPerformance:
             except (ValueError, TypeError) as e:
                 return str(e)
 
-        # add the sale to the employee's performance
-        selected_empl.performance.sale_list.append(sale)
-        selected_empl.performance.sales_count += 1
-        selected_empl.performance.total_revenue += sale.revenue
-        selected_empl.performance.total_cost += sale.cost
-        selected_empl.performance.total_profit += sale.profit
+        empls[empl_idx_select].performance.sale_list.append(sale)
+        empls[empl_idx_select].performance.sales_count += 1
+        empls[empl_idx_select].performance.total_revenue += sale.revenue
+        empls[empl_idx_select].performance.total_cost += sale.cost
+        empls[empl_idx_select].performance.total_profit += sale.profit
 
-        rating_sum = sum([sale.client_rating for sale in selected_empl.performance.sale_list])
-        selected_empl.performance.average_rating = rating_sum / len(selected_empl.performance.sale_list)
+        rating_sum = sum([sale.client_rating for sale in empls[empl_idx_select].performance.sale_list])
+        rating_count = len([sale for sale in empls[empl_idx_select].performance.sale_list if sale.client_rating])
+        empls[empl_idx_select].performance.average_rating = rating_sum / rating_count if rating_count else 0
 
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one({"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"performance"})}, upsert=True)
+            employee_repo.update_one(
+                {"_id": empls[empl_idx_select].id}, {"$set": empls[empl_idx_select].dict()}, upsert=True
+            )
 
-        return f"Sale for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} added successfully!"
+        return "Sale for {}{}{} added successfully!".format(FCOLORS.GREEN, empls[empl_idx_select].name, FCOLORS.END)
 
     def __view_all(self) -> str:
         if not the_company.logged_in_employee.is_admin:
@@ -157,19 +165,22 @@ class MenuPerformance:
         if sale_idx_select in (-1, -2):
             return NO_SALES_MSG if sale_idx_select == -1 else ""
 
+        # THIS VARIABLE IS A COPY OF THE SALE OBJECT, NOT A REFERENCE
+        _sale = _empl_select.performance.sale_list[sale_idx_select]
 
-        # remove the sale
-        del selected_empl.performance.sale_list[selected_sale_index]
-        selected_empl.performance.sales_count -= 1
-        selected_empl.performance.total_revenue -= sale.revenue
-        selected_empl.performance.total_cost -= sale.cost
-        selected_empl.performance.total_profit -= sale.profit
+        del empls[empl_idx_select].performance.sale_list[sale_idx_select]
+        empls[empl_idx_select].performance.sales_count -= 1
+        empls[empl_idx_select].performance.total_revenue -= _sale.revenue
+        empls[empl_idx_select].performance.total_cost -= _sale.cost
+        empls[empl_idx_select].performance.total_profit -= _sale.profit
 
-        rating_sum = sum([sale.client_rating for sale in selected_empl.performance.sale_list])
-        selected_empl.performance.average_rating = rating_sum / len(selected_empl.performance.sale_list)
+        rating_sum = sum([sale.client_rating for sale in _empl_select.performance.sale_list])
+        empls[empl_idx_select].performance.average_rating = rating_sum / len(_empl_select.performance.sale_list)
 
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one({"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"performance"})}, upsert=True)
+            employee_repo.update_one(
+                {"_id": empls[empl_idx_select].id}, {"$set": empls[empl_idx_select].dict()}, upsert=True
+            )
         return ""
 
     def __get_info(self) -> str:
@@ -183,13 +194,21 @@ class MenuPerformance:
         if sale_idx_select in (-1, -2):
             return NO_SALES_MSG if sale_idx_select == -1 else ""
 
-        sale = all_sales[selected_sale_index]
-        print(sale)
+        print(all_sales[sale_idx_select])
         input(ENTER_TO_CONTINUE_MSG)
         return ""
 
     def __find_submenu_admin(self) -> str:
-        search_fields = ["[1] Sale ID", "[2] Client ID", "[3] Client rating", "[4] Date", "[5] Employee", "[else] Back"]
+        # fmt: off
+        search_fields = [
+            "[1] Sale ID",
+            "[2] Client ID",
+            "[3] Client rating",
+            "[4] Date",
+            "[5] Employee",
+            "[else] Back"
+        ]
+        # fmt: on
         search_selection = get_user_option_from_menu("Find all sales by...", search_fields)
         all_sales = tuple(the_company.logged_in_employee.performance.sale_list)
         match search_selection:
@@ -211,7 +230,15 @@ class MenuPerformance:
     def __find_submenu_employee(self) -> str:
         if the_company.logged_in_employee.is_admin:
             return "An admin don't sell anything!"
-        search_fields = ["[1] Sale ID", "[2] Client ID", "[3] Client rating", "[4] Date", "[else] Back"]
+        # fmt: off
+        search_fields = [
+            "[1] Sale ID",
+            "[2] Client ID",
+            "[3] Client rating",
+            "[4] Date",
+            "[else] Back"
+        ]
+        # fmt: on
         search_selection = get_user_option_from_menu("Find all sales by...", search_fields)
         all_sales = tuple(s for e in the_company.employees for s in e.performance.sale_list)
         match search_selection:
@@ -233,6 +260,7 @@ class MenuPerformance:
         sale = next((sale for sale in sales if sale.sale_id == sale_id), None)
         if not sale:
             return None
+        clrscr()
         print(sale)
         input(ENTER_TO_CONTINUE_MSG)
 

@@ -52,14 +52,14 @@ class MenuPayroll:
         if empl_idx_select in (-1, -2):
             return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
-        if not the_company.can_modify("payroll", selected_empl):
+        if not the_company.can_modify("payroll", empls[empl_idx_select]):
             return "Only the owner can create payroll for admins!"
 
-        if selected_empl.payroll.salary != 0:
-            return f"Employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} already has a payroll!"
+        if empls[empl_idx_select].payroll.salary != 0:
+            return f"Employee {FCOLORS.GREEN}{empls[empl_idx_select].name}{FCOLORS.END} already has a payroll!"
 
         clrscr()
-        print(f"== Creating payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} ==")
+        print(f"== Creating payroll for employee {FCOLORS.GREEN}{empls[empl_idx_select].name}{FCOLORS.END} ==")
 
         # create an empty payroll object
         payroll = Payroll()
@@ -76,11 +76,14 @@ class MenuPayroll:
                 return msg
 
         # add the payroll object to the employee
-        the_company.employees[selected_empl_index].payroll = payroll
+        the_company.employees[empl_idx_select].payroll = payroll
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one({"_id": selected_empl.id}, {"$set": {"payroll": payroll.dict()}}, upsert=True)
+            # employee_repo.update_one({"_id": selected_empl.id}, {"$set": {"payroll": payroll.dict()}}, upsert=True)
+            employee_repo.update_one(
+                {"_id": empls[empl_idx_select].id}, {"$set": empls[empl_idx_select].dict(include={"payroll"})}, upsert=True
+            )
 
-        return f"Payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} created successfully!"
+        return f"Payroll for employee {FCOLORS.GREEN}{empls[empl_idx_select].name}{FCOLORS.END} created successfully!"
 
     def __update(self) -> str:
         empls = the_company.employees
@@ -91,29 +94,31 @@ class MenuPayroll:
         if empl_idx_select in (-1, -2):
             return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
-        if not the_company.can_modify("payroll", selected_empl):
+        if not the_company.can_modify("payroll", empls[empl_idx_select]):
             return "Only the owner can update payroll for admins!"
 
-        if selected_empl.payroll.salary == 0:
-            return f"Employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} has no payroll!"
+        if empls[empl_idx_select].payroll.salary == 0:
+            return f"Employee {FCOLORS.GREEN}{empls[empl_idx_select].name}{FCOLORS.END} has no payroll!"
 
         clrscr()
-        print(f"== Updating payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} ==")
+        print(f"== Updating payroll for employee {FCOLORS.GREEN}{empls[empl_idx_select].name}{FCOLORS.END} ==")
 
         # assigning values to the payroll object
         fields_data = [
-            ("Enter payroll salary", empls[selected_empl_index].payroll.set_salary),
-            ("Enter payroll bonus", empls[selected_empl_index].payroll.set_bonus),
-            ("Enter payroll tax", empls[selected_empl_index].payroll.set_tax),
-            ("Enter payroll punishment", empls[selected_empl_index].payroll.set_punish),
+            ("Enter payroll salary", empls[empl_idx_select].payroll.set_salary),
+            ("Enter payroll bonus", empls[empl_idx_select].payroll.set_bonus),
+            ("Enter payroll tax", empls[empl_idx_select].payroll.set_tax),
+            ("Enter payroll punishment", empls[empl_idx_select].payroll.set_punish),
         ]
         for field, setter in fields_data:
             if (msg := loop_til_valid_input(field, setter)) != "":
                 return msg
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one({"_id": selected_empl.id}, {"$set": empls[selected_empl_index].dict(include={"payroll"})}, upsert=True)
+            employee_repo.update_one(
+                {"_id": empls[empl_idx_select].id}, {"$set": empls[empl_idx_select].dict(include={"payroll"})}, upsert=True
+            )
 
-        return f"Payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} updated successfully!"
+        return f"Payroll for employee {FCOLORS.GREEN}{empls[empl_idx_select].name}{FCOLORS.END} updated successfully!"
 
     def __view_all(self) -> str:
         empl_payroll_items = tuple(
@@ -136,6 +141,7 @@ class MenuPayroll:
             )
             if empl_idx_select in (-1, -2):
                 return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
+            print(empls[empl_idx_select].payroll)
 
         input(ENTER_TO_CONTINUE_MSG)
         return ""
