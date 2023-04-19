@@ -2,10 +2,10 @@ from .clrscr import clrscr
 from .COLORS import BCOLORS, FCOLORS
 from .get_user_option_from_list import get_user_option_from_list
 from .get_user_option_from_menu import get_user_option_from_menu
+from .global_styling import *
 from .listing import listing
 from .loop_til_valid_input import loop_til_valid_input
 from .merge_callable import merge_callable
-from .global_styling import *
 
 
 def styling(x, y):
