@@ -6,6 +6,7 @@ from .global_styling import *
 from .listing import listing
 from .loop_til_valid_input import loop_til_valid_input
 from .merge_callable import merge_callable
+from .refresh_tui import refresh
 
 
 def styling(x, y):
@@ -35,6 +36,7 @@ __all__ = [
     "listing",
     "loop_til_valid_input",
     "styling",
+    "refresh",
     "merge_callable",
     "NO_ATTENDANCE_MSG",
     "NO_BENEFIT_MSG",
