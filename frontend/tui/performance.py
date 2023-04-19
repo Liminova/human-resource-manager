@@ -2,7 +2,7 @@ from datetime import datetime
 from ..helpers import *
 from models import Sale, Company
 from option import Result, Ok
-from database.mongo import employee_repo # type: ignore
+from database.mongo import employee_repo  # type: ignore
 
 import os
 
@@ -306,9 +306,9 @@ class MenuPerformance:
         if empl_idx_select in (-1, -2):
             return None
 
-        selected_empl = the_company.employees[empl_idx_select]
-        found_sales = tuple(s for s in sales if s.employee_id == selected_empl.employee_id)
+        empl_select = the_company.employees[empl_idx_select]
+        found_sales = tuple(s for s in sales if s.employee_id == empl_select.employee_id)
         if not found_sales:
             return None
 
-        listing("Sales of employee " + selected_empl.name, tuple(s.one_line_str() for s in found_sales))
+        listing("Sales of employee " + empl_select.name, tuple(s.one_line_str() for s in found_sales))

@@ -133,14 +133,14 @@ class MenuDepartment:
         depts = the_company.departments
 
         # get the index of the department to update
-        dept_selected_index = get_user_option_from_list(
+        dept_idx_select = get_user_option_from_list(
             "Select a department to update", tuple(f"{dept.name} ({dept.dept_id})" for dept in depts)
         )
-        if dept_selected_index in (-1, -2):
-            return NO_DEPARTMENT_MSG if dept_selected_index == -1 else ""
+        if dept_idx_select in (-1, -2):
+            return NO_DEPARTMENT_MSG if dept_idx_select == -1 else ""
 
         # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
-        _dept = depts[dept_selected_index]
+        _dept = depts[dept_idx_select]
 
         # get the new values for the department
         input_fields = [("Enter new department name", _dept.set_name), ("Enter new department ID", _dept.set_id)]
