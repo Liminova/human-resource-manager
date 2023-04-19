@@ -118,7 +118,77 @@ class MenuBenefits:
 
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} added successfully!"
 
-    def __apply(self) -> str:
+    def __remove(self) -> str:
+        benefits = the_company.benefits
+        employees = the_company.employees
+
+        # get the index of the benefit selected by the user
+        benefit_idx_select = get_user_option_from_list(
+            "Select a benefit plan to remove", tuple(f"{b.name}" for b in benefits)
+        )
+        if benefit_idx_select in (-1, -2):
+            return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
+
+        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
+        _bnf = benefits[benefit_idx_select]
+
+        # remove the benefit plan from all employees that have it applied to them
+        for employee in employees:
+            if _bnf.name not in employee.benefits:
+                continue
+            employee.benefits.remove(_bnf.name)
+            if os.getenv("HRMGR_DB") == "TRUE":
+                employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"benefits"})}, upsert=True)
+
+        # remove the benefit from the company's list of benefits
+        del benefits[benefit_idx_select]
+        if os.getenv("HRMGR_DB") == "TRUE":
+            benefit_repo.delete_one({"_id": _bnf.id})
+
+        return f"Benefit {FCOLORS.RED}{_bnf.name}{FCOLORS.END} removed successfully!"
+
+    def __update(self) -> str:
+        benefits = the_company.benefits
+
+        # get the index of the benefit selected by the user
+        benefit_idx_select = get_user_option_from_list(
+            "Select a benefit plan to update", tuple(f"{b.name} ({b.cost})" for b in benefits)
+        )
+        if benefit_idx_select in (-1, -2):
+            return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
+
+        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
+        _bnf = benefits[benefit_idx_select]
+
+        # assigning the new values to the benefit object
+        fields_data = (
+            ("Enter benefit plan name", benefits[benefit_idx_select].set_name),
+            ("Enter benefit plan description", benefits[benefit_idx_select].set_description),
+            ("Enter benefit plan cost", benefits[benefit_idx_select].set_cost),
+        )
+        for field, setter in fields_data:
+            if (msg := loop_til_valid_input(field, setter)) != "":
+                return msg
+
+        if os.getenv("HRMGR_DB") == "TRUE":
+            benefit_repo.update_one({"_id": _bnf.id}, {"$set": benefits[benefit_idx_select].dict()}, upsert=True)
+        return f"Benefit {FCOLORS.GREEN}{_bnf.name}{FCOLORS.END} updated successfully!"
+
+    def __view(self) -> str:
+        benefit_idx_select = get_user_option_from_list(
+            "Select a benefit plan to view", tuple(f"{b.name} ({b.cost})" for b in the_company.benefits)
+        )
+        if benefit_idx_select in (-1, -2):
+            return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
+        _bnf = the_company.benefits[benefit_idx_select]
+
+        clrscr()
+        print(_bnf)
+        input(ENTER_TO_CONTINUE_MSG)
+
+        return ""
+
+    def __apply_to_employee(self) -> str:
         empls = the_company.employees
         benefits = the_company.benefits
 
@@ -158,82 +228,63 @@ class MenuBenefits:
                 {"_id": empls[empl_idx_select].id},
                 {"$set": empls[empl_idx_select].dict(by_alias=True, include={"benefits"})},
             )
+            benefit_repo.update_one(
+                {"_id": benefits[benefit_idx_select].id},
+                {"$set": benefits[benefit_idx_select].dict(by_alias=True, include={"enrolled_employees"})},
+            )
 
         return "Benefit {}{}{} applied to employee {}{}{} successfully!".format(
             FCOLORS.GREEN, _bnf.name, FCOLORS.END, FCOLORS.GREEN, _empl.name, FCOLORS.END
         )
 
-    def __remove(self) -> str:
+    def __remove_from_employee(self) -> str:
+        empls = the_company.employees
         benefits = the_company.benefits
-        employees = the_company.employees
+
+        # get the index of the employee selected by the user
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to remove benefit plan from", tuple(f"{e.name} ({e.employee_id})" for e in empls)
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
+
+        if not the_company.can_modify("benefits", empls[empl_idx_select]):
+            return "Only other admins can manage your benefits!"
 
         # get the index of the benefit selected by the user
         benefit_idx_select = get_user_option_from_list(
-            "Select a benefit plan to remove", tuple(f"{b.name}" for b in benefits)
+            "Select a benefit plan to remove from employee", tuple(f"{b.name}" for b in benefits)
         )
         if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
 
-        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
-        _bnf = benefits[benefit_idx_select]
+        # THESE ARE COPIES OF THE OBJECTS, NOT REFERENCES
+        _bnf, _empl = benefits[benefit_idx_select], empls[empl_idx_select]
 
-        # remove the benefit plan from all employees that have it applied to them
-        for employee in employees:
-            if _bnf.name not in employee.benefits:
-                continue
-            employee.benefits.remove(_bnf.name)
-            if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"benefits"})}, upsert=True)
+        # check if the employee already has the benefit applied to them
+        if _bnf.name not in _empl.benefits:
+            return "Employee {}{}{} does not have benefit {}{}{} applied to them!".format(
+                FCOLORS.GREEN, _empl.name, FCOLORS.END, FCOLORS.GREEN, _bnf.name, FCOLORS.END
+            )
 
-        # remove the benefit from the company's list of benefits
-        del benefits[benefit_idx_select]
+        # remove the benefit from the employee and vice versa
+        empls[empl_idx_select].benefits.remove(benefits[benefit_idx_select].name)
+        benefits[benefit_idx_select].enrolled_employees.remove(empls[empl_idx_select])
+
+        # update DB
         if os.getenv("HRMGR_DB") == "TRUE":
-            benefit_repo.delete_one({"_id": _bnf.id})
+            employee_repo.update_one(
+                {"_id": empls[empl_idx_select].id},
+                {"$set": empls[empl_idx_select].dict(by_alias=True, include={"benefits"})},
+            )
+            benefit_repo.update_one(
+                {"_id": benefits[benefit_idx_select].id},
+                {"$set": benefits[benefit_idx_select].dict(by_alias=True, include={"enrolled_employees"})},
+            )
 
-        return f"Benefit {FCOLORS.RED}{_bnf.name}{FCOLORS.END} removed successfully!"
-
-    def __update(self) -> str:
-        benefits = the_company.benefits
-
-        # a list containing the string representation of each benefit
-
-        # get the index of the benefit selected by the user
-        benefit_idx_select = get_user_option_from_list(
-            "Select a benefit plan to update", tuple(f"{b.name} ({b.cost})" for b in benefits)
+        return "Benefit {}{}{} removed from employee {}{}{} successfully!".format(
+            FCOLORS.GREEN, _bnf.name, FCOLORS.END, FCOLORS.GREEN, _empl.name, FCOLORS.END
         )
-        if benefit_idx_select in (-1, -2):
-            return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
-
-        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
-        _bnf = benefits[benefit_idx_select]
-
-        # assigning the new values to the benefit object
-        fields_data = [
-            ("Enter benefit plan name", benefits[benefit_idx_select].set_name),
-            ("Enter benefit plan description", benefits[benefit_idx_select].set_description),
-            ("Enter benefit plan cost", benefits[benefit_idx_select].set_cost),
-        ]
-        for field, setter in fields_data:
-            if (msg := loop_til_valid_input(field, setter)) != "":
-                return msg
-
-        if os.getenv("HRMGR_DB") == "TRUE":
-            benefit_repo.update_one({"_id": _bnf.id}, {"$set": benefits[benefit_idx_select].dict()}, upsert=True)
-        return f"Benefit {FCOLORS.GREEN}{_bnf.name}{FCOLORS.END} updated successfully!"
-
-    def __view(self) -> str:
-        benefit_idx_select = get_user_option_from_list(
-            "Select a benefit plan to view", tuple(f"{b.name} ({b.cost})" for b in the_company.benefits)
-        )
-        if benefit_idx_select in (-1, -2):
-            return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
-        _bnf = the_company.benefits[benefit_idx_select]
-
-        clrscr()
-        print(_bnf)
-        input(ENTER_TO_CONTINUE_MSG)
-
-        return ""
 
     def __view_all(self) -> str:
         benenfit_idx_select = get_user_option_from_list(
@@ -345,3 +396,12 @@ class MenuBenefits:
             benefits[benefit_idx_select].name,
             FCOLORS.END,
         )
+
+    def __list_employees_without_benefits(self) -> str:
+        clrscr()
+        print("Employees without benefits:")
+        for employee in the_company.employees:
+            if len(employee.benefits) == 0:
+                print(employee)
+        input(ENTER_TO_CONTINUE_MSG)
+        return ""
