@@ -31,25 +31,25 @@ class MenuEmployee:
 
             match choice:
                 case 1:
-                    last_msg: str = self.__add()
+                    last_msg = self.__add()
                 case 2:
-                    last_msg: str = self.__remove()
+                    last_msg = self.__remove()
                 case 3:
-                    last_msg: str = self.__update()
+                    last_msg = self.__update()
                 case 4:
-                    last_msg: str = self.__view()
+                    last_msg = self.__view()
                 case 5:
-                    last_msg: str = self.__change_password()
+                    last_msg = self.__change_password()
                 case 6:
-                    last_msg: str = self.__view_all()
+                    last_msg = self.__view_all()
                 case 7:
-                    last_msg: str = self.__grant_admin_rights()
+                    last_msg = self.__grant_admin_rights()
                 case 8:
-                    last_msg: str = self.__revoke_admin_rights()
+                    last_msg = self.__revoke_admin_rights()
                 case 9:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
         last_msg = ""
@@ -60,13 +60,13 @@ class MenuEmployee:
             choice = get_user_option_from_menu("Employee management for " + the_company.logged_in_employee.name, employee_menu)
             match choice:
                 case 1:
-                    last_msg: str = self.__view()
+                    last_msg = self.__view()
                 case 2:
-                    last_msg: str = self.__change_password()
+                    last_msg = self.__change_password()
                 case 3:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
         depts = the_company.departments
