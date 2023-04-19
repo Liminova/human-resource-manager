@@ -19,10 +19,7 @@ class MenuBenefits:
     def admin(self) -> Result[None, str]:
         last_msg: str = ""
         while True:
-            clrscr()
-            if last_msg:
-                print(last_msg)
-                last_msg: str = ""
+            last_msg = refresh(last_msg)
             benefit_plan_menu = [
                 "[1] Add benefit",
                 "[2] Apply benefit to employee",
@@ -66,10 +63,7 @@ class MenuBenefits:
         logged_in_employee = the_company.logged_in_employee
         last_msg: str = ""
         while True:
-            clrscr()
-            if last_msg:
-                print(last_msg)
-                last_msg: str = ""
+            last_msg = refresh(last_msg)
             benefit_plan_menu = ["[1] View details of one", "[2] List all", "[3] Request to enroll in one", "[4] Back"]
             choice = get_user_option_from_menu("Benefit plan management for " + logged_in_employee.name, benefit_plan_menu)
             match choice:
