@@ -102,12 +102,12 @@ class MenuBenefits:
         benefit = BenefitPlan()
 
         # assign values to the benefit plan object
-        input_fields = [
+        input_fields = (
             ("Enter benefit plan name", benefit.set_name),
             ("Enter benefit plan description", benefit.set_description),
             ("Enter benefit plan cost", benefit.set_cost),
-        ]
-        for prompt, setter in input_fields:
+        )
+        for prompt, setter in tuple(input_fields):
             if (msg := loop_til_valid_input(prompt, setter)) != "":
                 return msg
 
