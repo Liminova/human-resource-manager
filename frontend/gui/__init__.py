@@ -8,4 +8,14 @@ from .payrollgui import PayrollGui
 from .performancegui import PerformanceGui
 from .signup import Signup
 
-__all__ = ["AttendanceGui", "BenefitPlanGui", "DepartmentGui", "Employee", "Homepage", "Login", "PayrollGui", "PerformanceGui", "Signup"]
+__all__ = [
+    "AttendanceGui",
+    "BenefitPlanGui",
+    "DepartmentGui",
+    "Employee",
+    "Homepage",
+    "Login",
+    "PayrollGui",
+    "PerformanceGui",
+    "Signup",
+]

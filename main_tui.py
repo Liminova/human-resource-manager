@@ -78,13 +78,25 @@ def main():
         first_account_name_is_owner = the_company.employees[0].name == "Owner"
         only_one_owner = len([employee for employee in the_company.employees if employee.name == "Owner"]) == 1
         if not first_account_is_admin:
-            print(FCOLORS.RED + "WARNING: The first account is not an admin! Contact the IT department immediately!" + FCOLORS.END)
+            print(
+                FCOLORS.RED
+                + "WARNING: The first account is not an admin! Contact the IT department immediately!"
+                + FCOLORS.END
+            )
             raise KeyboardInterrupt
         if not first_account_name_is_owner:
-            print(FCOLORS.RED + "WARNING: The first account's name is not 'Owner'! Contact the IT department immediately!" + FCOLORS.END)
+            print(
+                FCOLORS.RED
+                + "WARNING: The first account's name is not 'Owner'! Contact the IT department immediately!"
+                + FCOLORS.END
+            )
             raise KeyboardInterrupt
         elif not only_one_owner:
-            print(FCOLORS.RED + "WARNING: There are more than one owner accounts! Contact the IT department immediately!" + FCOLORS.END)
+            print(
+                FCOLORS.RED
+                + "WARNING: There are more than one owner accounts! Contact the IT department immediately!"
+                + FCOLORS.END
+            )
             raise KeyboardInterrupt
 
     # ==========================
