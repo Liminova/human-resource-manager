@@ -115,7 +115,7 @@ class MenuBenefits:
         empl_idx_select = get_user_option_from_list(
             "Select an employee to apply benefit plan to", [f"{e.name} ({e.employee_id})" for e in empls]
         )
-        if empl_idx_select in [-1, -2]:
+        if empl_idx_select in (-1, -2):
             return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
         if not the_company.can_modify("benefits", empls[empl_idx_select]):
@@ -125,7 +125,7 @@ class MenuBenefits:
         benefit_idx_select = get_user_option_from_list(
             "Select a benefit plan to apply to employee", [f"{b.name}" for b in benefits]
         )
-        if benefit_idx_select in [-1, -2]:
+        if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
 
         # THESE ARE COPIES OF THE OBJECTS, NOT REFERENCES
@@ -160,7 +160,7 @@ class MenuBenefits:
         benefit_idx_select = get_user_option_from_list(
             "Select a benefit plan to remove", [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
         )
-        if benefit_idx_select in [-1, -2]:
+        if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
 
         # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
@@ -215,7 +215,7 @@ class MenuBenefits:
         benefit_idx_select = get_user_option_from_list(
             "Select a benefit plan to view", [f"{b.name}" for b in the_company.benefits]
         )
-        if benefit_idx_select in [-1, -2]:
+        if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
         _bnf = the_company.benefits[benefit_idx_select]
 
@@ -229,7 +229,7 @@ class MenuBenefits:
         benenfit_idx_select = get_user_option_from_list(
             "Select a benefit plan to view", [f"{b.name}" for b in the_company.benefits]
         )
-        if benenfit_idx_select in [-1, -2]:
+        if benenfit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benenfit_idx_select == -1 else ""
 
         clrscr()
@@ -243,7 +243,7 @@ class MenuBenefits:
 
         benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
         benefit_idx_select = get_user_option_from_list("Select a benefit plan to request enrollment", benefit_items)
-        if benefit_idx_select in [-1, -2]:
+        if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
 
         # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
@@ -274,7 +274,7 @@ class MenuBenefits:
             "Select a benefit plan to resolve pending requests for",
             [f"{benefit.name} ({benefit.cost})" for benefit in benefits if len(benefit.pending_requests) > 0],
         )
-        if benefit_idx_select in [-1, -2]:
+        if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
 
         # getting the index of the employee selected by the user
@@ -282,7 +282,7 @@ class MenuBenefits:
             "Select an employee to resolve their pending request",
             [f"{employee.name} ({employee.id})" for employee in benefits[benefit_idx_select].pending_requests],
         )
-        if empl_idx_select in [-1, -2]:
+        if empl_idx_select in (-1, -2):
             return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
         if not the_company.can_modify("benefits", the_company.employees[empl_idx_select]):
@@ -300,7 +300,7 @@ class MenuBenefits:
             ["[1] Approve", "[2] Deny", "[3] Cancel"],
         )
 
-        if decision in [-1, -2, 3]:
+        if decision in (-1, -2, 3):
             return "Invalid option!" if decision == -1 else ""
 
         # remove the empl from the benefit's pending requests list
