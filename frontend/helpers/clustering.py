@@ -1,14 +1,7 @@
-def clustering(entries: list[str], size: int) -> list[list[str]]:
-    """Takes a list of entries and returns a list of clusters"""
+def clustering(entries: tuple[str], size: int) -> tuple[tuple[str]]:
+    # """Takes a list of entries and returns a list of clusters"""
+    """Takes a tuple of entries and returns a tuple of clusters"""
     clusters = []
-    counter = 0
-
-    for entry in entries:
-        if counter == 0:
-            clusters.append([])
-        clusters[-1].append(entry)
-        counter += 1
-        if counter == size:
-            counter = 0
-
-    return clusters
+    for cluster in range(0, len(entries), size):
+        clusters.append(tuple(entries[cluster : cluster + size]))
+    return tuple(clusters)
