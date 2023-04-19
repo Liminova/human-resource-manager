@@ -97,14 +97,16 @@ class MenuDepartment:
         empls = the_company.employees
 
         # get the index of the department selected by the user
-        dept_selected_index = get_user_option_from_list("Select a department to remove", [f"{dept.name} ({dept.dept_id})" for dept in depts])
-        if dept_selected_index == -1:
-            return NO_DEPARTMENT_MSG
-        elif dept_selected_index == -2:
-            return ""
+        dept_idx_select = get_user_option_from_list(
+            # "Select a department to remove", [f"{dept.name} ({dept.dept_id})" for dept in depts]
+            "Select a department to remove",
+            tuple(f"{dept.name} ({dept.dept_id})" for dept in depts),
+        )
+        if dept_idx_select in (-1, -2):
+            return NO_DEPARTMENT_MSG if dept_idx_select == -1 else ""
 
         # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
-        _dept = depts[dept_selected_index]
+        _dept = depts[dept_idx_select]
 
         # remove the department id from all employees in the department
         for emp in empls:
@@ -123,15 +125,12 @@ class MenuDepartment:
     def __update(self) -> str:
         depts = the_company.departments
 
-        # a list containing the string representation of each department
-        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in depts]
-
         # get the index of the department to update
-        dept_selected_index = get_user_option_from_list("Select a department to update", dept_items)
-        if dept_selected_index == -1:
-            return NO_DEPARTMENT_MSG
-        elif dept_selected_index == -2:
-            return ""
+        dept_selected_index = get_user_option_from_list(
+            "Select a department to update", tuple(f"{dept.name} ({dept.dept_id})" for dept in depts)
+        )
+        if dept_selected_index in (-1, -2):
+            return NO_DEPARTMENT_MSG if dept_selected_index == -1 else ""
 
         # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
         _dept = depts[dept_selected_index]
@@ -157,7 +156,8 @@ class MenuDepartment:
 
         # get the index of the employee selected by the user
         empl_idx_select = get_user_option_from_list(
-            "Select an employee to add to a department", [f"{employee.name} ({employee.employee_id})" for employee in empls]
+            "Select an employee to add to a department",
+            tuple(f"{employee.name} ({employee.employee_id})" for employee in empls),
         )
         if empl_idx_select in (-1, -2):
             return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
@@ -166,7 +166,9 @@ class MenuDepartment:
             return "Only other admins can manage departments!"
 
         # get the index of the department selected by the user
-        dept_idx_select = get_user_option_from_list("Select a department to add the employee to", [f"{dept.name} ({dept.dept_id})" for dept in depts])
+        dept_idx_select = get_user_option_from_list(
+            "Select a department to add the employee to", tuple(f"{dept.name} ({dept.dept_id})" for dept in depts)
+        )
         if dept_idx_select in (-1, -2):
             return NO_DEPARTMENT_MSG if dept_idx_select == -1 else ""
 
@@ -197,14 +199,15 @@ class MenuDepartment:
 
         # get the index of the employee selected by the user
         empl_idx_select = get_user_option_from_list(
-            "Select an employee to remove from a department", [f"{employee.name} ({employee.employee_id})" for employee in empls]
+            "Select an employee to remove from a department",
+            tuple(f"{employee.name} ({employee.employee_id})" for employee in empls),
         )
         if empl_idx_select in (-1, -2):
             return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
         # get the index of the department selected by the user
         dept_idx_select = get_user_option_from_list(
-            "Select a department to remove the employee from", [f"{dept.name} ({dept.dept_id})" for dept in depts]
+            "Select a department to remove the employee from", tuple(f"{dept.name} ({dept.dept_id})" for dept in depts)
         )
         if dept_idx_select in (-1, -2):
             return NO_DEPARTMENT_MSG if dept_idx_select == -1 else ""
@@ -218,7 +221,9 @@ class MenuDepartment:
             return "Employee {}{}{} is not in a department!".format(FCOLORS.GREEN, _empl.name, FCOLORS.END)
         else:
             empls[empl_idx_select].department_id = ""
-            depts[dept_idx_select].members = [empl for empl in depts[dept_idx_select].members if empl.employee_id != _empl.employee_id]
+            depts[dept_idx_select].members = [
+                empl for empl in depts[dept_idx_select].members if empl.employee_id != _empl.employee_id
+            ]
 
         # update DB
         if os.getenv("HRMGR_DB") == "TRUE":
@@ -231,7 +236,9 @@ class MenuDepartment:
         depts = the_company.departments
 
         # get the index of the department from the user
-        dept_idx_select = get_user_option_from_list("Select a department to view info", [f"{dept.name} ({dept.dept_id})" for dept in depts])
+        dept_idx_select = get_user_option_from_list(
+            "Select a department to view info", tuple(f"{dept.name} ({dept.dept_id})" for dept in depts)
+        )
         if dept_idx_select in (-1, -2):
             return NO_DEPARTMENT_MSG if dept_idx_select == -1 else ""
         _dept = the_company.departments[dept_idx_select]
