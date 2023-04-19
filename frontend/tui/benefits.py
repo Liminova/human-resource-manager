@@ -18,15 +18,14 @@ class MenuBenefits:
         while True:
             last_msg = refresh(last_msg)
             benefit_plan_menu = [
-                "[1] Add benefit",
-                "[2] Apply benefit to employee",
-                "[3] Remove benefit",
-                "[4] Update benefit",
-                "[5] View details of benefit",
-                "[6] List all benefits",
-                "[7] Request to enroll in benefit",
-                "[8] Resolve pending requests",
-                "[9] Back",
+                "[1] Add/remove/modify benefits",
+                "[2] Apply/remove benefits from employees",
+                "[3] Request to enroll in benefits",
+                "[4] Resolve pending requests",
+                "[5] List all benefits",
+                "[6] View details of a benefit",
+                "[7] List all employees without benefits",
+                "[8] Back",
             ]
 
             title = "Benefit plan management"
@@ -37,23 +36,44 @@ class MenuBenefits:
 
             choice = get_user_option_from_menu(title, benefit_plan_menu)
             match choice:
-                case 1:
-                    last_msg = self.__add()
-                case 2:
-                    last_msg = self.__apply()
+                case 1:  # Add/remove/modify benefits
+                    clrscr()
+                    sub_choice = get_user_option_from_menu(
+                        "Add/remove/modify benefits", ["[1] Add", "[2] Remove", "[3] Modify", "[else] Back"]
+                    )
+                    match sub_choice:
+                        case 1:
+                            last_msg = self.__add()
+                        case 2:
+                            last_msg = self.__remove()
+                        case 3:
+                            last_msg = self.__update()
+                        case _:
+                            last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+
+                case 2:  # Apply/remove benefits from employees
+                    clrscr()
+                    sub_choice = get_user_option_from_menu(
+                        "Apply/remove benefits from employees", ["[1] Apply", "[2] Remove", "[else] Back"]
+                    )
+                    match sub_choice:
+                        case 1:
+                            last_msg = self.__apply_to_employee()
+                        case 2:
+                            last_msg = self.__remove_from_employee()
+                        case _:
+                            last_msg = ""
                 case 3:
-                    last_msg = self.__remove()
-                case 4:
-                    last_msg = self.__update()
-                case 5:
-                    last_msg = self.__view()
-                case 6:
-                    last_msg = self.__view_all()
-                case 7:
                     last_msg = self.__request_enroll()
-                case 8:
+                case 4:
                     last_msg = self.__resolve_pending_requests()
-                case 9:
+                case 5:
+                    last_msg = self.__view_all()
+                case 6:
+                    last_msg = self.__view()
+                case 7:
+                    last_msg = self.__list_employees_without_benefits()
+                case 8:
                     return Ok(None)
                 case _:
                     last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
