@@ -120,14 +120,14 @@ class MenuAttendance:
                 date = datetime.strptime(date_str, "%Y-%m-%d") if date_str != "" else datetime.now()
 
                 # check if attendance exists for that date
-                if date not in empls[self.__empl_idx].attendance.attendances:
+                if datetime.strftime(date, "%Y-%m-%d") not in empls[self.__empl_idx].attendance.attendances:
                     return "No attendance found for that date!"
 
                 # get the attendance object
                 is_present = input("Is employee present? (y/n): ")
                 if is_present.lower() == "y":
                     # update the attendance
-                    empls[self.__empl_idx].attendance.attendances[date] = True
+                    empls[self.__empl_idx].attendance.add_attendance(date, True).unwrap()
                 else:
                     # if the employee is absent, ask for the reason
                     reason = input("Enter reason for absent: ")
