@@ -11,10 +11,7 @@ the_company: Company = Company()
 
 class MenuBenefits:
     def __init__(self):
-        if the_company.logged_in_employee.is_admin:
-            self.mainloop = self.admin
-        else:
-            self.mainloop = self.employee
+        self.mainloop = self.admin if the_company.logged_in_employee.is_admin else self.employee
 
     def admin(self) -> Result[None, str]:
         last_msg = ""
