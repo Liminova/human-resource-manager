@@ -12,12 +12,12 @@ class MenuEmployee:
         self.mainloop = self.admin if the_company.logged_in_employee.is_admin else self.employee
 
     def admin(self) -> Result[None, str]:
-        last_msg: str = ""
+        last_msg = ""
         while True:
             clrscr()
             if last_msg:
                 print(last_msg)
-                last_msg: str = ""
+                last_msg = ""
 
             employee_menu = [
                 "[1] Add employee",
@@ -55,12 +55,12 @@ class MenuEmployee:
                     last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
-        last_msg: str = ""
+        last_msg = ""
         while True:
             clrscr()
             if last_msg:
                 print(last_msg)
-                last_msg: str = ""
+                last_msg = ""
 
             employee_menu = ["[1] View details", "[2] Change password", "[3] Back"]
             choice = get_user_option_from_menu("Employee management for " + the_company.logged_in_employee.name, employee_menu)
