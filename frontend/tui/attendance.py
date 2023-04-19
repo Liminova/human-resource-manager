@@ -31,12 +31,9 @@ class MenuAttendance:
         if not the_company.can_modify("attendance", self.__employee):
             return Err("You do not have permission to modify this employee's attendance!")
 
-        last_msg: str = ""
+        last_msg = ""
         while True:
-            clrscr()
-            if last_msg:
-                print(last_msg)
-                last_msg: str = ""
+            last_msg = refresh(last_msg)
             # fmt: off
             attendance_menu = [
                 "[1] Check attendance",
@@ -48,23 +45,23 @@ class MenuAttendance:
             choice = get_user_option_from_menu("Attendance management for " + self.__employee.name, attendance_menu)
             match choice:
                 case 1:
-                    last_msg: str = self.__check()
+                    last_msg = self.__check()
                 case 2:
-                    last_msg: str = self.__update()
+                    last_msg = self.__update()
                 case 3:
-                    last_msg: str = self.__report()
+                    last_msg = self.__report()
                 case 4:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
-        last_msg: str = ""
+        last_msg = ""
         while True:
             clrscr()
             if last_msg:
                 print(last_msg)
-                last_msg: str = ""
+                last_msg = ""
             # fmt: off
             attendance_menu = [
                 "[1] Check attendance",
@@ -77,13 +74,13 @@ class MenuAttendance:
             )
             match choice:
                 case 1:
-                    last_msg: str = self.__check()
+                    last_msg = self.__check()
                 case 2:
-                    last_msg: str = self.__report()
+                    last_msg = self.__report()
                 case 3:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __check(self) -> str:
         employee = the_company.logged_in_employee
