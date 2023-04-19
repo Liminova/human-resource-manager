@@ -33,12 +33,6 @@ class MenuBenefits:
             ]
 
             title = "Benefit plan management"
-            # if (
-            #     pending_request_count := len(
-            #         [employee for benefit in the_company.benefits for employee in benefit.pending_requests]
-            #     )
-            #     > 0
-            # ):
             pending_reqs = [e for b in the_company.benefits for e in b.pending_requests]
             pending_request_count = len(pending_reqs)
             if pending_request_count > 0:
