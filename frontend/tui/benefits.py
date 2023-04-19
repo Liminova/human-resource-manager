@@ -107,7 +107,7 @@ class MenuBenefits:
 
         # get the index of the employee selected by the user
         empl_idx_select = get_user_option_from_list(
-            "Select an employee to apply benefit plan to", [f"{e.name} ({e.employee_id})" for e in empls]
+            "Select an employee to apply benefit plan to", tuple(f"{e.name} ({e.employee_id})" for e in empls)
         )
         if empl_idx_select in (-1, -2):
             return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
@@ -117,7 +117,7 @@ class MenuBenefits:
 
         # get the index of the benefit selected by the user
         benefit_idx_select = get_user_option_from_list(
-            "Select a benefit plan to apply to employee", [f"{b.name}" for b in benefits]
+            "Select a benefit plan to apply to employee", tuple(f"{b.name}" for b in benefits)
         )
         if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
@@ -152,7 +152,7 @@ class MenuBenefits:
 
         # get the index of the benefit selected by the user
         benefit_idx_select = get_user_option_from_list(
-            "Select a benefit plan to remove", [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+            "Select a benefit plan to remove", tuple(f"{b.name}" for b in benefits)
         )
         if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
@@ -179,14 +179,13 @@ class MenuBenefits:
         benefits = the_company.benefits
 
         # a list containing the string representation of each benefit
-        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
 
         # get the index of the benefit selected by the user
-        benefit_idx_select = get_user_option_from_list("Select a benefit plan to update", benefit_items)
-        if benefit_idx_select == -1:
-            return NO_BENEFIT_MSG
-        elif benefit_idx_select == -2:
-            return ""
+        benefit_idx_select = get_user_option_from_list(
+            "Select a benefit plan to update", tuple(f"{b.name} ({b.cost})" for b in benefits)
+        )
+        if benefit_idx_select in (-1, -2):
+            return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
 
         # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
         _bnf = benefits[benefit_idx_select]
@@ -207,7 +206,7 @@ class MenuBenefits:
 
     def __view(self) -> str:
         benefit_idx_select = get_user_option_from_list(
-            "Select a benefit plan to view", [f"{b.name}" for b in the_company.benefits]
+            "Select a benefit plan to view", tuple(f"{b.name} ({b.cost})" for b in the_company.benefits)
         )
         if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
@@ -221,7 +220,7 @@ class MenuBenefits:
 
     def __view_all(self) -> str:
         benenfit_idx_select = get_user_option_from_list(
-            "Select a benefit plan to view", [f"{b.name}" for b in the_company.benefits]
+            "Select a benefit plan to view", tuple(f"{b.name} ({b.cost})" for b in the_company.benefits)
         )
         if benenfit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benenfit_idx_select == -1 else ""
@@ -235,8 +234,9 @@ class MenuBenefits:
         logged_in_employee = the_company.logged_in_employee
         benefits = the_company.benefits
 
-        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
-        benefit_idx_select = get_user_option_from_list("Select a benefit plan to request enrollment", benefit_items)
+        benefit_idx_select = get_user_option_from_list(
+            "Select a benefit plan to request enrollment", tuple(f"{b.name} ({b.cost})" for b in benefits)
+        )
         if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
 
@@ -266,7 +266,7 @@ class MenuBenefits:
         # getting the index of the benefit selected by the user
         benefit_idx_select = get_user_option_from_list(
             "Select a benefit plan to resolve pending requests for",
-            [f"{benefit.name} ({benefit.cost})" for benefit in benefits if len(benefit.pending_requests) > 0],
+            tuple(f"{benefit.name} ({benefit.cost})" for benefit in benefits if len(benefit.pending_requests) > 0),
         )
         if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
@@ -274,7 +274,7 @@ class MenuBenefits:
         # getting the index of the employee selected by the user
         empl_idx_select = get_user_option_from_list(
             "Select an employee to resolve their pending request",
-            [f"{employee.name} ({employee.id})" for employee in benefits[benefit_idx_select].pending_requests],
+            tuple(f"{employee.name} ({employee.id})" for employee in benefits[benefit_idx_select].pending_requests),
         )
         if empl_idx_select in (-1, -2):
             return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
