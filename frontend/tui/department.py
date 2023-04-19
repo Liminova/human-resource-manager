@@ -18,15 +18,12 @@ class MenuDepartment:
         while True:
             last_msg = refresh(last_msg)
             department_menu = [
-                "[1] Add department",
-                "[2] Remove department",
-                "[3] Update information for department",
-                "[4] Add employee to department",
-                "[5] Remove employee from department",
-                "[6] View details of department",
-                "[7] List all departments",
-                "[8] List employees without a department",
-                "[9] Back",
+                "[1] Add/remove/update department",
+                "[2] Add/remove employee from department",
+                "[3] View details of department",
+                "[4] List all departments",
+                "[5] List employees without a department",
+                "[6] Back",
             ]
 
             title = "Department management"
@@ -34,22 +31,39 @@ class MenuDepartment:
             choice = get_user_option_from_menu("Department management", department_menu)
             match choice:
                 case 1:
-                    last_msg: str = self.__add()
+                    clrscr()
+                    sub_choice = get_user_option_from_menu(
+                        "Add/remove/update department", ["[1] Add", "[2] Remove", "[3] Update", "[else] Back"]
+                    )
+                    match sub_choice:
+                        case 1:
+                            last_msg = self.__add()
+                        case 2:
+                            last_msg = self.__remove()
+                        case 3:
+                            last_msg = self.__update()
+                        case _:
+                            last_msg = ""
                 case 2:
-                    last_msg: str = self.__remove()
+                    clrscr()
+                    sub_choice = get_user_option_from_menu(
+                        "Add/remove employee from department",
+                        ["[1] Add", "[2] Remove", "[else] Back"],
+                    )
+                    match sub_choice:
+                        case 1:
+                            last_msg = self.__add_employee()
+                        case 2:
+                            last_msg = self.__remove_employee()
+                        case _:
+                            last_msg = ""
                 case 3:
-                    last_msg: str = self.__update()
+                    last_msg = self.__view()
                 case 4:
-                    last_msg: str = self.__add_employee()
+                    last_msg = self.__view_all()
                 case 5:
-                    last_msg: str = self.__remove_employee()
+                    last_msg = self.__view_employees_without_dept()
                 case 6:
-                    last_msg: str = self.__view()
-                case 7:
-                    last_msg: str = self.__view_all()
-                case 8:
-                    last_msg: str = self.__view_employees_not_belong_to_any_department()
-                case 9:
                     return Ok(None)
                 case _:
                     last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
@@ -263,7 +277,7 @@ class MenuDepartment:
 
         return ""
 
-    def __view_employees_not_belong_to_any_department(self) -> str:
+    def __view_employees_without_dept(self) -> str:
         empls = the_company.employees
         if len(empls) == 0:
             return NO_EMPLOYEE_MSG
