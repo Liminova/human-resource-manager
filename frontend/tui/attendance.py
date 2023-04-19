@@ -17,15 +17,13 @@ class MenuAttendance:
         self.__employee = Employee()
 
     def admin(self) -> Result[None, str]:
-        # a list containing the string representation of each employee
-        employee_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees]
-
         # get the index of the selected employee
-        selected_employee_index = get_user_option_from_list("Select an employee to manage attendance for", employee_items)
-        if selected_employee_index == -1:
-            return Err(NO_EMPLOYEE_MSG)
-        elif selected_employee_index == -2:
-            return Ok(None)
+        selected_employee_index = get_user_option_from_list(
+            "Select an employee to manage attendance for",
+            tuple(f"{e.name} ({e.employee_id})" for e in the_company.employees),
+        )
+        if selected_employee_index in (-1, -2):
+            return Err(NO_EMPLOYEE_MSG) if selected_employee_index == -1 else Ok(None)
 
         # get the employee object from the index
         self.__employee = the_company.employees[selected_employee_index]
@@ -74,7 +72,9 @@ class MenuAttendance:
                 "[3] Back"
             ]
             # fmt: on
-            choice = get_user_option_from_menu("Attendance management for " + the_company.logged_in_employee.name, attendance_menu)
+            choice = get_user_option_from_menu(
+                "Attendance management for " + the_company.logged_in_employee.name, attendance_menu
+            )
             match choice:
                 case 1:
                     last_msg: str = self.__check()
@@ -105,7 +105,9 @@ class MenuAttendance:
                         the_company.logged_in_employee.payroll.set_punish("10")
 
                 if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"attendance"})}, upsert=True)
+                    employee_repo.update_one(
+                        {"_id": employee.id}, {"$set": employee.dict(include={"attendance"})}, upsert=True
+                    )
 
             # as an employee or admin updating their own attendance
             else:
@@ -113,7 +115,9 @@ class MenuAttendance:
                     return "You are already present!"
                 the_company.logged_in_employee.attendance.add_attendance(datetime.now(), True).unwrap()
                 if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"attendance"})}, upsert=True)
+                    employee_repo.update_one(
+                        {"_id": employee.id}, {"$set": employee.dict(include={"attendance"})}, upsert=True
+                    )
                 return "You are present now!"
 
         except (ValueError, TypeError) as e:
@@ -146,7 +150,9 @@ class MenuAttendance:
                         self.__employee.payroll.set_punish("10")
 
                 if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.update_one({"_id": self.__employee.id}, {"$set": self.__employee.dict(include={"attendance"})}, upsert=True)
+                    employee_repo.update_one(
+                        {"_id": self.__employee.id}, {"$set": self.__employee.dict(include={"attendance"})}, upsert=True
+                    )
         except (ValueError, TypeError) as e:
             return str(e)
         return ""
@@ -166,17 +172,19 @@ class MenuAttendance:
             year_items = [str(year) for year in available_years]
 
             # get the index of the selected year
-            selected_year_index = get_user_option_from_list("Select a year to view attendance report for", year_items)
-            if selected_year_index == -1:
-                return NO_ATTENDANCE_MSG
-            elif selected_year_index == -2:
-                return ""
+            selected_year_index = get_user_option_from_list(
+                "Select a year to view attendance report for", tuple(str(y) for y in year_items)
+            )
+            if selected_year_index in (-1, -2):
+                return NO_ATTENDANCE_MSG if selected_year_index == -1 else ""
 
             # print the attendance report
             print(attendances.get_report(datetime.strptime(year_items[selected_year_index], "%Y")))
         else:
             year_items = [str(year) for year in attendances.get_available_years()]
-            selected_year_index = get_user_option_from_list("Select a year to view attendance report for", year_items)
+            selected_year_index = get_user_option_from_list(
+                "Select a year to view attendance report for", tuple(str(y) for y in year_items)
+            )
             if selected_year_index == -1:
                 return NO_ATTENDANCE_MSG
             elif selected_year_index == -2:
