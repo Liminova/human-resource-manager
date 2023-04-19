@@ -3,7 +3,7 @@ import os
 
 from ..helpers import *
 from models import Employee, Company, validate, hash
-from database.mongo import employee_repo
+from database.mongo import employee_repo # type: ignore
 from getpass import getpass
 
 the_company: Company = Company()
@@ -85,5 +85,5 @@ class MenuLoginSignup:
             the_company.logged_in_employee = owner
 
             if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.insert_one(owner.dict(by_alias=True))
+                employee_repo.insert_one(owner.dict(by_alias=True)) # type: ignore
             return True

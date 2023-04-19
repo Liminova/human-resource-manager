@@ -1,7 +1,7 @@
 import os
 from ..helpers import *
 from models import Attendance, Employee, Company, hash
-from database.mongo import employee_repo, benefit_repo, department_repo
+from database.mongo import employee_repo, benefit_repo, department_repo  # type: ignore
 from option import Result, Ok
 
 the_company: Company = Company()
@@ -116,7 +116,7 @@ class MenuEmployee:
 
         # add employee to mongodb database
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.insert_one(employee.dict(by_alias=True))
+            employee_repo.insert_one(employee.dict(by_alias=True)) # type: ignore
 
         return "Employee {}{}{} ({}{}{}) added successfully!".format(
             FCOLORS.GREEN, employee.name, FCOLORS.END, FCOLORS.GREEN, employee.employee_id, FCOLORS.END

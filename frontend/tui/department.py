@@ -3,7 +3,7 @@ import os
 
 from ..helpers import *
 from models import Department, Company
-from database.mongo import department_repo, employee_repo
+from database.mongo import department_repo, employee_repo  # type: ignore
 from option import Result, Ok
 
 the_company: Company = Company()
@@ -95,7 +95,7 @@ class MenuDepartment:
         # add the department to the company
         the_company.departments.append(dept)
         if os.getenv("HRMGR_DB") == "TRUE":
-            department_repo.insert_one(dept.dict(by_alias=True))
+            department_repo.insert_one(dept.dict(by_alias=True))  # type: ignore
 
         return f"Department {FCOLORS.GREEN}{dept.name}{FCOLORS.END} added successfully!"
 

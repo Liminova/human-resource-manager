@@ -1,7 +1,7 @@
 from ..helpers import *
 from models import Payroll, Company
 from option import Result, Ok
-from database.mongo import employee_repo
+from database.mongo import employee_repo # type: ignore
 import os
 
 the_company: Company = Company()
