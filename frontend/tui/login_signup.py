@@ -11,12 +11,9 @@ the_company: Company = Company()
 
 class MenuLoginSignup:
     def login(self) -> bool:
-        last_msg: str = ""
+        last_msg = ""
         while True:
-            clrscr()
-            if last_msg:
-                print(last_msg)
-                last_msg: str = ""
+            last_msg = refresh(last_msg)
             print(f"{FCOLORS.PURPLE}Employee login{FCOLORS.END}")
             print("Please contact the admin if you don't have an account yet.")
             print(FCOLORS.CYAN + ("=" * 58) + FCOLORS.END)
@@ -52,12 +49,12 @@ class MenuLoginSignup:
         if the_company.employees:
             return False
 
-        last_msg: str = ""
+        last_msg = ""
         while True:
             clrscr()
             if last_msg:
                 print(last_msg)
-                last_msg: str = ""
+                last_msg = ""
             print(f"{FCOLORS.PURPLE}Admin signup{FCOLORS.END}")
             print(FCOLORS.CYAN + ("=" * 12) + FCOLORS.END)
 
