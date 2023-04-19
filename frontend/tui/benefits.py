@@ -17,7 +17,7 @@ class MenuBenefits:
             self.mainloop = self.employee
 
     def admin(self) -> Result[None, str]:
-        last_msg: str = ""
+        last_msg = ""
         while True:
             last_msg = refresh(last_msg)
             benefit_plan_menu = [
@@ -41,44 +41,44 @@ class MenuBenefits:
             choice = get_user_option_from_menu(title, benefit_plan_menu)
             match choice:
                 case 1:
-                    last_msg: str = self.__add()
+                    last_msg = self.__add()
                 case 2:
-                    last_msg: str = self.__apply()
+                    last_msg = self.__apply()
                 case 3:
-                    last_msg: str = self.__remove()
+                    last_msg = self.__remove()
                 case 4:
-                    last_msg: str = self.__update()
+                    last_msg = self.__update()
                 case 5:
-                    last_msg: str = self.__view()
+                    last_msg = self.__view()
                 case 6:
-                    last_msg: str = self.__view_all()
+                    last_msg = self.__view_all()
                 case 7:
-                    last_msg: str = self.__request_enroll()
+                    last_msg = self.__request_enroll()
                 case 8:
-                    last_msg: str = self.__resolve_pending_requests()
+                    last_msg = self.__resolve_pending_requests()
                 case 9:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
         logged_in_employee = the_company.logged_in_employee
-        last_msg: str = ""
+        last_msg = ""
         while True:
             last_msg = refresh(last_msg)
             benefit_plan_menu = ["[1] View details of one", "[2] List all", "[3] Request to enroll in one", "[4] Back"]
             choice = get_user_option_from_menu("Benefit plan management for " + logged_in_employee.name, benefit_plan_menu)
             match choice:
                 case 1:
-                    last_msg: str = self.__view()
+                    last_msg = self.__view()
                 case 2:
-                    last_msg: str = self.__view_all()
+                    last_msg = self.__view_all()
                 case 3:
-                    last_msg: str = self.__request_enroll()
+                    last_msg = self.__request_enroll()
                 case 4:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
         # create a blank benefit plan object
