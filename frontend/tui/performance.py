@@ -60,15 +60,14 @@ class MenuPerformance:
                     last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
-        empl_items = [f"{employee.name} ({employee.employee_id})" for employee in the_company.employees]
-        empl_selected_index = get_user_option_from_list("Select an employee to add a sale for", empl_items)
-        if empl_selected_index == -1:
-            return NO_EMPLOYEE_MSG
-        elif empl_selected_index == -2:
-            return ""
-        selected_empl = the_company.employees[empl_selected_index]
+        empls = the_company.employees
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to add a sale for", tuple(f"{e.name} ({e.employee_id})" for e in the_company.employees)
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
-        if selected_empl.is_admin:
+        if empls[empl_idx_select].is_admin:
             return "An admin doesn't sell anything!"
 
         # create a new, empty sale object
@@ -127,38 +126,37 @@ class MenuPerformance:
         if not the_company.logged_in_employee.is_admin:
             sales = the_company.logged_in_employee.performance.sale_list
         else:
-            sales = [sale for employee in the_company.employees for sale in employee.performance.sale_list]
+            sales = tuple(s for e in the_company.employees for s in e.performance.sale_list)
         if not sales:
             return NO_SALES_MSG
 
-        # a list containing the string representation of each sale
-        sale_items = [sale.one_line_str() for sale in sales]
+        sale_items = tuple(sale.one_line_str() for sale in sales)
         listing("All sales", sale_items)
         return ""
 
     def __remove(self) -> str:
-        empl_items = [f"{employee.name} ({employee.employee_id})" for employee in the_company.employees]
-        empl_selected_index = get_user_option_from_list("Select an employee to remove a sale for", empl_items)
-        if empl_selected_index == -1:
-            return NO_EMPLOYEE_MSG
-        elif empl_selected_index == -2:
-            return ""
-        selected_empl = the_company.employees[empl_selected_index]
+        empls = the_company.employees
 
-        if selected_empl.is_admin:
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to remove a sale for", tuple(f"{e.name} ({e.employee_id})" for e in the_company.employees)
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
+
+        # THIS VARIABLE IS A COPY OF THE EMPLOYEE OBJECT, NOT A REFERENCE
+        _empl_select = the_company.employees[empl_idx_select]
+
+        if _empl_select.is_admin:
             return "An admin don't sell anything!"
 
-        # a list containing the string representation of each sale
-        sale_items = [f"{sale.sale_id} ({sale.client_id})" for sale in selected_empl.performance.sale_list]
-
         # get the index of the sale to remove
-        selected_sale_index = get_user_option_from_list("Select a sale to remove", sale_items)
-        if selected_sale_index == -1:
-            return NO_SALES_MSG
-        elif selected_sale_index == -2:
-            return ""
+        sale_idx_select = get_user_option_from_list(
+            "Select a sale to remove",
+            tuple(f"{s.sale_id} ({s.client_id})" for s in the_company.employees[empl_idx_select].performance.sale_list),
+        )
+        if sale_idx_select in (-1, -2):
+            return NO_SALES_MSG if sale_idx_select == -1 else ""
 
-        sale = selected_empl.performance.sale_list[selected_sale_index]
 
         # remove the sale
         del selected_empl.performance.sale_list[selected_sale_index]
@@ -176,15 +174,14 @@ class MenuPerformance:
 
     def __get_info(self) -> str:
         if not the_company.logged_in_employee.is_admin:
-            all_sales = the_company.logged_in_employee.performance.sale_list
+            all_sales = tuple(the_company.logged_in_employee.performance.sale_list)
         else:
-            all_sales = [sale for employee in the_company.employees for sale in employee.performance.sale_list]
-        sale_items = [sale.one_line_str() for sale in all_sales]
-        selected_sale_index = get_user_option_from_list("Select a sale to view info", sale_items)
-        if selected_sale_index == -1:
-            return NO_SALES_MSG
-        elif selected_sale_index == -2:
-            return ""
+            all_sales = tuple(sale for employee in the_company.employees for sale in employee.performance.sale_list)
+        sale_idx_select = get_user_option_from_list(
+            "Select a sale to view info", tuple(sale.one_line_str() for sale in all_sales)
+        )
+        if sale_idx_select in (-1, -2):
+            return NO_SALES_MSG if sale_idx_select == -1 else ""
 
         sale = all_sales[selected_sale_index]
         print(sale)
@@ -194,7 +191,7 @@ class MenuPerformance:
     def __find_submenu_admin(self) -> str:
         search_fields = ["[1] Sale ID", "[2] Client ID", "[3] Client rating", "[4] Date", "[5] Employee", "[else] Back"]
         search_selection = get_user_option_from_menu("Find all sales by...", search_fields)
-        all_sales: list[Sale] = [sale for employee in the_company.employees for sale in employee.performance.sale_list]
+        all_sales = tuple(the_company.logged_in_employee.performance.sale_list)
         match search_selection:
             case 1:
                 self.__find__by_sale_id(all_sales)
@@ -216,7 +213,7 @@ class MenuPerformance:
             return "An admin don't sell anything!"
         search_fields = ["[1] Sale ID", "[2] Client ID", "[3] Client rating", "[4] Date", "[else] Back"]
         search_selection = get_user_option_from_menu("Find all sales by...", search_fields)
-        all_sales: list[Sale] = the_company.logged_in_employee.performance.sale_list
+        all_sales = tuple(s for e in the_company.employees for s in e.performance.sale_list)
         match search_selection:
             case 1:
                 self.__find__by_sale_id(all_sales)
@@ -231,23 +228,23 @@ class MenuPerformance:
 
         return ""
 
-    def __find__by_sale_id(self, sales: list[Sale]) -> None:
+    def __find__by_sale_id(self, sales: tuple[Sale]) -> None:
         sale_id = input("Enter sale ID: ")
-        sale = [sale for sale in sales if sale.sale_id == sale_id][0]
+        sale = next((sale for sale in sales if sale.sale_id == sale_id), None)
         if not sale:
             return None
         print(sale)
         input(ENTER_TO_CONTINUE_MSG)
 
-    def __find__by_client_id(self, sales: list[Sale]) -> None:
+    def __find__by_client_id(self, sales: tuple[Sale]) -> None:
         client_id = input("Enter client ID: ")
-        found_sales = [sale.one_line_str() for sale in sales if sale.client_id == client_id]
+        found_sales = tuple(sale.one_line_str() for sale in sales if sale.client_id == client_id)
         if not found_sales:
             return None
 
         listing("All sales for client " + client_id, found_sales)
 
-    def __find__by_client_rating(self, sales: list[Sale]) -> None:
+    def __find__by_client_rating(self, sales: tuple[Sale]) -> None:
         rating = input("Enter client rating (integer 1-5): ")
         try:
             rating = int(rating)
@@ -261,29 +258,29 @@ class MenuPerformance:
         for sale in found_sales:
             print(sale, end="\n\n")
 
-    def __find__by_date(self, sales: list[Sale]) -> None:
+    def __find__by_date(self, sales: tuple[Sale]) -> None:
         date = input("Enter date (YYYY-MM-DD, leave blank for today): ")
         try:
             date = datetime.strptime(date, "%Y-%m-%d") if date else datetime.now()
         except:
             return None
 
-        found_sales = [sale for sale in sales if datetime.strftime(sale.date, "%Y-%m-%d") == date]
+        found_sales = tuple(sale for sale in sales if datetime.strftime(sale.date, "%Y-%m-%d") == date)
         if not sales:
             return None
 
-        display_sales = [sale.one_line_str() for sale in found_sales]
-        listing("All sales for date " + datetime.strftime(date, "%Y-%m-%d"), display_sales)
+        listing("All sales for date " + datetime.strftime(date, "%Y-%m-%d"), tuple(s.one_line_str() for s in found_sales))
 
-    def __find__by_employee(self, sales: list[Sale]) -> None:
-        empl_items = [f"{employee.name} ({employee.employee_id})" for employee in the_company.employees]
-        empl_selected_index = get_user_option_from_list("Select an employee to view sales for", empl_items)
-        if empl_selected_index == -1:
+    def __find__by_employee(self, sales: tuple[Sale]) -> None:
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to view sales for", tuple(f"{e.name} ({e.employee_id})" for e in the_company.employees)
+        )
+        if empl_idx_select in (-1, -2):
             return None
-        elif empl_selected_index == -2:
+
+        selected_empl = the_company.employees[empl_idx_select]
+        found_sales = tuple(s for s in sales if s.employee_id == selected_empl.employee_id)
+        if not found_sales:
             return None
-        selected_empl = the_company.employees[empl_selected_index]
 
-        found_sales = [sale.one_line_str() for sale in selected_empl.performance.sale_list]
-
-        listing("Sales of employee " + selected_empl.name, found_sales)
+        listing("Sales of employee " + selected_empl.name, tuple(s.one_line_str() for s in found_sales))

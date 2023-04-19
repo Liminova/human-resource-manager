@@ -44,13 +44,13 @@ class MenuPayroll:
                     last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __create(self) -> str:
-        empl_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees]
-        selected_empl_index = get_user_option_from_list("Select an employee to create payroll for", empl_items)
-        if selected_empl_index == -1:
-            return NO_EMPLOYEE_MSG
-        elif selected_empl_index == -2:
-            return ""
-        selected_empl = the_company.employees[selected_empl_index]
+        empls = the_company.employees
+
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to create payroll for", tuple(f"{e.name} ({e.employee_id})" for e in the_company.employees)
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
         if not the_company.can_modify("payroll", selected_empl):
             return "Only the owner can create payroll for admins!"
@@ -85,13 +85,11 @@ class MenuPayroll:
     def __update(self) -> str:
         empls = the_company.employees
 
-        empl_items = [f"{e.name} ({e.employee_id})" for e in empls]
-        selected_empl_index = get_user_option_from_list("Select an employee to update payroll for", empl_items)
-        if selected_empl_index == -1:
-            return NO_EMPLOYEE_MSG
-        elif selected_empl_index == -2:
-            return ""
-        selected_empl = empls[selected_empl_index]
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to update payroll for", tuple(f"{e.name} ({e.employee_id})" for e in empls)
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
         if not the_company.can_modify("payroll", selected_empl):
             return "Only the owner can update payroll for admins!"
@@ -118,10 +116,10 @@ class MenuPayroll:
         return f"Payroll for employee {FCOLORS.GREEN}{selected_empl.name}{FCOLORS.END} updated successfully!"
 
     def __view_all(self) -> str:
-        empl_payroll_items = [
+        empl_payroll_items = tuple(
             f"{e.name} ({e.employee_id}) | Salary: {e.payroll.salary} | Bonus: {e.payroll.bonus} | Tax: {e.payroll.tax} | Punishment: {e.payroll.punish}"
             for e in the_company.employees
-        ]
+        )
         listing("All employees payroll", empl_payroll_items)
         return ""
 
@@ -133,14 +131,11 @@ class MenuPayroll:
         if not the_company.logged_in_employee.is_admin:
             print(the_company.logged_in_employee.payroll)
         else:
-            empl_items = [f"{e.name} ({e.employee_id})" for e in empls]
-            selected_empl_index = get_user_option_from_list("Select an employee to view payroll for", empl_items)
-            if selected_empl_index == -1:
-                return NO_EMPLOYEE_MSG
-            elif selected_empl_index == -2:
-                return ""
-            selected_empl = empls[selected_empl_index]
-            print(selected_empl.payroll)
+            empl_idx_select = get_user_option_from_list(
+                "Select an employee to view payroll for", tuple(f"{e.name} ({e.employee_id})" for e in empls)
+            )
+            if empl_idx_select in (-1, -2):
+                return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
         input(ENTER_TO_CONTINUE_MSG)
         return ""
