@@ -1,19 +1,10 @@
 from __future__ import annotations
-import sys
 import os
 
 from ..helpers import *
 from models import BenefitPlan, Company
 from database.mongo import benefit_repo, employee_repo
 from option import Result, Ok
-
-if sys.version_info >= (3, 11):
-    from typing import TYPE_CHECKING
-else:
-    from typing_extensions import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from models import Employee
 
 the_company: Company = Company()
 
