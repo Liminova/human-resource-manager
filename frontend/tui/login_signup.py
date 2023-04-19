@@ -28,7 +28,7 @@ class MenuLoginSignup:
                 employees[employee.employee_id] = employee
 
             if employee_id not in employees.keys():
-                last_msg: str = FCOLORS.RED + "Employee ID not found!" + FCOLORS.END
+                last_msg = FCOLORS.RED + "Employee ID not found!" + FCOLORS.END
                 continue
 
             input_password = getpass("Password, or leave blank to go back: ")
@@ -37,7 +37,7 @@ class MenuLoginSignup:
 
             # validate password
             if not validate(employee_id, input_password, employees[employee_id].hashed_password):
-                last_msg: str = FCOLORS.RED + "Invalid password!" + FCOLORS.END
+                last_msg = FCOLORS.RED + "Invalid password!" + FCOLORS.END
                 continue
 
             # login
@@ -71,7 +71,7 @@ class MenuLoginSignup:
                 return False
 
             if password != password_confirm:
-                last_msg: str = FCOLORS.RED + "Passwords do not match!" + FCOLORS.END
+                last_msg = FCOLORS.RED + "Passwords do not match!" + FCOLORS.END
                 continue
 
             # create the owner
