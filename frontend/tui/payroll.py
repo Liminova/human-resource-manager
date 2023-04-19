@@ -15,12 +15,9 @@ class MenuPayroll:
             self.mainloop = self.employee
 
     def admin(self) -> Result[None, str]:
-        last_msg: str = ""
+        last_msg = ""
         while True:
-            clrscr()
-            if last_msg:
-                print(last_msg)
-                last_msg: str = ""
+            last_msg = refresh(last_msg)
             payroll_menu = ["[1] Create payroll", "[2] Update payroll", "[3] View all payrolls", "[4] Back"]
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:
@@ -36,12 +33,9 @@ class MenuPayroll:
                     last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
-        last_msg: str = ""
+        last_msg = ""
         while True:
-            clrscr()
-            if last_msg:
-                print(last_msg)
-                last_msg: str = ""
+            last_msg = refresh(last_msg)
             payroll_menu = ["[1] View details", "[2] Back"]
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:

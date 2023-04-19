@@ -17,12 +17,9 @@ class MenuPerformance:
             self.mainloop = self.employee
 
     def admin(self) -> Result[None, str]:
-        last_msg: str = ""
+        last_msg = ""
         while True:
-            clrscr()
-            if last_msg:
-                print(last_msg)
-                last_msg: str = ""
+            last_msg = refresh(last_msg)
             performance_menu = [
                 "[1] Add sale",
                 "[2] Remove sale",
@@ -49,12 +46,8 @@ class MenuPerformance:
                     last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
-        last_msg: str = ""
+        last_msg = ""
         while True:
-            clrscr()
-            if last_msg:
-                print(last_msg)
-                last_msg: str = ""
             performance_menu = ["[1] View sales performance", "[2] View info about a sale", "[3] Find sale(s) by...", "[4] Back"]
             choice = get_user_option_from_menu("Performance management", performance_menu)
             match choice:
