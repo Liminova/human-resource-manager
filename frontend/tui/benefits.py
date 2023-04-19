@@ -33,7 +33,15 @@ class MenuBenefits:
             ]
 
             title = "Benefit plan management"
-            if pending_request_count := len([employee for benefit in the_company.benefits for employee in benefit.pending_requests]) > 0:
+            # if (
+            #     pending_request_count := len(
+            #         [employee for benefit in the_company.benefits for employee in benefit.pending_requests]
+            #     )
+            #     > 0
+            # ):
+            pending_reqs = [e for b in the_company.benefits for e in b.pending_requests]
+            pending_request_count = len(pending_reqs)
+            if pending_request_count > 0:
                 title += f" ({FCOLORS.BLUE}{pending_request_count}{FCOLORS.END} pending requests)"
 
             choice = get_user_option_from_menu(title, benefit_plan_menu)
@@ -100,81 +108,78 @@ class MenuBenefits:
         return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} added successfully!"
 
     def __apply(self) -> str:
-        employees = the_company.employees
+        empls = the_company.employees
         benefits = the_company.benefits
 
-        # a list containing the string representation of each employee
-        employee_items = [f"{e.name} ({e.employee_id})" for e in employees]
-
         # get the index of the employee selected by the user
-        employee_index_selected = get_user_option_from_list("Select an employee to apply benefit plan to", employee_items)
-        if employee_index_selected == -1:
-            return NO_EMPLOYEE_MSG
-        elif employee_index_selected == -2:
-            return ""
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to apply benefit plan to", [f"{e.name} ({e.employee_id})" for e in empls]
+        )
+        if empl_idx_select in [-1, -2]:
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
-        # get the actual employee object
-        employee = employees[employee_index_selected]
-
-        if not the_company.can_modify("benefits", employee):
+        if not the_company.can_modify("benefits", empls[empl_idx_select]):
             return "Only other admins can manage your benefits!"
 
-        # a list containing the string representation of each benefit
-        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
-
         # get the index of the benefit selected by the user
-        benefit_index_selected = get_user_option_from_list("Select a benefit plan to apply to employee", benefit_items)
-        if benefit_index_selected == -1:
-            return NO_BENEFIT_MSG
-        elif benefit_index_selected == -2:
-            return ""
+        benefit_idx_select = get_user_option_from_list(
+            "Select a benefit plan to apply to employee", [f"{b.name}" for b in benefits]
+        )
+        if benefit_idx_select in [-1, -2]:
+            return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
 
-        # get the actual benefit objects
-        benefit = benefits[benefit_index_selected]
+        # THESE ARE COPIES OF THE OBJECTS, NOT REFERENCES
+        _bnf, _empl = benefits[benefit_idx_select], empls[empl_idx_select]
 
         # check if the employee already has the benefit applied to them
-        if benefit.name in employee.benefits:
-            return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} already has benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} applied to them!"
+        if _bnf.name in _empl.benefits:
+            return "Employee {}{}{} already has benefit {}{}{} applied to them!".format(
+                FCOLORS.GREEN, _empl.name, FCOLORS.END, FCOLORS.GREEN, _bnf.name, FCOLORS.END
+            )
 
-        # apply the benefit to the employee
-        employee.benefits.append(benefit.name)
-        benefit.enrolled_employees.append(employee)
+        # apply the benefit to the employee and vice versa
+        empls[empl_idx_select].benefits.append(benefits[benefit_idx_select].name)
+        benefits[benefit_idx_select].enrolled_employees.append(empls[empl_idx_select])
+
+        # update DB
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"benefits"})}, upsert=True)
-            benefit_repo.update_one({"_id": benefit.id}, {"$set": benefit.dict(include={"enrolled_employees"})}, upsert=True)
+            employee_repo.update_one(
+                {"_id": empls[empl_idx_select].id},
+                {"$set": empls[empl_idx_select].dict(by_alias=True, include={"benefits"})},
+            )
 
-        return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} applied to employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} successfully!"
+        return "Benefit {}{}{} applied to employee {}{}{} successfully!".format(
+            FCOLORS.GREEN, _bnf.name, FCOLORS.END, FCOLORS.GREEN, _empl.name, FCOLORS.END
+        )
 
     def __remove(self) -> str:
         benefits = the_company.benefits
         employees = the_company.employees
 
-        # a list containing the string representation of each benefit
-        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
-
         # get the index of the benefit selected by the user
-        benefit_index_selected = get_user_option_from_list("Select a benefit plan to remove", benefit_items)
-        if benefit_index_selected == -1:
-            return NO_BENEFIT_MSG
-        elif benefit_index_selected == -2:
-            return ""
+        benefit_idx_select = get_user_option_from_list(
+            "Select a benefit plan to remove", [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
+        )
+        if benefit_idx_select in [-1, -2]:
+            return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
 
-        # get the actual benefit object
-        benefit = benefits[benefit_index_selected]
+        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
+        _bnf = benefits[benefit_idx_select]
 
         # remove the benefit plan from all employees that have it applied to them
         for employee in employees:
-            if benefit.name in employee.benefits:
-                employee.benefits.remove(benefit.name)
-                if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"benefits"})}, upsert=True)
+            if _bnf.name not in employee.benefits:
+                continue
+            employee.benefits.remove(_bnf.name)
+            if os.getenv("HRMGR_DB") == "TRUE":
+                employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"benefits"})}, upsert=True)
 
         # remove the benefit from the company's list of benefits
-        del benefits[benefit_index_selected]
+        del benefits[benefit_idx_select]
         if os.getenv("HRMGR_DB") == "TRUE":
-            benefit_repo.delete_one({"_id": benefit.id})
+            benefit_repo.delete_one({"_id": _bnf.id})
 
-        return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} removed successfully!"
+        return f"Benefit {FCOLORS.RED}{_bnf.name}{FCOLORS.END} removed successfully!"
 
     def __update(self) -> str:
         benefits = the_company.benefits
@@ -183,71 +188,53 @@ class MenuBenefits:
         benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
 
         # get the index of the benefit selected by the user
-        selected_benefit_index = get_user_option_from_list("Select a benefit plan to update", benefit_items)
-        if selected_benefit_index == -1:
+        benefit_idx_select = get_user_option_from_list("Select a benefit plan to update", benefit_items)
+        if benefit_idx_select == -1:
             return NO_BENEFIT_MSG
-        elif selected_benefit_index == -2:
+        elif benefit_idx_select == -2:
             return ""
 
-        # get the actual benefit object
-        benefit = benefits[selected_benefit_index]
+        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
+        _bnf = benefits[benefit_idx_select]
 
         # assigning the new values to the benefit object
         fields_data = [
-            ("Enter benefit plan name", benefit.set_name),
-            ("Enter benefit plan description", benefit.set_description),
-            ("Enter benefit plan cost", benefit.set_cost),
+            ("Enter benefit plan name", benefits[benefit_idx_select].set_name),
+            ("Enter benefit plan description", benefits[benefit_idx_select].set_description),
+            ("Enter benefit plan cost", benefits[benefit_idx_select].set_cost),
         ]
         for field, setter in fields_data:
             if (msg := loop_til_valid_input(field, setter)) != "":
                 return msg
 
         if os.getenv("HRMGR_DB") == "TRUE":
-            benefit_repo.update_one({"_id": benefit.id}, {"$set": benefit.dict(exclude={"id"}, by_alias=True)}, upsert=True)
-
-        return f"Benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} updated successfully!"
+            benefit_repo.update_one({"_id": _bnf.id}, {"$set": benefits[benefit_idx_select].dict()}, upsert=True)
+        return f"Benefit {FCOLORS.GREEN}{_bnf.name}{FCOLORS.END} updated successfully!"
 
     def __view(self) -> str:
-        logged_in_employee = the_company.logged_in_employee
+        benefit_idx_select = get_user_option_from_list(
+            "Select a benefit plan to view", [f"{b.name}" for b in the_company.benefits]
+        )
+        if benefit_idx_select in [-1, -2]:
+            return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
+        _bnf = the_company.benefits[benefit_idx_select]
 
-        # a list containing the string representation of each benefit
-        benefits: list[BenefitPlan] = []
-        if not logged_in_employee.is_admin:
-            # restore the benefit objects from the benefit names
-            benefits = [benefit for benefit in the_company.benefits if benefit.name in logged_in_employee.benefits]
-            benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
-        else:
-            benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in the_company.benefits]
-
-        # get the index of the benefit selected by the user
-        selected_benefit_index = get_user_option_from_list("Select a benefit plan to view", benefit_items)
-        if selected_benefit_index == -1:
-            return NO_BENEFIT_MSG
-        elif selected_benefit_index == -2:
-            return ""
-
-        # print the benefit plan
-        if not logged_in_employee.is_admin:
-            print(logged_in_employee.benefits[selected_benefit_index])
-        else:
-            print(benefits[selected_benefit_index])
+        clrscr()
+        print(_bnf)
         input(ENTER_TO_CONTINUE_MSG)
 
         return ""
 
     def __view_all(self) -> str:
-        logged_in_employee = the_company.logged_in_employee
-        benefits = the_company.benefits
+        benenfit_idx_select = get_user_option_from_list(
+            "Select a benefit plan to view", [f"{b.name}" for b in the_company.benefits]
+        )
+        if benenfit_idx_select in [-1, -2]:
+            return NO_BENEFIT_MSG if benenfit_idx_select == -1 else ""
 
-        if not logged_in_employee.is_admin:
-            # restore the benefit objects from the benefit names
-            benefits: list[BenefitPlan] = [benefit for benefit in benefits if benefit.name in logged_in_employee.benefits]
-            benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
-        else:
-            benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
-        if len(benefit_items) == 0:
-            return NO_BENEFIT_MSG
-        listing("All existing benefit plans", benefit_items)
+        clrscr()
+        print(the_company.benefits[benenfit_idx_select])
+        input(ENTER_TO_CONTINUE_MSG)
         return ""
 
     def __request_enroll(self) -> str:
@@ -255,61 +242,57 @@ class MenuBenefits:
         benefits = the_company.benefits
 
         benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
-        selected_benefit_index = get_user_option_from_list("Select a benefit plan to request enrollment", benefit_items)
-        if selected_benefit_index == -1:
-            return NO_BENEFIT_MSG
-        elif selected_benefit_index == -2:
-            return ""
-        benefit = benefits[selected_benefit_index]
+        benefit_idx_select = get_user_option_from_list("Select a benefit plan to request enrollment", benefit_items)
+        if benefit_idx_select in [-1, -2]:
+            return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
 
-        if logged_in_employee in benefit.enrolled_employees:
-            return f"Employee {FCOLORS.GREEN}{logged_in_employee.name}{FCOLORS.END} already has benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} applied to them!"
+        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
+        _bnf = benefits[benefit_idx_select]
 
-        if logged_in_employee in benefit.pending_requests:
-            return f"Employee {FCOLORS.GREEN}{logged_in_employee.name}{FCOLORS.END} already has a pending request for benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END}!"
+        if logged_in_employee in _bnf.enrolled_employees:
+            return f"You are already enrolled in benefit {FCOLORS.GREEN}{_bnf.name}{FCOLORS.END}!"
 
-        benefit.pending_requests.append(logged_in_employee)
+        if logged_in_employee in _bnf.pending_requests:
+            return f"You have already requested enrollment in benefit {FCOLORS.GREEN}{_bnf.name}{FCOLORS.END}!"
+
+        benefits[benefit_idx_select].pending_requests.append(logged_in_employee)
         if os.getenv("HRMGR_DB") == "TRUE":
-            benefit_repo.update_one({"_id": benefit.id}, {"$set": benefit.dict(include={"pending_requests"})}, upsert=True)
+            benefit_repo.update_one(
+                {"_id": benefits[benefit_idx_select].id},
+                {"$set": benefits[benefit_idx_select].dict(include={"pending_requests"})},
+                upsert=True,
+            )
 
-        return f"Request for benefit {FCOLORS.GREEN}{benefit.name}{FCOLORS.END} sent to HR successfully!"
+        return f"Request for benefit {FCOLORS.GREEN}{_bnf.name}{FCOLORS.END} sent to HR successfully!"
 
     def __resolve_pending_requests(self):
-        custom_pending_requests: dict[BenefitPlan, list[Employee]] = {}
         benefits = the_company.benefits
+        empls = the_company.employees
 
-        for benefit in benefits:
-            if len(benefit.pending_requests) > 0:
-                custom_pending_requests[benefit] = benefit.pending_requests
+        # getting the index of the benefit selected by the user
+        benefit_idx_select = get_user_option_from_list(
+            "Select a benefit plan to resolve pending requests for",
+            [f"{benefit.name} ({benefit.cost})" for benefit in benefits if len(benefit.pending_requests) > 0],
+        )
+        if benefit_idx_select in [-1, -2]:
+            return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
 
-        # a list representing all benefit plans with pending requests
-        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in custom_pending_requests.keys()]
-        benefit_index_selected = get_user_option_from_list("Select a benefit plan to resolve pending requests for", benefit_items)
-        if benefit_index_selected == -1:
-            return NO_BENEFIT_MSG
-        elif benefit_index_selected == -2:
-            return ""
+        # getting the index of the employee selected by the user
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to resolve their pending request",
+            [f"{employee.name} ({employee.id})" for employee in benefits[benefit_idx_select].pending_requests],
+        )
+        if empl_idx_select in [-1, -2]:
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
-        # get the actual benefit object
-        benefit = list(custom_pending_requests.keys())[benefit_index_selected]
-
-        # a list representing all employees with pending requests for the selected benefit plan
-        employee_items = [f"{employee.name} ({employee.id})" for employee in custom_pending_requests[benefit]]
-        employee_index_selected = get_user_option_from_list("Select an employee to resolve their pending request", employee_items)
-        if employee_index_selected == -1:
-            return NO_EMPLOYEE_MSG
-        elif employee_index_selected == -2:
-            return ""
-
-        # get the actual employee object
-        employee = custom_pending_requests[benefit][employee_index_selected]
-
-        if not the_company.can_modify("benefits", employee):
+        if not the_company.can_modify("benefits", the_company.employees[empl_idx_select]):
             return "You cannot approve or deny your own request!"
 
-        empl_name = FCOLORS.GREEN + employee.name + FCOLORS.END
-        empl_id = FCOLORS.GREEN + employee.employee_id + FCOLORS.END
-        benefit_name = FCOLORS.GREEN + benefit.name + FCOLORS.END
+        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
+        _empl = the_company.employees[empl_idx_select]
+        empl_name = FCOLORS.GREEN + _empl.name + FCOLORS.END
+        empl_id = FCOLORS.GREEN + _empl.employee_id + FCOLORS.END
+        benefit_name = FCOLORS.GREEN + benefits[benefit_idx_select].name + FCOLORS.END
 
         # get the user's decision
         decision = get_user_option_from_menu(
@@ -317,25 +300,37 @@ class MenuBenefits:
             ["[1] Approve", "[2] Deny", "[3] Cancel"],
         )
 
-        if decision == -1:
-            return "Invalid option!"
-        elif decision == -2 or decision == 3:
-            return ""
+        if decision in [-1, -2, 3]:
+            return "Invalid option!" if decision == -1 else ""
 
-        # remove the employee from the pending requests list
-        benefit.pending_requests.remove(employee)
+        # remove the empl from the benefit's pending requests list
+        benefits[benefit_idx_select].pending_requests.pop(empl_idx_select)
 
-        # if the user approved the request, add the employee to the enrolled employees list and update the benefit plan for the employee
-        if decision == 0:
-            benefit.enrolled_employees.append(employee)
-            employee.benefits.append(benefit.name)
+        # if admin aprv rqst, add empl to benefit's enrolled empls list
+        if decision == 1:
+            benefits[benefit_idx_select].enrolled_employees.append(empls[empl_idx_select])
+            empls[empl_idx_select].benefits.append(benefits[benefit_idx_select].name)
 
+        # update DB
         if os.getenv("HRMGR_DB") == "TRUE":
-            benefit_repo.update_one({"_id": benefit.id}, {"$set": benefit.dict(include={"pending_requests", "enrolled_employees"})}, upsert=True)
-            if decision == 1:
-                employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"benefits"})}, upsert=True)
+            benefit_repo.update_one(
+                {"_id": benefits[benefit_idx_select].id},
+                {"$set": benefits[benefit_idx_select].dict(include={"pending_requests", "enrolled_employees"})},
+                upsert=True,
+            )
+            employee_repo.update_one(
+                {"_id": empls[empl_idx_select].id}, {"$set": empls[empl_idx_select].dict(include={"benefits"})}, upsert=True
+            ) if decision == 1 else None
 
-        if decision == 0:
-            return f"Employee {empl_name} ({empl_id}) approved for benefit {benefit_name}!"
-        else:
-            return f"Employee {empl_name} ({empl_id}) denied for benefit {benefit_name}!"
+        return "Employee {}{}{} ({}{}{}) {}{}{} for benefit {}{}{}!".format(
+            FCOLORS.GREEN,
+            _empl.name,
+            FCOLORS.END,
+            FCOLORS.GREEN,
+            _empl.employee_id,
+            FCOLORS.END,
+            (FCOLORS.GREEN + "approved") if decision == 1 else (FCOLORS.RED + "denied") + FCOLORS.END,
+            FCOLORS.GREEN,
+            benefits[benefit_idx_select].name,
+            FCOLORS.END,
+        )
