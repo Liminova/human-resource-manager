@@ -3,7 +3,7 @@ from .clustering import clustering
 from .COLORS import FCOLORS
 
 
-def listing(title: str, entries: list[str]) -> None:
+def listing(title: str, entries: tuple[str]) -> None:
     """Prints a list of entries in a nice format"""
 
     clusters = clustering(entries, 9)
