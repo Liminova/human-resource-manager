@@ -18,12 +18,12 @@ class MenuAttendance:
 
     def admin(self) -> Result[None, str]:
         # get the index of the selected employee
-        selected_employee_index = get_user_option_from_list(
+        empl_idx_select = get_user_option_from_list(
             "Select an employee to manage attendance for",
             tuple(f"{e.name} ({e.employee_id})" for e in the_company.employees),
         )
-        if selected_employee_index in (-1, -2):
-            return Err(NO_EMPLOYEE_MSG) if selected_employee_index == -1 else Ok(None)
+        if empl_idx_select in (-1, -2):
+            return Err(NO_EMPLOYEE_MSG) if empl_idx_select == -1 else Ok(None)
 
         # get the employee object from the index
         self.__employee = the_company.employees[selected_employee_index]
@@ -169,23 +169,19 @@ class MenuAttendance:
             year_items = [str(year) for year in available_years]
 
             # get the index of the selected year
-            selected_year_index = get_user_option_from_list(
+            year_idx_selected = get_user_option_from_list(
                 "Select a year to view attendance report for", tuple(str(y) for y in year_items)
             )
-            if selected_year_index in (-1, -2):
-                return NO_ATTENDANCE_MSG if selected_year_index == -1 else ""
+            if year_idx_selected in (-1, -2):
+                return NO_ATTENDANCE_MSG if year_idx_selected == -1 else ""
 
             # print the attendance report
             print(attendances.get_report(datetime.strptime(year_items[selected_year_index], "%Y")))
         else:
-            year_items = [str(year) for year in attendances.get_available_years()]
-            selected_year_index = get_user_option_from_list(
-                "Select a year to view attendance report for", tuple(str(y) for y in year_items)
-            )
-            if selected_year_index == -1:
-                return NO_ATTENDANCE_MSG
-            elif selected_year_index == -2:
-                return ""
+            year_items = [str(year) for year in empls[self.__empl_idx].attendance.get_available_years()]
+            year_idx_selected = get_user_option_from_list("Select a year to view attendance report for", tuple(year_items))
+            if year_idx_selected in (-1, -2):
+                return NO_ATTENDANCE_MSG if year_idx_selected == -1 else ""
 
             # print the attendance report
             print(attendances.get_report(datetime.strptime(year_items[selected_year_index], "%Y")))
