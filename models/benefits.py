@@ -55,6 +55,11 @@ class BenefitPlan(BaseModel):
             data += f"  {styling(i, employee.name)} ({employee.employee_id})\n"
         return data
 
+    def one_line_str(self) -> str:
+        return "{} ({}) | Enrolled: {} | Pending: {}".format(
+            styling("Name", self.name), styling("Cost", self.cost), len(self.enrolled_employees), len(self.pending_requests)
+        )
+
     class Config:
         arbitrary_types_allowed = True
         allow_population_by_field_name = True
