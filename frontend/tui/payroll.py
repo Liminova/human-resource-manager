@@ -19,15 +19,15 @@ class MenuPayroll:
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:
                 case 1:
-                    last_msg: str = self.__create()
+                    last_msg = self.__create()
                 case 2:
-                    last_msg: str = self.__update()
+                    last_msg = self.__update()
                 case 3:
-                    last_msg: str = self.__view_all()
+                    last_msg = self.__view_all()
                 case 4:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
         last_msg = ""
@@ -37,11 +37,11 @@ class MenuPayroll:
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:
                 case 1:
-                    last_msg: str = self.__view()
+                    last_msg = self.__view()
                 case 2:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __create(self) -> str:
         empl_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees]

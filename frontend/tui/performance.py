@@ -28,19 +28,19 @@ class MenuPerformance:
             choice = get_user_option_from_menu("Performance management", performance_menu)
             match choice:
                 case 1:
-                    last_msg: str = self.__add()
+                    last_msg = self.__add()
                 case 2:
-                    last_msg: str = self.__remove()
+                    last_msg = self.__remove()
                 case 3:
-                    last_msg: str = self.__get_info()
+                    last_msg = self.__get_info()
                 case 4:
-                    last_msg: str = self.__find_submenu_admin()
+                    last_msg = self.__find_submenu_admin()
                 case 5:
-                    last_msg: str = self.__view_all()
+                    last_msg = self.__view_all()
                 case 6:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
         last_msg = ""
@@ -49,15 +49,15 @@ class MenuPerformance:
             choice = get_user_option_from_menu("Performance management", performance_menu)
             match choice:
                 case 1:
-                    last_msg: str = self.__view_all()
+                    last_msg = self.__view_all()
                 case 2:
-                    last_msg: str = self.__get_info()
+                    last_msg = self.__get_info()
                 case 3:
-                    last_msg: str = self.__find_submenu_employee()
+                    last_msg = self.__find_submenu_employee()
                 case 4:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
         empl_items = [f"{employee.name} ({employee.employee_id})" for employee in the_company.employees]
