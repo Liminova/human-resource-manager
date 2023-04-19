@@ -11,13 +11,10 @@ the_company: Company = Company()
 
 class MenuDepartment:
     def __init__(self) -> None:
-        if the_company.logged_in_employee.is_admin:
-            self.mainloop = self.admin
-        else:
-            self.mainloop = self.employee
+        self.mainloop = self.admin if the_company.logged_in_employee.is_admin else self.employee
 
     def admin(self) -> Result[None, str]:
-        last_msg: str = ""
+        last_msg = ""
         while True:
             last_msg = refresh(last_msg)
             department_menu = [
@@ -55,7 +52,7 @@ class MenuDepartment:
                 case 9:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
         logged_in_employee = the_company.logged_in_employee
@@ -67,13 +64,13 @@ class MenuDepartment:
             choice = get_user_option_from_menu("Department management", department_menu)
             match choice:
                 case 1:
-                    last_msg: str = self.__view()
+                    last_msg = self.__view()
                 case 2:
-                    last_msg: str = self.__view_all()
+                    last_msg = self.__view_all()
                 case 3:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
         # create a new, empty department
