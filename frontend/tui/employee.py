@@ -57,7 +57,9 @@ class MenuEmployee:
             last_msg = refresh(last_msg)
 
             employee_menu = ["[1] View details", "[2] Change password", "[3] Back"]
-            choice = get_user_option_from_menu("Employee management for " + the_company.logged_in_employee.name, employee_menu)
+            choice = get_user_option_from_menu(
+                "Employee management for " + the_company.logged_in_employee.name, employee_menu
+            )
             match choice:
                 case 1:
                     last_msg = self.__view()
@@ -70,6 +72,7 @@ class MenuEmployee:
 
     def __add(self) -> str:
         depts = the_company.departments
+        empls = the_company.employees
 
         # create a new, empty employee
         employee = Employee()
@@ -89,22 +92,23 @@ class MenuEmployee:
         employee.is_admin = False
         employee.attendance = Attendance().default()
 
-        # a list containing the string representation of each department
-        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in depts]
+        # # a list containing the string representation of each department
+        depts_items = tuple(f"{dept.name} ({dept.dept_id})" for dept in depts)
 
-        if len(dept_items) > 0:
+        if depts_items:
             # get the index of the department to add the employee to
-            dept_index = get_user_option_from_list("Select a department to add the employee to", dept_items)
-            dept = depts[dept_index]
-            if dept_index == -1:
-                return NO_DEPARTMENT_MSG
-            elif dept_index == -2:
-                return ""
+            depts_idx_select = get_user_option_from_list("Select a department to add the employee to", depts_items)
+            if depts_idx_select in (-1, -2):
+                return NO_DEPARTMENT_MSG if depts_idx_select == -1 else ""
 
             # add the employee to the department's members
-            dept.members.append(employee)
+            depts[depts_idx_select].members.append(employee)
             if os.getenv("HRMGR_DB") == "TRUE":
-                department_repo.update_one({"_id": dept.id}, {"$set": dept.dict(include={"members"})}, upsert=True)
+                department_repo.update_one(
+                    {"_id": depts[depts_idx_select].id},
+                    {"$set": depts[depts_idx_select].dict(include={"members"})},
+                    upsert=True,
+                )
 
             # add the department id to the employee's department_id
             employee.set_department(depts[dept_index].dept_id).unwrap()
@@ -119,18 +123,15 @@ class MenuEmployee:
         return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.employee_id}{FCOLORS.END}) added successfully!"
 
     def __remove(self) -> str:
-        # a list containing the string representation of each employee that isn't an admin
-        employee_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees if not e.is_admin]
+        empls = the_company.employees
 
         # get the index of the employee to remove
-        employee_index = get_user_option_from_list("Select an employee to remove", employee_items)
-        if employee_index == -1:
-            return NO_EMPLOYEE_MSG
-        elif employee_index == -2:
-            return ""
-
-        # get the actual employee
-        employee = the_company.employees[employee_index + 1]
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to remove",
+            tuple(f"{e.name} ({e.employee_id})" for e in empls if not e.is_admin),
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
         # if employee.is_admin and not the_company.owner:
         if not the_company.can_modify("employee", employee):
@@ -158,18 +159,14 @@ class MenuEmployee:
         return f"Employee {FCOLORS.RED}{employee.name}{FCOLORS.END} ({FCOLORS.RED}{employee.employee_id}{FCOLORS.END}) removed successfully!"
 
     def __update(self) -> str:
-        # a list containing the string representation of each employee
-        employee_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees]
+        empls = the_company.employees
 
         # get the employee to update
-        selected_employee_index = get_user_option_from_list("Select an employee to update", employee_items)
-        if selected_employee_index == -1:
-            return NO_EMPLOYEE_MSG
-        elif selected_employee_index == -2:
-            return ""
-
-        # get the actual employee object
-        employee = the_company.employees[selected_employee_index]
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to update", tuple(f"{e.name} ({e.employee_id})" for e in the_company.employees)
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
         # get the new data
         fields_data = [
@@ -199,31 +196,25 @@ class MenuEmployee:
             input(ENTER_TO_CONTINUE_MSG)
             return ""
 
-        # a list containing the string representation of each employee
-        employee_items = [f"{e.name} ({e.employee_id})" for e in empls]
-
         # get the employee to view
-        selected_employee_index = get_user_option_from_list("Select an employee to view", employee_items)
-        if selected_employee_index == -1:
-            return NO_EMPLOYEE_MSG
-        elif selected_employee_index == -2:
-            return ""
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to view", tuple(f"{e.name} ({e.employee_id})" for e in empls)
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
         # print the employee
-        print(empls[selected_employee_index])
+        print(empls[empl_idx_select])
         input(ENTER_TO_CONTINUE_MSG)
         return ""
 
     def __view_all(self) -> str:
-        # a list containing the string representation of each employee
-        employee_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees]
-
-        # print the list
-        listing("Employees", employee_items)
+        listing("Employees", tuple(f"{e.name} ({e.employee_id})" for e in the_company.employees))
         return ""
 
     def __change_password(self) -> str:
         empls = the_company.employees
+        logged_in_employee = the_company.logged_in_employee
 
         # as an admin
         logged_in_employee = the_company.logged_in_employee
