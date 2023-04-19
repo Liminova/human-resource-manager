@@ -14,10 +14,7 @@ class MenuEmployee:
     def admin(self) -> Result[None, str]:
         last_msg = ""
         while True:
-            clrscr()
-            if last_msg:
-                print(last_msg)
-                last_msg = ""
+            last_msg = refresh(last_msg)
 
             employee_menu = [
                 "[1] Add employee",
@@ -57,10 +54,7 @@ class MenuEmployee:
     def employee(self) -> Result[None, str]:
         last_msg = ""
         while True:
-            clrscr()
-            if last_msg:
-                print(last_msg)
-                last_msg = ""
+            last_msg = refresh(last_msg)
 
             employee_menu = ["[1] View details", "[2] Change password", "[3] Back"]
             choice = get_user_option_from_menu("Employee management for " + the_company.logged_in_employee.name, employee_menu)
