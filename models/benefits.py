@@ -48,7 +48,7 @@ class BenefitPlan(BaseModel):
             {styling('Name', self.name)}
             {styling('Description', self.description)}
             {styling('Cost', self.cost)}
-            # {styling('Enrolled employees', len(self.enrolled_employees))}
+            {styling('Enrolled employees', len(self.enrolled_employees))}
         """
         )
         for i, employee in enumerate(self.enrolled_employees, 1):
