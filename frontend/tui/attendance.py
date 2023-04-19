@@ -1,7 +1,7 @@
 from ..helpers import *
 from datetime import datetime
 from option import Result, Ok, Err
-from models import Company, Employee
+from models import Company
 from database.mongo import employee_repo
 import os
 

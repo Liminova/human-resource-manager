@@ -26,8 +26,6 @@ class MenuDepartment:
                 "[6] Back",
             ]
 
-            title = "Department management"
-
             choice = get_user_option_from_menu("Department management", department_menu)
             match choice:
                 case 1:
@@ -47,8 +45,7 @@ class MenuDepartment:
                 case 2:
                     clrscr()
                     sub_choice = get_user_option_from_menu(
-                        "Add/remove employee from department",
-                        ["[1] Add", "[2] Remove", "[else] Back"],
+                        "Add/remove employee from department", ["[1] Add", "[2] Remove", "[else] Back"]
                     )
                     match sub_choice:
                         case 1:
@@ -69,7 +66,6 @@ class MenuDepartment:
                     last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
-        logged_in_employee = the_company.logged_in_employee
         last_msg: str = ""
         while True:
             last_msg = refresh(last_msg)
@@ -91,10 +87,7 @@ class MenuDepartment:
         dept = Department()
 
         # assign values to the department object
-        input_fields = [
-            ("Enter department name", dept.set_name),
-            ("Enter department ID", dept.set_id),
-        ]
+        input_fields = [("Enter department name", dept.set_name), ("Enter department ID", dept.set_id)]
         for promt, setter in input_fields:
             if (msg := loop_til_valid_input(promt, setter)) != "":
                 return msg
@@ -150,10 +143,7 @@ class MenuDepartment:
         _dept = depts[dept_selected_index]
 
         # get the new values for the department
-        input_fields = [
-            ("Enter new department name", _dept.set_name),
-            ("Enter new department ID", _dept.set_id),
-        ]
+        input_fields = [("Enter new department name", _dept.set_name), ("Enter new department ID", _dept.set_id)]
         for promt, setter in input_fields:
             if (msg := loop_til_valid_input(promt, setter)) != "":
                 return msg

@@ -72,7 +72,6 @@ class MenuEmployee:
 
     def __add(self) -> str:
         depts = the_company.departments
-        empls = the_company.employees
 
         # create a new, empty employee
         employee = Employee()
@@ -128,8 +127,7 @@ class MenuEmployee:
 
         # get the index of the employee to remove
         empl_idx_select = get_user_option_from_list(
-            "Select an employee to remove",
-            tuple(f"{e.name} ({e.employee_id})" for e in empls if not e.is_admin),
+            "Select an employee to remove", tuple(f"{e.name} ({e.employee_id})" for e in empls if not e.is_admin)
         )
         if empl_idx_select in (-1, -2):
             return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
@@ -167,12 +165,7 @@ class MenuEmployee:
         del empls[empl_idx_select]
 
         return "Employee {}{}{} ({}{}{}) removed successfully!".format(
-            FCOLORS.RED,
-            _empl_name,
-            FCOLORS.END,
-            FCOLORS.RED,
-            _empl_id,
-            FCOLORS.END,
+            FCOLORS.RED, _empl_name, FCOLORS.END, FCOLORS.RED, _empl_id, FCOLORS.END
         )
 
     def __update(self) -> str:
@@ -347,9 +340,7 @@ class MenuEmployee:
         empls[empl_idx_select].is_admin = True
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one(
-                {"_id": empls[empl_idx_select].id},
-                {"$set": empls[empl_idx_select].dict(include={"is_admin"})},
-                upsert=True,
+                {"_id": empls[empl_idx_select].id}, {"$set": empls[empl_idx_select].dict(include={"is_admin"})}, upsert=True
             )
         return f"Admin rights granted to {empls[empl_idx_select].name}"
 
