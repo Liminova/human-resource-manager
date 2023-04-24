@@ -4,7 +4,7 @@ import os
 import sys
 
 from frontend.gui import Login, Signup
-from frontend.helpers import *
+from frontend.helpers_tui import *
 from models import Company, Employee, BenefitPlan, Department
 from dotenv import load_dotenv
 from database.mongo import employee_repo, benefit_repo, department_repo
@@ -59,7 +59,11 @@ def main_gui():
 
     # Database newly created
     if len(the_company.employees) == 0:
-        msgbox.showinfo("Welcome", "Welcome to HR Manager! It seems like you are new here. Please create an account to get started.", type="ok")
+        msgbox.showinfo(
+            "Welcome",
+            "Welcome to HR Manager! It seems like you are new here. Please create an account to get started.",
+            type="ok",
+        )
         window1 = Signup(the_company)
         window1.mainloop()
 
@@ -77,7 +81,7 @@ def main_gui():
         elif not only_one_owner:
             msgbox.showerror("Error", "There are more than one 'Owner' account! Contact the IT department immediately!")
             raise KeyboardInterrupt
-        msgbox.showinfo("Welcome", "Welcome back to HR Manager! Please log in to continue.", type="ok")
+        # msgbox.showinfo("Welcome", "Welcome back to HR Manager! Please log in to continue.", type="ok")
 
         if len(the_company.employees) < 10:
             confirm = msgbox.askyesno("Confirm", "Do you want to generate random data into the database?")
