@@ -111,16 +111,15 @@ class MenuDepartment:
         )
         if dept_idx_select in (-1, -2):
             return NO_DEPARTMENT_MSG if dept_idx_select == -1 else ""
-
-        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
         _dept = depts[dept_idx_select]
 
         # remove the department id from all employees in the department
         for emp in empls:
-            if emp.department_id == _dept.dept_id:
-                emp.department_id = ""
-                if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.update_one({"_id": emp.id}, {"$set": emp.dict(exclude={"id"}, by_alias=True)}, upsert=True)
+            if emp.department_id != _dept.dept_id:
+                continue
+            emp.department_id = ""
+            if os.getenv("HRMGR_DB") == "TRUE":
+                employee_repo.update_one({"_id": emp.id}, {"$set": emp.dict(exclude={"id"}, by_alias=True)}, upsert=True)
 
         # remove the department from the company
         depts.remove(_dept)
@@ -138,8 +137,6 @@ class MenuDepartment:
         )
         if dept_idx_select in (-1, -2):
             return NO_DEPARTMENT_MSG if dept_idx_select == -1 else ""
-
-        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
         _dept = depts[dept_idx_select]
 
         # get the new values for the department
@@ -176,7 +173,6 @@ class MenuDepartment:
         if dept_idx_select in (-1, -2):
             return NO_DEPARTMENT_MSG if dept_idx_select == -1 else ""
 
-        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
         _dept = depts[dept_idx_select]
         _empl = empls[empl_idx_select]
 
@@ -187,8 +183,8 @@ class MenuDepartment:
             )
 
         # add the employee to the department and vice versa
-        empls[empl_idx_select].department_id = depts[dept_idx_select].dept_id
-        depts[dept_idx_select].members.append(empls[empl_idx_select])
+        _empl.department_id = _dept.dept_id
+        _dept.members.append(_empl)
 
         # update DB
         if os.getenv("HRMGR_DB") == "TRUE":
@@ -216,7 +212,6 @@ class MenuDepartment:
         if dept_idx_select in (-1, -2):
             return NO_DEPARTMENT_MSG if dept_idx_select == -1 else ""
 
-        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
         _empl = empls[empl_idx_select]
         _dept = depts[dept_idx_select]
 
@@ -224,17 +219,17 @@ class MenuDepartment:
         if _empl.department_id == "":
             return "Employee {}{}{} is not in a department!".format(FCOLORS.GREEN, _empl.name, FCOLORS.END)
         else:
-            empls[empl_idx_select].department_id = ""
-            depts[dept_idx_select].members = [
-                empl for empl in depts[dept_idx_select].members if empl.employee_id != _empl.employee_id
-            ]
+            _empl.department_id = ""
+            _dept.members.remove(_empl)
 
         # update DB
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(exclude={"id"}, by_alias=True)}, upsert=True)
             department_repo.update_one({"_id": _dept.id}, {"$set": _dept.dict(exclude={"id"}, by_alias=True)}, upsert=True)
 
-        return f"Employee {FCOLORS.GREEN}{_empl.name}{FCOLORS.END} removed from department {FCOLORS.GREEN}{_dept.name}{FCOLORS.END} successfully!"
+        return "Employee {}{}{} removed from department {}{}{} successfully!".format(
+            FCOLORS.GREEN, _empl.name, FCOLORS.END, FCOLORS.GREEN, _dept.name, FCOLORS.END
+        )
 
     def __view(self) -> str:
         depts = the_company.departments

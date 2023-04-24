@@ -128,8 +128,6 @@ class MenuBenefits:
         )
         if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
-
-        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
         _bnf = benefits[benefit_idx_select]
 
         # remove the benefit plan from all employees that have it applied to them
@@ -141,7 +139,7 @@ class MenuBenefits:
                 employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"benefits"})}, upsert=True)
 
         # remove the benefit from the company's list of benefits
-        del benefits[benefit_idx_select]
+        benefits.remove(_bnf)
         if os.getenv("HRMGR_DB") == "TRUE":
             benefit_repo.delete_one({"_id": _bnf.id})
 
@@ -156,22 +154,20 @@ class MenuBenefits:
         )
         if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
-
-        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
         _bnf = benefits[benefit_idx_select]
 
         # assigning the new values to the benefit object
         fields_data = (
-            ("Enter benefit plan name", benefits[benefit_idx_select].set_name),
-            ("Enter benefit plan description", benefits[benefit_idx_select].set_description),
-            ("Enter benefit plan cost", benefits[benefit_idx_select].set_cost),
+            ("Enter benefit plan name", _bnf.set_name),
+            ("Enter benefit plan description", _bnf.set_description),
+            ("Enter benefit plan cost", _bnf.set_cost),
         )
         for field, setter in fields_data:
             if (msg := loop_til_valid_input(field, setter)) != "":
                 return msg
 
         if os.getenv("HRMGR_DB") == "TRUE":
-            benefit_repo.update_one({"_id": _bnf.id}, {"$set": benefits[benefit_idx_select].dict()}, upsert=True)
+            benefit_repo.update_one({"_id": _bnf.id}, {"$set": _bnf.dict()}, upsert=True)
         return f"Benefit {FCOLORS.GREEN}{_bnf.name}{FCOLORS.END} updated successfully!"
 
     def __view(self) -> str:
@@ -180,10 +176,9 @@ class MenuBenefits:
         )
         if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
-        _bnf = the_company.benefits[benefit_idx_select]
 
         clrscr()
-        print(_bnf)
+        print(the_company.benefits[benefit_idx_select])
         input(ENTER_TO_CONTINUE_MSG)
 
         return ""
@@ -209,7 +204,6 @@ class MenuBenefits:
         if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
 
-        # THESE ARE COPIES OF THE OBJECTS, NOT REFERENCES
         _bnf, _empl = benefits[benefit_idx_select], empls[empl_idx_select]
 
         # check if the employee already has the benefit applied to them
@@ -219,19 +213,13 @@ class MenuBenefits:
             )
 
         # apply the benefit to the employee and vice versa
-        empls[empl_idx_select].benefits.append(benefits[benefit_idx_select].name)
-        benefits[benefit_idx_select].enrolled_employees.append(empls[empl_idx_select])
+        _empl.benefits.append(_bnf.name)
+        _bnf.enrolled_employees.append(_empl)
 
         # update DB
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one(
-                {"_id": empls[empl_idx_select].id},
-                {"$set": empls[empl_idx_select].dict(by_alias=True, include={"benefits"})},
-            )
-            benefit_repo.update_one(
-                {"_id": benefits[benefit_idx_select].id},
-                {"$set": benefits[benefit_idx_select].dict(by_alias=True, include={"enrolled_employees"})},
-            )
+            employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(by_alias=True, include={"benefits"})})
+            benefit_repo.update_one({"_id": _bnf.id}, {"$set": _bnf.dict(by_alias=True, include={"enrolled_employees"})})
 
         return "Benefit {}{}{} applied to employee {}{}{} successfully!".format(
             FCOLORS.GREEN, _bnf.name, FCOLORS.END, FCOLORS.GREEN, _empl.name, FCOLORS.END
@@ -258,7 +246,6 @@ class MenuBenefits:
         if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
 
-        # THESE ARE COPIES OF THE OBJECTS, NOT REFERENCES
         _bnf, _empl = benefits[benefit_idx_select], empls[empl_idx_select]
 
         # check if the employee already has the benefit applied to them
@@ -268,19 +255,13 @@ class MenuBenefits:
             )
 
         # remove the benefit from the employee and vice versa
-        empls[empl_idx_select].benefits.remove(benefits[benefit_idx_select].name)
-        benefits[benefit_idx_select].enrolled_employees.remove(empls[empl_idx_select])
+        _empl.benefits.remove(_bnf.name)
+        _bnf.enrolled_employees.remove(_empl)
 
         # update DB
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one(
-                {"_id": empls[empl_idx_select].id},
-                {"$set": empls[empl_idx_select].dict(by_alias=True, include={"benefits"})},
-            )
-            benefit_repo.update_one(
-                {"_id": benefits[benefit_idx_select].id},
-                {"$set": benefits[benefit_idx_select].dict(by_alias=True, include={"enrolled_employees"})},
-            )
+            employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(by_alias=True, include={"benefits"})})
+            benefit_repo.update_one({"_id": _bnf.id}, {"$set": _bnf.dict(by_alias=True, include={"enrolled_employees"})})
 
         return "Benefit {}{}{} removed from employee {}{}{} successfully!".format(
             FCOLORS.GREEN, _bnf.name, FCOLORS.END, FCOLORS.GREEN, _empl.name, FCOLORS.END
@@ -307,8 +288,6 @@ class MenuBenefits:
         )
         if benefit_idx_select in (-1, -2):
             return NO_BENEFIT_MSG if benefit_idx_select == -1 else ""
-
-        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
         _bnf = benefits[benefit_idx_select]
 
         if logged_in_employee in _bnf.enrolled_employees:
@@ -320,16 +299,13 @@ class MenuBenefits:
         benefits[benefit_idx_select].pending_requests.append(logged_in_employee)
         if os.getenv("HRMGR_DB") == "TRUE":
             benefit_repo.update_one(
-                {"_id": benefits[benefit_idx_select].id},
-                {"$set": benefits[benefit_idx_select].dict(include={"pending_requests"})},
-                upsert=True,
+                {"_id": _bnf.id}, {"$set": _bnf.dict(by_alias=True, include={"pending_requests"})}, upsert=True
             )
 
         return f"Request for benefit {FCOLORS.GREEN}{_bnf.name}{FCOLORS.END} sent to HR successfully!"
 
     def __resolve_pending_requests(self):
         benefits = the_company.benefits
-        empls = the_company.employees
 
         # getting the index of the benefit selected by the user
         benefit_idx_select = get_user_option_from_list(
@@ -350,7 +326,7 @@ class MenuBenefits:
         if not the_company.can_modify("benefits", the_company.employees[empl_idx_select]):
             return "You cannot approve or deny your own request!"
 
-        # THIS IS A COPY OF THE OBJECT, NOT A REFERENCE
+        _bnf = benefits[benefit_idx_select]
         _empl = the_company.employees[empl_idx_select]
         empl_name = FCOLORS.GREEN + _empl.name + FCOLORS.END
         empl_id = FCOLORS.GREEN + _empl.employee_id + FCOLORS.END
@@ -365,23 +341,22 @@ class MenuBenefits:
         if decision in (-1, -2, 3):
             return "Invalid option!" if decision == -1 else ""
 
-        # remove the empl from the benefit's pending requests list
-        benefits[benefit_idx_select].pending_requests.pop(empl_idx_select)
+        _bnf.pending_requests.remove(_empl)
 
         # if admin aprv rqst, add empl to benefit's enrolled empls list
         if decision == 1:
-            benefits[benefit_idx_select].enrolled_employees.append(empls[empl_idx_select])
-            empls[empl_idx_select].benefits.append(benefits[benefit_idx_select].name)
+            _bnf.enrolled_employees.append(_empl)
+            _empl.benefits.append(_bnf.name)
 
         # update DB
         if os.getenv("HRMGR_DB") == "TRUE":
             benefit_repo.update_one(
-                {"_id": benefits[benefit_idx_select].id},
-                {"$set": benefits[benefit_idx_select].dict(include={"pending_requests", "enrolled_employees"})},
+                {"_id": _bnf.id},
+                {"$set": _bnf.dict(by_alias=True, include={"pending_requests", "enrolled_employees"})},
                 upsert=True,
             )
             employee_repo.update_one(
-                {"_id": empls[empl_idx_select].id}, {"$set": empls[empl_idx_select].dict(include={"benefits"})}, upsert=True
+                {"_id": _empl.id}, {"$set": _empl.dict(include={"benefits"})}, upsert=True
             ) if decision == 1 else None
 
         return "Employee {}{}{} ({}{}{}) {}{}{} for benefit {}{}{}!".format(

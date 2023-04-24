@@ -72,21 +72,21 @@ class MenuPerformance:
         )
         if empl_idx_select in (-1, -2):
             return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
+        _empl = empls[empl_idx_select]
 
         if empls[empl_idx_select].is_admin:
             return "An admin doesn't sell anything!"
 
         # create a new, empty sale object
         sale = Sale()
-        sale.employee_id = empls[empl_idx_select].employee_id
-        sale.employee_name = empls[empl_idx_select].name
+        sale.employee_id = _empl.employee_id
+        sale.employee_name = _empl.name
 
         # enter the sale data
         fields_data = [
             ("Enter sale ID", sale.set_sale_id),
             ("Enter revenue", sale.set_revenue),
             ("Enter cost", sale.set_cost),
-            ("Enter profit", sale.set_profit),
             ("Enter client ID", sale.set_client_id),
             ("Enter client rating", sale.set_client_rating),
             ("Enter client comment", sale.set_client_comment),
@@ -94,6 +94,7 @@ class MenuPerformance:
         for field, setter in fields_data:
             if (msg := loop_til_valid_input(field, setter)) != "":
                 return msg
+        sale.profit = sale.revenue - sale.cost
 
         while True:
             # sale date has a default value, can't use the loop_til_valid_input function
@@ -113,22 +114,21 @@ class MenuPerformance:
             except (ValueError, TypeError) as e:
                 return str(e)
 
-        empls[empl_idx_select].performance.sale_list.append(sale)
-        empls[empl_idx_select].performance.sales_count += 1
-        empls[empl_idx_select].performance.total_revenue += sale.revenue
-        empls[empl_idx_select].performance.total_cost += sale.cost
-        empls[empl_idx_select].performance.total_profit += sale.profit
+        _perf = _empl.performance
+        _perf.sale_list.append(sale)
+        _perf.sales_count += 1
+        _perf.total_revenue += sale.revenue
+        _perf.total_cost += sale.cost
+        _perf.total_profit += sale.profit
 
-        rating_sum = sum([sale.client_rating for sale in empls[empl_idx_select].performance.sale_list])
-        rating_count = len([sale for sale in empls[empl_idx_select].performance.sale_list if sale.client_rating])
-        empls[empl_idx_select].performance.average_rating = rating_sum / rating_count if rating_count else 0
+        rating_sum = sum([sale.client_rating for sale in _perf.sale_list])
+        rating_count = len([sale for sale in _perf.sale_list])
+        _perf.average_rating = rating_sum / rating_count if rating_count else 0
 
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one(
-                {"_id": empls[empl_idx_select].id}, {"$set": empls[empl_idx_select].dict()}, upsert=True
-            )
+            employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict()}, upsert=True)
 
-        return "Sale for {}{}{} added successfully!".format(FCOLORS.GREEN, empls[empl_idx_select].name, FCOLORS.END)
+        return f"Sale for {FCOLORS.GREEN}{_empl.name}{FCOLORS.END} added successfully!"
 
     def __view_all(self) -> str:
         if not the_company.logged_in_employee.is_admin:
@@ -143,44 +143,37 @@ class MenuPerformance:
         return ""
 
     def __remove(self) -> str:
-        empls = the_company.employees
 
         empl_idx_select = get_user_option_from_list(
             "Select an employee to remove a sale for", tuple(f"{e.name} ({e.employee_id})" for e in the_company.employees)
         )
         if empl_idx_select in (-1, -2):
             return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
+        _empl = the_company.employees[empl_idx_select]
+        _perf = _empl.performance
 
-        # THIS VARIABLE IS A COPY OF THE EMPLOYEE OBJECT, NOT A REFERENCE
-        _empl_select = the_company.employees[empl_idx_select]
-
-        if _empl_select.is_admin:
+        if _empl.is_admin:
             return "An admin don't sell anything!"
 
         # get the index of the sale to remove
         sale_idx_select = get_user_option_from_list(
-            "Select a sale to remove",
-            tuple(f"{s.sale_id} ({s.client_id})" for s in the_company.employees[empl_idx_select].performance.sale_list),
+            "Select a sale to remove", tuple(f"{s.sale_id} ({s.client_id})" for s in _empl.performance.sale_list)
         )
         if sale_idx_select in (-1, -2):
             return NO_SALES_MSG if sale_idx_select == -1 else ""
+        _sale = _perf.sale_list[sale_idx_select]
 
-        # THIS VARIABLE IS A COPY OF THE SALE OBJECT, NOT A REFERENCE
-        _sale = _empl_select.performance.sale_list[sale_idx_select]
+        _perf.sales_count -= 1
+        _perf.total_revenue -= _sale.revenue
+        _perf.total_cost -= _sale.cost
+        _perf.total_profit -= _sale.profit
+        _perf.sale_list.remove(_sale)
 
-        del empls[empl_idx_select].performance.sale_list[sale_idx_select]
-        empls[empl_idx_select].performance.sales_count -= 1
-        empls[empl_idx_select].performance.total_revenue -= _sale.revenue
-        empls[empl_idx_select].performance.total_cost -= _sale.cost
-        empls[empl_idx_select].performance.total_profit -= _sale.profit
-
-        rating_sum = sum([sale.client_rating for sale in _empl_select.performance.sale_list])
-        empls[empl_idx_select].performance.average_rating = rating_sum / len(_empl_select.performance.sale_list)
+        rating_sum = sum([sale.client_rating for sale in _perf.sale_list])
+        _perf.average_rating = rating_sum / len(_perf.sale_list) if len(_perf.sale_list) else 0
 
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one(
-                {"_id": empls[empl_idx_select].id}, {"$set": empls[empl_idx_select].dict()}, upsert=True
-            )
+            employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict()}, upsert=True)
         return ""
 
     def __get_info(self) -> str:
