@@ -1,12 +1,13 @@
-import customtkinter as ctk
-import tkinter
 import os
-from tkinter import messagebox
-from frontend.helpers import merge_callable
-
-from models import Company, Employee, Attendance
-from database.mongo import employee_repo
+import tkinter
+import customtkinter as ctk
 from datetime import datetime
+from tkinter import messagebox
+
+from models import Company
+from database.mongo import employee_repo
+from frontend.helpers_gui import *
+from frontend.helpers_gui.global_styling import *
 
 the_company = Company()
 
@@ -18,74 +19,71 @@ Height = 768
 
 
 class AttendanceGui(ctk.CTk):
-    def __init__(self, master=None):
+    def __init__(self):
         super().__init__()
         self.title("Attendance Management")
         self.geometry(f"{Width}x{Height}")
-        self.resizable(True, True)
+        self.resizable(False, False)
         self.left_frame = ctk.CTkFrame(master=self, corner_radius=10)
 
-        if the_company.logged_in_employee.is_admin:
-            self.admin()
-        else:
-            self.employee()
+        self.admin() if the_company.logged_in_employee.is_admin else self.employee()
 
         self.left_frame.pack(side=ctk.LEFT)
         self.left_frame.pack_propagate(False)
         self.left_frame.configure(width=320, height=760)
 
-        self.right_frame = ctk.CTkFrame(master=self, border_width=2, corner_radius=10)
-        self.right_frame.pack(side=ctk.RIGHT)
+        self.right_frame = ctk.CTkFrame(master=self)
+        self.right_frame.pack(side=ctk.RIGHT, expand=True)
         self.right_frame.pack_propagate(False)
-        self.right_frame.configure(width=700, height=760)
 
     def admin(self):
-        self.button1 = ctk.CTkButton(
-            master=self.left_frame, text="Attendance Check", command=merge_callable(self.__destroy_all_frames, self.__admin_attendance_check)
+        pos = Position(x=0.5, y=0.0, increment_by_x=0, increment_by_y=0.1)
+
+        ctk.CTkButton(
+            master=self.left_frame,
+            text="Check",
+            command=merge_callable(self.__destroy_all_frames, self.__attendance_check),
+            **btn_menu_style,
+        ).place(relx=pos.x, rely=pos.y, anchor=tkinter.CENTER)
+
+        ctk.CTkButton(
+            master=self.left_frame,
+            text="Update",
+            command=merge_callable(self.__destroy_all_frames, self.__admin_attendance_update),
+            **btn_menu_style,
+        ).place(relx=pos.x, rely=pos.y, anchor=tkinter.CENTER)
+
+        ctk.CTkButton(
+            master=self.left_frame,
+            text="Get report",
+            command=merge_callable(self.__destroy_all_frames, self.__admin_attendance_report),
+            **btn_menu_style,
+        ).place(relx=pos.x, rely=pos.y, anchor=tkinter.CENTER)
+
+        ctk.CTkButton(master=self.left_frame, text="Back", command=self.__back_to_homepage, **btn_exit_style).place(
+            relx=pos.x, rely=0.9, anchor=tkinter.CENTER
         )
-        self.__button_style(self.button1)
-        self.button1.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
-
-        self.button2 = ctk.CTkButton(master=self.left_frame, text="Update Attendace")
-        self.__button_style(self.button2)
-        self.button2.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
-
-        self.button3 = ctk.CTkButton(
-            master=self.left_frame, text="Attendance Report", command=merge_callable(self.__destroy_all_frames, self.__admin_attendance_report)
-        )
-        self.__button_style(self.button3)
-        self.button3.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
-
-        self.button4 = ctk.CTkButton(master=self.left_frame, text="Back", command=lambda self=self: self.__back_to_homepage())
-        self.button4.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
-        self.button4.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
 
     def employee(self):
-        self.button1 = ctk.CTkButton(
-            master=self.left_frame, text="Attendance Check", command=merge_callable(self.__destroy_all_frames, self.__employee_attendance_check)
+        pos = Position(x=0.5, y=0.0, increment_by_x=0, increment_by_y=0.1)
+
+        ctk.CTkButton(
+            master=self.left_frame,
+            text="Check",
+            command=merge_callable(self.__destroy_all_frames, self.__attendance_check),
+            **btn_menu_style,
+        ).place(relx=pos.x, rely=pos.y, anchor=tkinter.CENTER)
+
+        ctk.CTkButton(
+            master=self.left_frame,
+            text="Get report",
+            command=merge_callable(self.__destroy_all_frames, self.__employee_attendance_report),
+            **btn_menu_style,
+        ).place(relx=pos.x, rely=pos.y, anchor=tkinter.CENTER)
+
+        ctk.CTkButton(master=self.left_frame, text="Back", command=self.__back_to_homepage, **btn_exit_style).place(
+            relx=pos.x, rely=0.9, anchor=tkinter.CENTER
         )
-        self.__button_style(self.button1)
-        self.button1.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
-
-        self.button2 = ctk.CTkButton(master=self.left_frame, text="Update Attendace")
-        self.__button_style(self.button2)
-        self.button2.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
-
-        self.button3 = ctk.CTkButton(
-            master=self.left_frame, text="Attendance Report", command=merge_callable(self.__destroy_all_frames, self.__employee_attendance_report)
-        )
-        self.__button_style(self.button3)
-        self.button3.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
-
-        self.button4 = ctk.CTkButton(master=self.left_frame, text="Back", command=lambda self=self: self.__back_to_homepage())
-        self.button4.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
-        self.button4.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
-
-    def __input_box_style(self, element):
-        element.configure(width=400, height=30, font=("Century Gothic", 14), corner_radius=10)
-
-    def __button_style(self, button):
-        button.configure(width=260, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
 
     def __destroy_all_frames(self):
         for widget in self.right_frame.winfo_children():
@@ -97,275 +95,190 @@ class AttendanceGui(ctk.CTk):
         self.destroy()
         Homepage().mainloop()
 
-    # region: admin functions
-    def __admin_attendance_check(self):
-        self.button1_frame = ctk.CTkFrame(master=self.right_frame)
+    def __attendance_check(self):
+        logged_in_employee = the_company.logged_in_employee
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button1_frame, text="Attendance Check", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        ctk.CTkLabel(master=main_frame, text="Attendance Check", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=20, padx=20
+        )
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text="Date", **label_desc_style).grid(row=1, column=0, pady=20, padx=20)
+        today: str = datetime.now().strftime("%Y-%m-%d")
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Name")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text=today, **label_desc_style).grid(row=1, column=1, pady=20, padx=20)
 
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="ID: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.0715, rely=0.275, anchor=tkinter.CENTER)
+        if today not in logged_in_employee.attendance.attendances:
+            logged_in_employee.attendance.attendances[today] = False
 
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__input_box_style(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
+        _status: bool = the_company.logged_in_employee.attendance.attendances[today]
+        status: str = "Present" if _status else "Absent"
+        ctk.CTkLabel(master=main_frame, text="Status", **label_desc_style).grid(row=2, column=0, pady=20, padx=20)
+        status_label = ctk.CTkLabel(master=main_frame, text=status, **label_desc_style)
+        status_label.grid(row=2, column=1, pady=20, padx=20)
 
-        self.label3 = ctk.CTkLabel(master=self.right_frame, text="Date: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.085, rely=0.4, anchor=tkinter.CENTER)
-
-        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="YYYY-MM-DD")
-        self.__input_box_style(self.entry3)
-        self.entry3.place(relx=0.325, rely=0.445, anchor=tkinter.CENTER)
-
-        self.label4 = ctk.CTkLabel(master=self.right_frame, text="Time: ", font=("Century Gothic", 20, "italic"))
-        self.label4.place(relx=0.085, rely=0.525, anchor=tkinter.CENTER)
-
-        self.entry4 = ctk.CTkEntry(master=self.right_frame, placeholder_text="HH:MM:SS")
-        self.__input_box_style(self.entry4)
-        self.entry4.place(relx=0.325, rely=0.57, anchor=tkinter.CENTER)
-
-        self.label5 = ctk.CTkLabel(master=self.right_frame, text="Present/Absent/Late: ", font=("Century Gothic", 20, "italic"))
-        self.label5.place(relx=0.195, rely=0.65, anchor=tkinter.CENTER)
-
-        self.radio1 = ctk.CTkRadioButton(master=self.right_frame, text="Absent", font=("Century Gothic", 15, "italic"))
-        self.radio1.place(relx=0.325, rely=0.695, anchor=tkinter.CENTER)
-
-        self.radio2 = ctk.CTkRadioButton(master=self.right_frame, text="Late", font=("Century Gothic", 15, "italic"))
-        self.radio2.place(relx=0.325, rely=0.745, anchor=tkinter.CENTER)
-
-        self.radio3 = ctk.CTkRadioButton(master=self.right_frame, text="Present", font=("Century Gothic", 15, "italic"))
-        self.radio3.place(relx=0.325, rely=0.795, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="Confirm", command=(lambda: attendance_check(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.875, anchor=tkinter.CENTER)
-
-        self.button1_frame.pack(pady=20)
-
-        def attendance_check(self):
-            name = self.entry1.get()
-            id = self.entry2.get()
-            date = self.entry3.get()
-            time = self.entry4.get()
-
-            status = ""
-            if self.radio1.get_value() == True:
-                status = "Absent"
-            elif self.radio2.get_value() == True:
-                status = "Late"
-            elif self.radio3.get_value() == True:
-                status = "Present"
-
-            if name == "" or id == "" or date == "" or time == "":
-                messagebox.showerror("Error", "Please fill in all the fields")
+        def _check_attendance():
+            logged_in_employee = the_company.logged_in_employee
+            nonlocal today
+            nonlocal status_label
+            if logged_in_employee.attendance.attendances[today]:
+                messagebox.showinfo("Present", f"You are already present today ({today})")
                 return
-            if status == "":
-                messagebox.showerror("Error", "Please select a status")
-                return
-            if not name.isalpha():
-                messagebox.showerror("Error", "Please enter a valid name")
-                return
-            if ":" not in time:
-                messagebox.showerror("Error", "Please enter a valid time")
-                return
-            presnet = False if status == "Absent" else True if status == "Present" else None if status == "Late" else False
-            if not self.__attendance_check(name, id, date, time, presnet):
-                messagebox.showerror("Error", "Please enter a valid ID")
-                return
-            self.__attendance_update(name, id, date, time, presnet)
-            messagebox.showinfo("Success", "Attendance updated successfully")
+
+            status_label.configure(text="Present")
+            logged_in_employee.attendance.attendances[today] = True
             if os.getenv("HRMGR_DB") == "TRUE":
-                self.__attendance_update_db(name, id, date, time, presnet)
+                employee_repo.update_one(
+                    {"_id": logged_in_employee.id}, {"$set": logged_in_employee.dict(include={"attendance"})}, upsert=True
+                )
+
+        ctk.CTkButton(master=main_frame, text="Check", command=_check_attendance, **btn_action_style).grid(
+            row=3, column=0, pady=20, padx=20, columnspan=2
+        )
+
+    def __admin_attendance_update(self):
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
+
+        ctk.CTkLabel(master=main_frame, text="Attendance Update", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
+
+        # Select employee from a list
+        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
+        _display_list = display_list(
+            _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
+                row=1, column=0, columnspan=2, pady=20, padx=20
+            )
+
+        # Input date
+        ctk.CTkLabel(master=main_frame, text="Date: ", **label_desc_style).grid(row=2, column=0, sticky=tkinter.W, padx=20)
+        input_date = ctk.CTkEntry(master=main_frame, placeholder_text="YYYY-MM-DD", **input_box_style)
+        input_date.grid(row=2, column=1, sticky=tkinter.W, pady=5, padx=20)
+
+        # Select present or absent
+        radio_is_present: ctk.Variable = ctk.BooleanVar(value=True)
+        ctk.CTkLabel(master=main_frame, text="Status: ", **label_desc_style).grid(row=3, column=0, sticky=tkinter.W, padx=20)
+        ctk.CTkRadioButton(master=main_frame, text="Present", variable=radio_is_present, value=True).grid(
+            row=3, column=1, sticky=tkinter.W, pady=5, padx=20
+        )
+        ctk.CTkRadioButton(master=main_frame, text="Absent", variable=radio_is_present, value=False).grid(
+            row=4, column=1, sticky=tkinter.W, pady=5, padx=20
+        )
+
+        # Update button + handler
+        data = {"is_present": radio_is_present, "empl_idx": radio_empl_idx_select, "date": input_date}
+
+        def _attendance_update():
+            nonlocal data
+            empls = the_company.employees
+            empl_idx: int = data["empl_idx"].get()
+            date: str = data["date"].get()
+            is_present: bool = data["is_present"].get()
+
+            # Try to validate the date
+            try:
+                date = datetime.strftime(datetime.strptime(date, "%Y-%m-%d"), "%Y-%m-%d")
+            except ValueError:
+                messagebox.showerror("Error", "Invalid date, please enter in YYYY-MM-DD format")
+                return
+
+            # get the employee object
+            empl = empls[empl_idx]
+
+            # update the attendance
+            empl.attendance.attendances[date] = is_present
+
+            # show success message and update the database
+            messagebox.showinfo(
+                "Success", f"Attendance for {empl.name} on {date} updated to {'Present' if is_present else 'Absent'}"
+            )
+            if os.getenv("HRMGR_DB") == "TRUE":
+                employee_repo.update_one(
+                    {"_id": empls[empl_idx].id}, {"$set": empls[empl_idx].dict(include={"attendance"})}, upsert=True
+                )
+
+        ctk.CTkButton(master=main_frame, text="Update", command=_attendance_update, **btn_action_style).grid(
+            row=5, column=0, columnspan=2, pady=20
+        )
 
     def __admin_attendance_report(self):
-        self.button3_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button3_frame, text="Report", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        # Title for the page
+        ctk.CTkLabel(master=main_frame, text="Attendance Report", **label_title_style).grid(
+            row=0, column=0, pady=20, padx=20
+        )
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
+        # Select employee from a list
+        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
+        err = display_list(
+            _master=main_frame, options=empl_items, selectable=True, returned_idx=[radio_empl_idx_select], page_size=9
+        )
+        if err is None:
+            messagebox.showerror("Error", "No employees found")
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Name")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        # Generate report button + handler
+        def _get_report():
+            nonlocal radio_empl_idx_select
+            nonlocal main_frame
+            nonlocal btn_action_report
+            nonlocal self
 
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="ID: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.0715, rely=0.275, anchor=tkinter.CENTER)
+            # Get the selected employee
+            empl_idx = radio_empl_idx_select.get()
 
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__input_box_style(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
+            # Destroy the current report frame
+            main_frame.destroy()
 
-        self.button = ctk.CTkButton(master=self.right_frame, text="Confirm", command=(lambda: get_report_successfully(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
+            # Create a new frame for the report
+            main_frame = ctk.CTkFrame(master=self.right_frame)
+            main_frame.grid(row=0, column=0)
+            ctk.CTkLabel(
+                master=main_frame, text="Attendance Report for " + the_company.employees[empl_idx].name, **label_title_style
+            ).grid(row=0, column=0, pady=20, padx=20)
 
-        self.button3_frame.pack(pady=20)
+            # Display the report
+            _attendances = the_company.employees[empl_idx].attendance.attendances
+            attendance_items = tuple(
+                f"{date} - {'Present' if is_present else 'Absent'}" for date, is_present in _attendances.items()
+            )
+            display_list(
+                _master=main_frame, options=attendance_items, selectable=False, page_size=9, err_msg="No attendance found"
+            )
 
-        def get_report_successfully(self):
-            name = self.entry1.get()
-            id = self.entry2.get()
+            # Create a new button to go back to the attendance report page
+            ctk.CTkButton(
+                master=main_frame,
+                text="Back",
+                command=merge_callable(main_frame.destroy, self.__admin_attendance_report),
+                **btn_action_style,
+            ).grid(row=2, column=0, pady=20)
 
-            if name == "" or id == "":
-                messagebox.showerror("Error", "Please fill in all the fields")
-                return
-            if not name.isalpha():
-                messagebox.showerror("Error", "Please enter a valid name")
-                return
-            if not self.__attendance_check(name, id, None, None, None):
-                messagebox.showerror("Error", "Please enter a valid ID")
-                return
-
-    # endregion
-
-    # region: employee functions
-
-    def __employee_attendance_check(self):
-        self.button2_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button2_frame, text="Attendance Check", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Date: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
-
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="YYYY-MM-DD")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="Time: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.1, rely=0.275, anchor=tkinter.CENTER)
-
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="HH:MM:SS")
-        self.__input_box_style(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="Confirm", command=(lambda: attendance_check_successfully(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
-
-        self.button2_frame.pack(pady=20)
-
-        def attendance_check_successfully(self):
-            input_date = self.entry1.get()
-            time = self.entry2.get()
-
-            if input_date == "" or time == "":
-                messagebox.showerror("Error", "Please fill in all the fields")
-            elif ":" not in time:
-                messagebox.showerror("Error", "Please enter a valid time")
-            else:
-                messagebox.showinfo("Success", "Attendance has been checked successfully")  # =))))))))
+        btn_action_report = ctk.CTkButton(master=main_frame, text="Report", command=_get_report, **btn_action_style)
+        btn_action_report.grid(row=2, column=0, pady=20)
 
     def __employee_attendance_report(self):
-        self.button3_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button3_frame, text="Report", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        # Title for the page
+        ctk.CTkLabel(
+            master=main_frame, text=f"Attendance Report for {the_company.logged_in_employee.name}", **label_title_style
+        ).grid(row=0, column=0, pady=(20, 0), padx=20)
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Date: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
-
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="YYYY-MM-DD")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="Confirm", command=(lambda: get_report_successfully(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
-
-        self.button3_frame.pack(pady=20)
-
-        def get_report_successfully(self):
-            input_date = self.entry1.get()
-
-            if input_date == "":
-                messagebox.showerror("Error", "Please fill in all the fields")
-            else:
-                messagebox.showinfo("Success", "Report has been generated")  # =)))))))
-
-    # endregion
-
-    # day xa hoi
-    def __update_attendance(self):
-        self.button1_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button1_frame, text="Update Attendance Check", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.label0 = ctk.CTkLabel(
-            master=self.right_frame, text="(You are currently update the attendance of: )", font=("Century Gothic", 14, "italic")
+        # Display the report
+        _attendances = the_company.logged_in_employee.attendance.attendances
+        attendance_items = tuple(
+            f"{date} - {'Present' if is_present else 'Absent'}" for date, is_present in _attendances.items()
         )
-        self.label0.place(relx=0.5, rely=0.095, anchor=tkinter.CENTER)
-
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
-
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Name")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="ID: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.0715, rely=0.275, anchor=tkinter.CENTER)
-
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__input_box_style(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
-
-        self.label3 = ctk.CTkLabel(master=self.right_frame, text="Date: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.085, rely=0.4, anchor=tkinter.CENTER)
-
-        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="YYYY-MM-DD")
-        self.__input_box_style(self.entry3)
-        self.entry3.place(relx=0.325, rely=0.445, anchor=tkinter.CENTER)
-
-        self.label4 = ctk.CTkLabel(master=self.right_frame, text="Time: ", font=("Century Gothic", 20, "italic"))
-        self.label4.place(relx=0.085, rely=0.525, anchor=tkinter.CENTER)
-
-        self.entry4 = ctk.CTkEntry(master=self.right_frame, placeholder_text="HH:MM:SS")
-        self.__input_box_style(self.entry4)
-        self.entry4.place(relx=0.325, rely=0.57, anchor=tkinter.CENTER)
-
-        self.label5 = ctk.CTkLabel(master=self.right_frame, text="Present/Absent/Late: ", font=("Century Gothic", 20, "italic"))
-        self.label5.place(relx=0.195, rely=0.65, anchor=tkinter.CENTER)
-
-        self.radio1 = ctk.CTkRadioButton(master=self.right_frame, text="Absent", font=("Century Gothic", 15, "italic"))
-        self.radio1.place(relx=0.325, rely=0.695, anchor=tkinter.CENTER)
-
-        self.radio2 = ctk.CTkRadioButton(master=self.right_frame, text="Late", font=("Century Gothic", 15, "italic"))
-        self.radio2.place(relx=0.325, rely=0.745, anchor=tkinter.CENTER)
-
-        self.radio3 = ctk.CTkRadioButton(master=self.right_frame, text="Present", font=("Century Gothic", 15, "italic"))
-        self.radio3.place(relx=0.325, rely=0.795, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="Update", command=lambda self=self: self.__attendance_check())
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.875, anchor=tkinter.CENTER)
-
-        self.button1_frame.pack(pady=20)
-
-        def attendance_check(self):
-            name = self.entry1.get()
-            id = self.entry2.get()
-            date = self.entry3.get()
-            time = self.entry4.get()
-
-            if name == "" or id == "" or date == "" or time == "":
-                messagebox.showerror("Error", "Please fill in all the fields")
-            elif not name.isalpha():
-                messagebox.showerror("Error", "Please enter a valid name")
-            elif "-" not in date:
-                messagebox.showerror("Error", "Please enter a valid date")
-            elif ":" not in time:
-                messagebox.showerror("Error", "Please enter a valid time")
-            else:
-                messagebox.showinfo("Success", "Attendance has been recorded")
+        display_list(
+            _master=main_frame, options=attendance_items, selectable=False, page_size=9, err_msg="No attendance found"
+        )
