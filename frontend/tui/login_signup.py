@@ -1,7 +1,7 @@
 from __future__ import annotations
 import os
 
-from ..helpers import *
+from ..helpers_tui import *
 from models import Employee, Company, validate, hash
 from database.mongo import employee_repo # type: ignore
 from getpass import getpass

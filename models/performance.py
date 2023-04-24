@@ -3,7 +3,7 @@ import textwrap
 from option import Result, Ok, Err
 from datetime import datetime
 from pydantic import BaseModel, Field
-from frontend.helpers import styling, FCOLORS
+from frontend.helpers_tui import styling, FCOLORS
 
 if sys.version_info >= (3, 11):
     from typing import Self

@@ -42,7 +42,9 @@ entry2.place(x=50, y=165)
 l3 = customtkinter.CTkLabel(master=frame, text="Forget password?", font=("Century Gothic", 12))
 l3.place(x=155, y=195)
 
-button1 = customtkinter.CTkButton(master=frame, width=220, text="Login", command=button_function, corner_radius=6, font=("Century Gothic", 14))
+button1 = customtkinter.CTkButton(
+    master=frame, width=220, text="Login", command=button_function, corner_radius=6, font=("Century Gothic", 14)
+)
 button1.place(x=50, y=240)
 
 l4 = customtkinter.CTkLabel(master=frame, text="Don't have an account? Sign up", font=("Century Gothic", 12))

@@ -1,4 +1,4 @@
-from ..helpers import *
+from ..helpers_tui import *
 from datetime import datetime
 from option import Result, Ok, Err
 from models import Company

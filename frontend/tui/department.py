@@ -1,7 +1,7 @@
 from __future__ import annotations
 import os
 
-from ..helpers import *
+from ..helpers_tui import *
 from models import Department, Company
 from database.mongo import department_repo, employee_repo  # type: ignore
 from option import Result, Ok

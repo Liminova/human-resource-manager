@@ -1,11 +1,10 @@
 from .clrscr import clrscr
+from .clustering import clustering
 from .COLORS import BCOLORS, FCOLORS
 from .get_user_option_from_list import get_user_option_from_list
 from .get_user_option_from_menu import get_user_option_from_menu
-from .global_styling import *
 from .listing import listing
 from .loop_til_valid_input import loop_til_valid_input
-from .merge_callable import merge_callable
 from .refresh_tui import refresh
 
 
@@ -29,6 +28,7 @@ ENTER_TO_CONTINUE_MSG: str = FCOLORS.PURPLE + "Press Enter to continue..." + FCO
 # fmt: off
 __all__ = [
     "clrscr",
+    "clustering",
     "BCOLORS",
     "FCOLORS",
     "get_user_option_from_list",
@@ -37,7 +37,6 @@ __all__ = [
     "loop_til_valid_input",
     "styling",
     "refresh",
-    "merge_callable",
     "NO_ATTENDANCE_MSG",
     "NO_BENEFIT_MSG",
     "NO_DEPARTMENT_MSG",
