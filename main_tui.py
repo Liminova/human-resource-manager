@@ -4,7 +4,7 @@ import sys
 import os
 import textwrap
 
-from frontend.helpers import *
+from frontend.helpers_tui import *
 from frontend.tui import *
 from models import Company, Employee, BenefitPlan, Department
 from dotenv import load_dotenv

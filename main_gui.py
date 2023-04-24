@@ -4,7 +4,6 @@ import os
 import sys
 
 from frontend.gui import Login, Signup
-from frontend.helpers_tui import *
 from models import Company, Employee, BenefitPlan, Department
 from dotenv import load_dotenv
 from database.mongo import employee_repo, benefit_repo, department_repo
