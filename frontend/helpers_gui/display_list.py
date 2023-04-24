@@ -1,0 +1,72 @@
+import tkinter as tk
+import customtkinter as ctk
+from frontend.helpers_tui import clustering
+from frontend.helpers_gui.global_styling import btn_action_style, label_desc_style
+
+
+def display_list(
+    _master,
+    options: tuple[str],
+    returned_idx: list[ctk.IntVar] = [],
+    selectable: bool = True,
+    page_size: int = 5,
+    err_msg: str = "",
+    place_row: int = 1,
+    colspan: int = 2,
+) -> tuple[bool, ctk.CTkFrame]:
+    """Create a page with multiple options to choose from. The options are clustered into groups of 5 (by default)."""
+    clustered = clustering(options, page_size)
+    current_page = 0
+    total_page = len(clustered)
+    empl_page = ctk.CTkFrame(master=_master)
+    empl_page.grid(row=place_row, column=0, columnspan=colspan, padx=20, pady=10)
+    if total_page == 0:
+        ctk.CTkLabel(master=empl_page, text=err_msg, **label_desc_style).grid(row=2, column=0, padx=20, pady=20)
+        return False, empl_page
+
+    def __update_empl_page(no_button: str = ""):
+        for widget in empl_page.winfo_children():
+            widget.destroy()
+
+        ctk.CTkLabel(master=empl_page, text=f"Page {current_page + 1} of {total_page}", **label_desc_style).grid(
+            row=0, column=0, columnspan=2, padx=10, pady=20
+        )
+
+        for i, option in enumerate(clustered[current_page]):
+            if selectable:
+                value = i + current_page * page_size
+                ctk.CTkRadioButton(master=empl_page, text=option, variable=returned_idx[0], value=value).grid(
+                    row=i + 1, column=0, padx=20, columnspan=2, sticky=tk.W
+                )
+            else:
+                ctk.CTkLabel(master=empl_page, text=option, **label_desc_style).grid(
+                    row=i + 1, column=0, padx=20, columnspan=2, sticky=tk.W
+                )
+        btn_prev = ctk.CTkButton(master=empl_page, text="<", command=__prev_page, **btn_action_style)
+        btn_prev.grid(row=page_size + 1, column=0, padx=20, pady=20)
+        if no_button == "prev":
+            btn_prev.configure(state=tk.DISABLED)
+        btn_next = ctk.CTkButton(master=empl_page, text=">", command=__next_page, **btn_action_style)
+        btn_next.grid(row=page_size + 1, column=1, padx=20, pady=20)
+        if no_button == "next":
+            btn_next.configure(state=tk.DISABLED)
+
+    def __prev_page():
+        nonlocal current_page
+        # if current_page > 0:
+        #     current_page -= 1
+        #     __update_empl_page()
+
+        if current_page > 0:
+            current_page -= 1
+            __update_empl_page(no_button=("prev" if current_page == 0 else ""))
+
+    def __next_page():
+        nonlocal current_page
+        if current_page + 1 < total_page:
+            current_page += 1
+            __update_empl_page(no_button=("next" if current_page + 1 == total_page else ""))
+
+    __update_empl_page()
+
+    return True, empl_page
