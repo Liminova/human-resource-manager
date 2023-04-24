@@ -19,12 +19,12 @@ class MenuBenefits:
             last_msg = refresh(last_msg)
             benefit_plan_menu = [
                 "[1] Add/remove/modify benefits",
-                "[2] Apply/remove benefits from employees",
-                "[3] Request to enroll in benefits",
-                "[4] Resolve pending requests",
-                "[5] List all benefits",
-                "[6] View details of a benefit",
-                "[7] List all employees without benefits",
+                "[2] Apply/remove one to/from employees",
+                "[3] Request to enroll",
+                "[4] Resolve requests",
+                "[5] List all",
+                "[6] View one",
+                "[7] List empls w/o benefit",
                 "[8] Back",
             ]
 
@@ -38,9 +38,17 @@ class MenuBenefits:
             match choice:
                 case 1:  # Add/remove/modify benefits
                     clrscr()
+                    # fmt: off
                     sub_choice = get_user_option_from_menu(
-                        "Add/remove/modify benefits", ["[1] Add", "[2] Remove", "[3] Modify", "[else] Back"]
+                        "Add/remove/modify benefits",
+                        [
+                            "[1] Add",
+                            "[2] Remove",
+                            "[3] Modify",
+                            "[else] Back"
+                        ]
                     )
+                    # fmt: on
                     match sub_choice:
                         case 1:
                             last_msg = self.__add()
@@ -83,7 +91,14 @@ class MenuBenefits:
         last_msg = ""
         while True:
             last_msg = refresh(last_msg)
-            benefit_plan_menu = ["[1] View details of one", "[2] List all", "[3] Request to enroll in one", "[4] Back"]
+            # fmt: off
+            benefit_plan_menu = [
+                "[1] View one",
+                "[2] List all",
+                "[3] Request to enroll",
+                "[4] Back"
+            ]
+            # fmt: on
             choice = get_user_option_from_menu("Benefit plan management for " + logged_in_employee.name, benefit_plan_menu)
             match choice:
                 case 1:
@@ -366,7 +381,8 @@ class MenuBenefits:
             FCOLORS.GREEN,
             _empl.employee_id,
             FCOLORS.END,
-            (FCOLORS.GREEN + "approved") if decision == 1 else (FCOLORS.RED + "denied"),
+            FCOLORS.GREEN if decision == 1 else FCOLORS.RED,
+            "approved" if decision == 1 else "denied",
             FCOLORS.END,
             FCOLORS.GREEN,
             benefits[benefit_idx_select].name,

@@ -143,7 +143,6 @@ class MenuPerformance:
         return ""
 
     def __remove(self) -> str:
-
         empl_idx_select = get_user_option_from_list(
             "Select an employee to remove a sale for", tuple(f"{e.name} ({e.employee_id})" for e in the_company.employees)
         )

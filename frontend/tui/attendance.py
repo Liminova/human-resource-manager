@@ -31,9 +31,9 @@ class MenuAttendance:
             last_msg = refresh(last_msg)
             # fmt: off
             attendance_menu = [
-                "[1] Check attendance",
-                "[2] Update attendance",
-                "[3] Get attendance report",
+                "[1] Check",
+                "[2] Update",
+                "[3] Report",
                 "[4] Back"
             ]
             # fmt: on
@@ -56,8 +56,8 @@ class MenuAttendance:
             last_msg = refresh(last_msg)
             # fmt: off
             attendance_menu = [
-                "[1] Check attendance",
-                "[2] Get attendance report",
+                "[1] Check",
+                "[2] Report",
                 "[3] Back"
             ]
             # fmt: on

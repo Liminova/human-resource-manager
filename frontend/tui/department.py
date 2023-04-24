@@ -18,11 +18,11 @@ class MenuDepartment:
         while True:
             last_msg = refresh(last_msg)
             department_menu = [
-                "[1] Add/remove/update department",
+                "[1] Add/remove/update",
                 "[2] Add/remove employee from department",
-                "[3] View details of department",
-                "[4] List all departments",
-                "[5] List employees without a department",
+                "[3] View one",
+                "[4] List all",
+                "[5] List empls w/o benefit	",
                 "[6] Back",
             ]
 
@@ -30,9 +30,17 @@ class MenuDepartment:
             match choice:
                 case 1:
                     clrscr()
+                    # fmt: off
                     sub_choice = get_user_option_from_menu(
-                        "Add/remove/update department", ["[1] Add", "[2] Remove", "[3] Update", "[else] Back"]
+                        "Add/remove/update department",
+                        [
+                            "[1] Add",
+                            "[2] Remove",
+                            "[3] Update",
+                            "[else] Back"
+                        ]
                     )
+                    # fmt: on
                     match sub_choice:
                         case 1:
                             last_msg = self.__add()
@@ -44,9 +52,16 @@ class MenuDepartment:
                             last_msg = ""
                 case 2:
                     clrscr()
+                    # fmt: off
                     sub_choice = get_user_option_from_menu(
-                        "Add/remove employee from department", ["[1] Add", "[2] Remove", "[else] Back"]
+                        "Add/remove employee from department",
+                        [
+                            "[1] Add",
+                            "[2] Remove",
+                            "[else] Back"
+                        ]
                     )
+                    # fmt: on
                     match sub_choice:
                         case 1:
                             last_msg = self.__add_employee()
@@ -69,8 +84,13 @@ class MenuDepartment:
         last_msg: str = ""
         while True:
             last_msg = refresh(last_msg)
-            department_menu = ["[1] View details of one", "[2] List all", "[3] Back"]
-
+            # fmt: off
+            department_menu = [
+                "[1] View one",
+                "[2] List all",
+                "[3] Back"
+            ]
+            # fmt: on
             choice = get_user_option_from_menu("Department management", department_menu)
             match choice:
                 case 1:

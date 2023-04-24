@@ -15,7 +15,14 @@ class MenuPayroll:
         last_msg = ""
         while True:
             last_msg = refresh(last_msg)
-            payroll_menu = ["[1] Create payroll", "[2] Update payroll", "[3] View all payrolls", "[4] Back"]
+            # fmt: off
+            payroll_menu = [
+                "[1] Create",
+                "[2] Update",
+                "[3] View all",
+                "[4] Back"
+            ]
+            # fmt: on
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:
                 case 1:
@@ -33,7 +40,12 @@ class MenuPayroll:
         last_msg = ""
         while True:
             last_msg = refresh(last_msg)
-            payroll_menu = ["[1] View details", "[2] Back"]
+            # fmt: off
+            payroll_menu = [
+                "[1] View details",
+                "[2] Back"
+            ]
+            # fmt: on
             choice = get_user_option_from_menu("Payroll management", payroll_menu)
             match choice:
                 case 1:

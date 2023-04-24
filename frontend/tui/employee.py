@@ -55,8 +55,13 @@ class MenuEmployee:
         last_msg = ""
         while True:
             last_msg = refresh(last_msg)
-
-            employee_menu = ["[1] View details", "[2] Change password", "[3] Back"]
+            # fmt: off
+            employee_menu = [
+                "[1] View details",
+                "[2] Change password",
+                "[3] Back"
+            ]
+            # fmt: on
             choice = get_user_option_from_menu(
                 "Employee management for " + the_company.logged_in_employee.name, employee_menu
             )
