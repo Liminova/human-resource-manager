@@ -20,10 +20,9 @@ class MenuDepartment:
             department_menu = [
                 "[1] Add/remove/update",
                 "[2] Add/remove employee from department",
-                "[3] View one",
-                "[4] List all",
-                "[5] List empls w/o benefit	",
-                "[6] Back",
+                "[3] View details",
+                "[4] List empls w/o benefit	",
+                "[5] Back",
             ]
 
             choice = get_user_option_from_menu("Department management", department_menu)
@@ -72,10 +71,8 @@ class MenuDepartment:
                 case 3:
                     last_msg = self.__view()
                 case 4:
-                    last_msg = self.__view_all()
-                case 5:
                     last_msg = self.__view_employees_without_dept()
-                case 6:
+                case 5:
                     return Ok(None)
                 case _:
                     last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
@@ -86,8 +83,7 @@ class MenuDepartment:
             last_msg = refresh(last_msg)
             # fmt: off
             department_menu = [
-                "[1] View one",
-                "[2] List all",
+                "[1] View details",
                 "[3] Back"
             ]
             # fmt: on
@@ -96,8 +92,6 @@ class MenuDepartment:
                 case 1:
                     last_msg = self.__view()
                 case 2:
-                    last_msg = self.__view_all()
-                case 3:
                     return Ok(None)
                 case _:
                     last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
@@ -265,19 +259,6 @@ class MenuDepartment:
         # print the department info
         clrscr()
         print(_dept)
-        input(ENTER_TO_CONTINUE_MSG)
-
-        return ""
-
-    def __view_all(self) -> str:
-        depts = the_company.departments
-        if len(depts) == 0:
-            return NO_DEPARTMENT_MSG
-
-        clrscr()
-        for dept in depts:
-            print(dept)
-            print("")
         input(ENTER_TO_CONTINUE_MSG)
 
         return ""

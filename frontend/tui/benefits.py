@@ -22,10 +22,9 @@ class MenuBenefits:
                 "[2] Apply/remove one to/from employees",
                 "[3] Request to enroll",
                 "[4] Resolve requests",
-                "[5] List all",
-                "[6] View one",
-                "[7] List empls w/o benefit",
-                "[8] Back",
+                "[5] View details",
+                "[6] List empls w/o benefit",
+                "[7] Back",
             ]
 
             title = "Benefit plan management"
@@ -76,12 +75,10 @@ class MenuBenefits:
                 case 4:
                     last_msg = self.__resolve_pending_requests()
                 case 5:
-                    last_msg = self.__view_all()
-                case 6:
                     last_msg = self.__view()
-                case 7:
+                case 6:
                     last_msg = self.__list_employees_without_benefits()
-                case 8:
+                case 7:
                     return Ok(None)
                 case _:
                     last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
@@ -93,10 +90,9 @@ class MenuBenefits:
             last_msg = refresh(last_msg)
             # fmt: off
             benefit_plan_menu = [
-                "[1] View one",
-                "[2] List all",
-                "[3] Request to enroll",
-                "[4] Back"
+                "[1] View details",
+                "[2] Request to enroll",
+                "[3] Back"
             ]
             # fmt: on
             choice = get_user_option_from_menu("Benefit plan management for " + logged_in_employee.name, benefit_plan_menu)
@@ -104,10 +100,8 @@ class MenuBenefits:
                 case 1:
                     last_msg = self.__view()
                 case 2:
-                    last_msg = self.__view_all()
-                case 3:
                     last_msg = self.__request_enroll()
-                case 4:
+                case 3:
                     return Ok(None)
                 case _:
                     last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
@@ -281,18 +275,6 @@ class MenuBenefits:
         return "Benefit {}{}{} removed from employee {}{}{} successfully!".format(
             FCOLORS.GREEN, _bnf.name, FCOLORS.END, FCOLORS.GREEN, _empl.name, FCOLORS.END
         )
-
-    def __view_all(self) -> str:
-        benenfit_idx_select = get_user_option_from_list(
-            "Select a benefit plan to view", tuple(f"{b.name} ({b.cost})" for b in the_company.benefits)
-        )
-        if benenfit_idx_select in (-1, -2):
-            return NO_BENEFIT_MSG if benenfit_idx_select == -1 else ""
-
-        clrscr()
-        print(the_company.benefits[benenfit_idx_select])
-        input(ENTER_TO_CONTINUE_MSG)
-        return ""
 
     def __request_enroll(self) -> str:
         logged_in_employee = the_company.logged_in_employee
