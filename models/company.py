@@ -65,20 +65,15 @@ class Company(metaclass=CompanyMeta):
         - password
         - grant_admin
         """
-        if self.is_owner:
-            return True
-        if self.logged_in_employee.name == "":
-            return False
-
         is_logged_in_admin = self.logged_in_employee.is_admin
         is_input_admin = input_employee.is_admin
         is_self: bool = self.logged_in_employee == input_employee
 
-        if (type == "password") and (is_self) and (not is_logged_in_admin):
+        if (type == "password") and (is_self):
             return True
 
-        if (type == "grant_admin") and (not self.is_owner):
-            return False
+        if (type == "grant_admin") and (self.is_owner):
+            return True
 
         if not is_logged_in_admin:
             return False
@@ -94,11 +89,17 @@ class Company(metaclass=CompanyMeta):
                 if (not is_self) and (not self.is_owner):
                     return True
             # - other admins (owner included)
-            case "employee" | "password":
-                if not is_input_admin:
+            case "employee":
+                if is_self and (not is_input_admin):
+                    return True
+            # - other admins (owner included)
+            # - other people if they're just an employee
+            case "password":
+                if is_self:
                     return True
             case _:
                 raise ValueError(f"Invalid type for system.can_modify: {type}")
+
         return False
 
     def set_name(self, name: str) -> Result[Self, str]:
