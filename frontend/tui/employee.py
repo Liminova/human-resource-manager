@@ -132,6 +132,9 @@ class MenuEmployee:
         if not the_company.can_modify("employee", empls[empl_idx_select]):
             return "Only the owner can remove admins!"
 
+        if not (empl_idx_select == 0):
+            return "Cannot remove owner!"
+
         _empl = empls[empl_idx_select]
         _empl_id = _empl.employee_id
         _empl_name = _empl.name
@@ -174,11 +177,18 @@ class MenuEmployee:
             return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
         _empl = empls[empl_idx_select]
 
+        if not the_company.can_modify("employee", _empl) and (not the_company.is_owner):
+            return "Only the owner can update admins!"
+
+        # Owner's name should not be changed
+        if not (empl_idx_select == 0):
+            if (msg := loop_til_valid_input("Enter employee name", _empl.set_name)) != "":
+                return msg
+
         # get the new data
         fields_data = [
-            ("Enter employee name", _empl.set_name),
-            ("Enter employee date of birth (YYYY-MM-DD)", _empl.set_dob),
             ("Enter employee ID", _empl.set_id),
+            ("Enter employee date of birth (YYYY-MM-DD)", _empl.set_dob),
             ("Enter employee phone number", _empl.set_phone),
             ("Enter employee email", _empl.set_email),
             ("Enter employee password", _empl.set_password),
@@ -349,7 +359,7 @@ class MenuEmployee:
         _empl = empls[empl_idx_select]
 
         if empl_idx_select == 0:
-            return "You cannot revoke your own admin rights"
+            return "Cannot revoke admin rights from the owner"
 
         if not _empl.is_admin:
             return f"{_empl.name} does not have admin rights"
