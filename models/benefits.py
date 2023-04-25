@@ -56,8 +56,13 @@ class BenefitPlan(BaseModel):
         return data
 
     def one_line_str(self) -> str:
-        return "{} ({}) | Enrolled: {} | Pending: {}".format(
-            styling("Name", self.name), styling("Cost", self.cost), len(self.enrolled_employees), len(self.pending_requests)
+        return str(
+            "{} ({}) | Enrolled: {} | Pending: {}".format(
+                styling("Name", self.name),
+                styling("Cost", str(self.cost)),
+                len(self.enrolled_employees),
+                len(self.pending_requests),
+            )
         )
 
     class Config:

@@ -84,7 +84,7 @@ class Sale(BaseModel):
         return data
 
     def one_line_str(self) -> str:
-        def _styling(key, value):
+        def _styling(key: str, value: str | int | float) -> str:
             return f" | {key}: {FCOLORS.GREEN}{value}{FCOLORS.END}"
 
         data: str = styling("Sale ID:", self.sale_id)
