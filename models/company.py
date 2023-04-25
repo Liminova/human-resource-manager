@@ -65,6 +65,9 @@ class Company(metaclass=CompanyMeta):
         - password
         - grant_admin
         """
+        if self.is_owner:
+            return True
+
         is_logged_in_admin = self.logged_in_employee.is_admin
         is_input_admin = input_employee.is_admin
         is_self: bool = self.logged_in_employee == input_employee
@@ -81,21 +84,12 @@ class Company(metaclass=CompanyMeta):
         # + everyone
         match type:
             # - themselves, other admins (owner included)
-            case "attendance" | "department" | "payroll" | "performance":
+            case "attendance" | "department" | "payroll" | "performance" | "benefits":
                 if (not is_self) and (not is_input_admin):
                     return True
-            # - themselves, owner
-            case "benefits":
-                if (not is_self) and (not self.is_owner):
-                    return True
             # - other admins (owner included)
-            case "employee":
-                if is_self and (not is_input_admin):
-                    return True
-            # - other admins (owner included)
-            # - other people if they're just an employee
-            case "password":
-                if is_self:
+            case "employee" | "password":
+                if not is_input_admin:
                     return True
             case _:
                 raise ValueError(f"Invalid type for system.can_modify: {type}")
