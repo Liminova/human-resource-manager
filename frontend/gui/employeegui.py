@@ -1,9 +1,8 @@
 import os
-import tkinter
 import customtkinter as ctk
 from tkinter import messagebox as msgbox
 
-from models import Company, Employee, hash
+from models import Company, Employee
 from database.mongo import employee_repo
 from frontend.helpers_gui import *
 from frontend.helpers_gui.global_styling import *
@@ -211,7 +210,6 @@ class EmployeeGui(ctk.CTk):
         ctk.CTkLabel(master=main_frame, text="Password: ", **label_desc_style).grid(row=7, column=0, pady=(20, 0))
         password_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter password", **input_box_style)
         password_entry.grid(row=7, column=1, pady=(20, 0))
-
 
         def _update_handler():
             nonlocal name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry
