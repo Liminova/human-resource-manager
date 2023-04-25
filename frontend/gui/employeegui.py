@@ -1,11 +1,12 @@
-import customtkinter as ctk
-import tkinter
 import os
+import tkinter
+import customtkinter as ctk
+from tkinter import messagebox as msgbox
 
 from models import Company, Employee, hash
 from database.mongo import employee_repo
-from tkinter import messagebox as msgbox
-from frontend.helpers import merge_callable
+from frontend.helpers_gui import *
+from frontend.helpers_gui.global_styling import *
 
 the_company = Company()
 ctk.set_appearance_mode("dark")
@@ -16,94 +17,49 @@ Height = 768
 
 
 class EmployeeGui(ctk.CTk):
-    def __init__(self, master=None):
+    def __init__(self):
         super().__init__()
         self.title("Employee Management")
         self.geometry(f"{Width}x{Height}")
         self.resizable(True, True)
         self.left_frame = ctk.CTkFrame(master=self, corner_radius=10)
 
-        if the_company.logged_in_employee.is_admin:
-            self.admin()
-        else:
-            self.employee()
+        self.admin() if the_company.logged_in_employee.is_admin else self.employee()
 
         self.left_frame.pack(side=ctk.LEFT)
         self.left_frame.pack_propagate(False)
         self.left_frame.configure(width=320, height=760)
 
-        self.right_frame = ctk.CTkFrame(master=self, border_width=2, corner_radius=10)
-        self.right_frame.pack(side=ctk.RIGHT)
+        self.right_frame = ctk.CTkFrame(master=self)
+        self.right_frame.pack(side=ctk.RIGHT, expand=True)
         self.right_frame.pack_propagate(False)
-        self.right_frame.configure(width=700, height=760)
 
     def admin(self):
-        self.button1 = ctk.CTkButton(
-            master=self.left_frame, text="Add Employee", command=merge_callable(self.__destroy_all_frames, self.__admin_add_employee)
+        menu_buttons = MenuButtons(
+            self.left_frame,
+            self.right_frame,
+            {
+                "Add Employee": self.__admin_add_employee,
+                "Remove Employee": self.__admin_remove_employee,
+                "Update Employee": self.__admin_update_employee,
+                "View Employee": self.__admin_view_employee,
+                "Change Password": self.__change_password,
+                "Back": self.__back_to_homepage,
+            },
         )
-        self.__button_style(self.button1)
-        self.button1.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
-
-        self.button2 = ctk.CTkButton(
-            master=self.left_frame, text="Remove Employee", command=merge_callable(self.__destroy_all_frames, self.__admin_remove_employee)
-        )
-        self.__button_style(self.button2)
-        self.button2.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
-
-        self.button3 = ctk.CTkButton(
-            master=self.left_frame, text="Update Employee", command=merge_callable(self.__destroy_all_frames, self.__admin_update_employee)
-        )
-        self.__button_style(self.button3)
-        self.button3.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
-
-        self.button4 = ctk.CTkButton(
-            master=self.left_frame, text="View Employee", command=merge_callable(self.__destroy_all_frames, self.__admin_view_employee)
-        )
-        self.__button_style(self.button4)
-        self.button4.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
-
-        self.button5 = ctk.CTkButton(
-            master=self.left_frame, text="View All Employees", command=merge_callable(self.__destroy_all_frames, self.__admin_list_all_employees)
-        )
-        self.__button_style(self.button5)
-        self.button5.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
-
-        self.button6 = ctk.CTkButton(
-            master=self.left_frame, text="Change Password", command=merge_callable(self.__destroy_all_frames, self.__admin_change_password)
-        )
-        self.__button_style(self.button6)
-        self.button6.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
-
-        self.button7 = ctk.CTkButton(master=self.left_frame, text="Back", command=lambda self=self: self.__back_to_homepage())
-        self.button7.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
-        self.button7.place(relx=0.5, rely=0.7, anchor=tkinter.CENTER)
+        menu_buttons.create()
 
     def employee(self):
-        self.button4 = ctk.CTkButton(
-            master=self.left_frame, text="View Employee", command=merge_callable(self.__destroy_all_frames, self.__employee_view_employee)
+        menu_buttons = MenuButtons(
+            self.left_frame,
+            self.right_frame,
+            {
+                "View Employee": self.__employee_view_employee,
+                "Change Password": self.__change_password,
+                "Back": self.__back_to_homepage,
+            },
         )
-        self.__button_style(self.button4)
-        self.button4.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
-
-        self.button6 = ctk.CTkButton(
-            master=self.left_frame, text="Change Password", command=merge_callable(self.__destroy_all_frames, self.__employee_change_password)
-        )
-        self.__button_style(self.button6)
-        self.button6.place(relx=0.5, rely=0.55, anchor=tkinter.CENTER)
-
-        self.button7 = ctk.CTkButton(master=self.left_frame, text="Back", fg_color="red", command=lambda self=self: self.__back_to_homepage())
-        self.button7.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
-        self.button7.place(relx=0.5, rely=0.7, anchor=tkinter.CENTER)
-
-    def __style_input_box(self, element):
-        element.configure(width=400, height=30, font=("Century Gothic", 14), corner_radius=10)
-
-    def __button_style(self, button):
-        button.configure(width=260, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-
-    def __destroy_all_frames(self):
-        for widget in self.right_frame.winfo_children():
-            widget.destroy()
+        menu_buttons.create()
 
     def __back_to_homepage(self):
         from .homepage import Homepage
@@ -114,67 +70,45 @@ class EmployeeGui(ctk.CTk):
     # region: admin functions
 
     def __admin_add_employee(self):
-        self.button1_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button1_frame, text="Information", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        ctk.CTkLabel(master=main_frame, text="Add Employee", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text="Name: ", **label_desc_style).grid(row=1, column=0, pady=(20, 0))
+        name_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter name", **input_box_style)
+        name_entry.grid(row=1, column=1, pady=(20, 0))
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Name")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text="Date of birth: ", **label_desc_style).grid(row=2, column=0, pady=(20, 0))
+        dob_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter date of birth", **input_box_style)
+        dob_entry.grid(row=2, column=1, pady=(20, 0))
 
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="Date of birth: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.145, rely=0.275, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text="ID: ", **label_desc_style).grid(row=3, column=0, pady=(20, 0))
+        id_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter ID", **input_box_style)
+        id_entry.grid(row=3, column=1, pady=(20, 0))
 
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="YYYY-MM-DD")
-        self.__style_input_box(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text="Phone Number: ", **label_desc_style).grid(row=4, column=0, pady=(20, 0))
+        phone_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter phone number", **input_box_style)
+        phone_entry.grid(row=4, column=1, pady=(20, 0))
 
-        self.label3 = ctk.CTkLabel(master=self.right_frame, text="ID: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.0715, rely=0.4, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text="Email: ", **label_desc_style).grid(row=5, column=0, pady=(20, 0))
+        email_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter email", **input_box_style)
+        email_entry.grid(row=5, column=1, pady=(20, 0))
 
-        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__style_input_box(self.entry3)
-        self.entry3.place(relx=0.325, rely=0.445, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text="Password: ", **label_desc_style).grid(row=6, column=0, pady=(20, 0))
+        password_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter password", **input_box_style)
+        password_entry.grid(row=6, column=1, pady=(20, 0))
 
-        self.label4 = ctk.CTkLabel(master=self.right_frame, text="Phone Number: ", font=("Century Gothic", 20, "italic"))
-        self.label4.place(relx=0.155, rely=0.525, anchor=tkinter.CENTER)
-
-        self.entry4 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Phone Number")
-        self.__style_input_box(self.entry4)
-        self.entry4.place(relx=0.325, rely=0.57, anchor=tkinter.CENTER)
-
-        self.label5 = ctk.CTkLabel(master=self.right_frame, text="Email: ", font=("Century Gothic", 20, "italic"))
-        self.label5.place(relx=0.09, rely=0.65, anchor=tkinter.CENTER)
-
-        self.entry5 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Email")
-        self.__style_input_box(self.entry5)
-        self.entry5.place(relx=0.325, rely=0.695, anchor=tkinter.CENTER)
-
-        self.label6 = ctk.CTkLabel(master=self.right_frame, text="Password: ", font=("Century Gothic", 20, "italic"))
-        self.label6.place(relx=0.125, rely=0.775, anchor=tkinter.CENTER)
-
-        self.entry6 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Password", show="*")
-        self.__style_input_box(self.entry6)
-        self.entry6.place(relx=0.325, rely=0.82, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="Confirm", command=(lambda: add_successfully(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
-
-        self.button1_frame.pack(pady=20)
-
-        def add_successfully(self):
-            name = self.entry1.get()
-            dob = self.entry2.get()
-            empl_id = self.entry3.get()
-            phone = self.entry4.get()
-            email = self.entry5.get()
+        def _add_successfully():
+            name = name_entry.get()
+            dob = dob_entry.get()
+            empl_id = id_entry.get()
+            phone = phone_entry.get()
+            email = email_entry.get()
+            password = password_entry.get()
             employee = Employee()
-            password = self.entry6.get()
             if name == "" or dob == "" or id == "" or phone == "" or email == "":
                 msgbox.showerror("Error", "Please fill in all the fields")
             elif not name.isalpha():
@@ -198,360 +132,221 @@ class EmployeeGui(ctk.CTk):
                     employee_repo.insert_one(employee.dict(by_alias=True))
                 msgbox.showinfo("Success", "Employee added successfully")
 
+        ctk.CTkButton(master=main_frame, text="Add", command=_add_successfully, **btn_action_style).grid(
+            row=7, column=0, columnspan=2, pady=(20, 0)
+        )
+
     def __admin_remove_employee(self):
-        self.button2_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button2_frame, text="Remove Employee", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        ctk.CTkLabel(master=main_frame, text="Remove Employee", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Employee's name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.175, rely=0.15, anchor=tkinter.CENTER)
+        # Select employee from a list
+        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
+        _display_list = display_list(
+            _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
+                row=1, column=0, columnspan=2, pady=20, padx=20
+            )
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter employee's name")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        def _remove_successfully():
+            if msgbox.askyesno("Confirmation", "Are you sure you want to remove this employee?"):
+                the_company.employees.pop(radio_empl_idx_select.get())
 
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="Employee's ID: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.145, rely=0.275, anchor=tkinter.CENTER)
-
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter employee's ID")
-        self.__style_input_box(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="Remove", fg_color="red", command=(lambda: remove_successfully(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button.place(relx=0.5, rely=0.55, anchor=tkinter.CENTER)
-
-        self.button2_frame.pack(pady=20)
-
-        def remove_successfully(self):
-            employee_name = self.entry1.get()
-            employee_id = self.entry2.get()
-            if employee_name == "" and employee_id == "":
-                msgbox.showerror("Error", "Please fill in at least one field")
-
-            for e in the_company.employees:
-                # finding the employee by name or id
-                found_employee_by_name = e.name == employee_name
-                found_employee_by_id = e.employee_id == employee_id if employee_id else False
-                if not (found_employee_by_name or found_employee_by_id):
-                    continue
-
-                # removing the employee
-                the_company.employees.remove(e)
                 if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.delete_one({"_id": e.id})
-                break
-            else:
-                msgbox.showerror("Error", "Employee not found")
-                return
+                    employee_repo.delete_one({"employee_id": the_company.employees[radio_empl_idx_select.get()].employee_id})
+                msgbox.showinfo("Success", "Employee removed successfully")
 
-            msgbox.showinfo("Success", "Employee removed successfully")
+        ctk.CTkButton(master=main_frame, text="Remove", command=_remove_successfully, **btn_action_style).grid(
+            row=2, column=0, columnspan=2, pady=(20, 0)
+        )
 
     def __admin_update_employee(self):
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Enter the ID to make changes: ", font=("Century Gothic", 14, "italic"))
-        self.label1.place(relx=0.195, rely=0.15, anchor=tkinter.CENTER)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.entry1.configure(width=100, font=("Century Gothic", 15, "italic"))
-        self.entry1.place(relx=0.45, rely=0.15, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text="Update Employee", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="New name: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.135, rely=0.275, anchor=tkinter.CENTER)
+        # Select employee from a list
+        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
+        _display_list = display_list(
+            _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
+                row=1, column=0, columnspan=2, pady=20, padx=20
+            )
 
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter name")
-        self.__style_input_box(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text="Name: ", **label_desc_style).grid(row=2, column=0, pady=(20, 0))
+        name_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter name", **input_box_style)
+        name_entry.grid(row=2, column=1, pady=(20, 0))
 
-        self.label3 = ctk.CTkLabel(master=self.right_frame, text="New DOB: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.1285, rely=0.4, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text="Date of Birth: ", **label_desc_style).grid(row=3, column=0, pady=(20, 0))
+        dob_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter date of birth", **input_box_style)
+        dob_entry.grid(row=3, column=1, pady=(20, 0))
 
-        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="YYYY-MM-DD")
-        self.__style_input_box(self.entry3)
-        self.entry3.place(relx=0.325, rely=0.445, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text="ID: ", **label_desc_style).grid(row=4, column=0, pady=(20, 0))
+        id_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter ID", **input_box_style)
+        id_entry.grid(row=4, column=1, pady=(20, 0))
 
-        self.label4 = ctk.CTkLabel(master=self.right_frame, text="New Phone Number: ", font=("Century Gothic", 20, "italic"))
-        self.label4.place(relx=0.2, rely=0.525, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text="Phone Number: ", **label_desc_style).grid(row=5, column=0, pady=(20, 0))
+        phone_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter phone number", **input_box_style)
+        phone_entry.grid(row=5, column=1, pady=(20, 0))
 
-        self.entry4 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Phone Number")
-        self.__style_input_box(self.entry4)
-        self.entry4.place(relx=0.325, rely=0.57, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text="Email: ", **label_desc_style).grid(row=6, column=0, pady=(20, 0))
+        email_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter email", **input_box_style)
+        email_entry.grid(row=6, column=1, pady=(20, 0))
 
-        self.label5 = ctk.CTkLabel(master=self.right_frame, text="New Email: ", font=("Century Gothic", 20, "italic"))
-        self.label5.place(relx=0.135, rely=0.65, anchor=tkinter.CENTER)
+        ctk.CTkLabel(master=main_frame, text="Password: ", **label_desc_style).grid(row=7, column=0, pady=(20, 0))
+        password_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter password", **input_box_style)
+        password_entry.grid(row=7, column=1, pady=(20, 0))
 
-        self.entry5 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Email")
-        self.__style_input_box(self.entry5)
-        self.entry5.place(relx=0.325, rely=0.695, anchor=tkinter.CENTER)
+        def _update_successfully():
+            if msgbox.askyesno("Confirmation", "Are you sure you want to update this employee?"):
+                the_company.employees[radio_empl_idx_select.get()].name = name_entry.get()
+                the_company.employees[radio_empl_idx_select.get()].date_of_birth = dob_entry.get()
+                the_company.employees[radio_empl_idx_select.get()].employee_id = id_entry.get()
+                the_company.employees[radio_empl_idx_select.get()].phone_number = phone_entry.get()
+                the_company.employees[radio_empl_idx_select.get()].email = email_entry.get()
+                the_company.employees[radio_empl_idx_select.get()].password = password_entry.get()
 
-        self.label6 = ctk.CTkLabel(master=self.right_frame, text="New Password: ", font=("Century Gothic", 20, "italic"))
-        self.label6.place(relx=0.165, rely=0.775, anchor=tkinter.CENTER)
-
-        self.entry6 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Password", show="*")
-        self.__style_input_box(self.entry6)
-        self.entry6.place(relx=0.325, rely=0.82, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="Confirm", command=(lambda: update_successfully(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
-
-        def update_successfully(self):
-            name = self.entry1.get()
-            dob = self.entry2.get()
-            id = self.entry3.get()
-            phone = self.entry4.get()
-            email = self.entry5.get()
-            password = self.entry6.get()
-            if name == "" or dob == "" or id == "" or phone == "" or email == "":
-                msgbox.showerror("Error", "Please fill in all the fields")
-            if not name.isalpha():
-                msgbox.showerror("Error", "Please enter a valid name")
-            if not phone.isdigit() and len(phone) != 10:
-                msgbox.showerror("Error", "Please enter a valid phone number")
-                return
-            if "@" not in email:
-                msgbox.showerror("Error", "Please enter a valid email")
-                return
-            if "-" not in dob:
-                msgbox.showerror("Error", "Please enter a valid date of birth")
-                return
-            try:
-                # fmt:off
-                (the_company
-                    .get_empl_by_id(id)
-                    .unwrap()
-                    .set_name(name)
-                    .unwrap()
-                    .set_dob(dob)
-                    .unwrap()
-                    .set_phone(phone)
-                    .unwrap()
-                    .set_email(email)
-                    .unwrap()
-                    .set_password(password)
-                    .unwrap()
-                ) 
-                # fmt:on
                 if os.getenv("HRMGR_DB") == "TRUE":
                     employee_repo.update_one(
-                        {"_id": the_company.get_empl_by_id(id).unwrap().id},
-                        {"$set": the_company.get_empl_by_id(id).unwrap().dict(exclude={"id"}, by_alias=True)},
-                        upsert=True,
+                        {"employee_id": the_company.employees[radio_empl_idx_select.get()].employee_id},
+                        {
+                            "$set": {
+                                "name": the_company.employees[radio_empl_idx_select.get()].name,
+                                "date_of_birth": the_company.employees[radio_empl_idx_select.get()].dob,
+                                "employee_id": the_company.employees[radio_empl_idx_select.get()].employee_id,
+                                "phone_number": the_company.employees[radio_empl_idx_select.get()].phone,
+                                "email": the_company.employees[radio_empl_idx_select.get()].email,
+                                "password": the_company.employees[radio_empl_idx_select.get()].hashed_password,
+                            }
+                        },
                     )
-
                 msgbox.showinfo("Success", "Employee updated successfully")
-            except ValueError as e:
-                msgbox.showerror("Error", str(e))
+
+        ctk.CTkButton(master=main_frame, text="Update", command=_update_successfully, **btn_action_style).grid(
+            row=8, column=0, columnspan=2, pady=(20, 0)
+        )
 
     def __admin_view_employee(self):
-        self.button2_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button2_frame, text="View Employee", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        ctk.CTkLabel(master=main_frame, text="View Employee", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Employee ID: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.145, rely=0.15, anchor=tkinter.CENTER)
+        # Select employee from a list
+        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
+        _display_list = display_list(
+            _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
+                row=1, column=0, columnspan=2, pady=20, padx=20
+            )
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        def _display_employee():
+            _empl = the_company.employees[radio_empl_idx_select.get()]
+            _empl_info = (
+                f"Name: {_empl.name}\n"
+                f"Date of Birth: {_empl.dob}\n"
+                f"ID: {_empl.employee_id}\n"
+                f"Phone Number: {_empl.phone}\n"
+                f"Email: {_empl.email}\n"
+                f"Password: {_empl.hashed_password}\n"
+            )
+            ctk.CTkLabel(master=main_frame, text=_empl_info, **label_desc_style).grid(
+                row=2, column=0, columnspan=2, pady=20, padx=20
+            )
 
-        self.button = ctk.CTkButton(master=self.right_frame, text="View", fg_color="purple", command=(lambda: view_employee(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
-
-        self.button2_frame.pack(pady=20)
-
-        def view_employee(self):
-            id = self.entry1.get()
-            employees = the_company.employees
-
-            if id == "":
-                msgbox.showerror("Error", "Please enter an ID")
-            else:
-                for employee in employees:
-                    if employee.employee_id == id:
-                        msgbox.showinfo(
-                            "Employee Details",
-                            f"Name: {employee.name}\nDate of Birth: {employee.dob}\nEmployee ID: {employee.employee_id}\nPhone Number: {employee.phone}\nEmail: {employee.email}",
-                        )
-                        break
-                else:
-                    msgbox.showerror("Error", "Employee not found")
-
-    def __admin_list_all_employees(self):
-        self.button3_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button3_frame, text="Click to view the list of employees", font=("Century Gothic", 20, "bold"))
-        self.label.pack()
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="View", fg_color="purple", command=lambda self=self: list_all_employees(self))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
-
-        def list_all_employees(self):
-            employees = the_company.employees
-            if len(employees) == 0:
-                msgbox.showerror("Error", "No employees found")
-            else:
-                msgbox.showinfo("Employees", f"Employees:\n{[employee.name for employee in employees]}")
-
-        self.button3_frame.pack(pady=20)
-
-    def __admin_change_password(self):
-        self.button4_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button4_frame, text="Change Password", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Old Password: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.15, rely=0.15, anchor=tkinter.CENTER)
-
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Old Password", show="*")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="New Password: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.15, rely=0.275, anchor=tkinter.CENTER)
-
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter New Password", show="*")
-        self.__style_input_box(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
-
-        self.label3 = ctk.CTkLabel(master=self.right_frame, text="Confirm Password: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.175, rely=0.4, anchor=tkinter.CENTER)
-
-        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Confirm New Password", show="*")
-        self.__style_input_box(self.entry3)
-        self.entry3.place(relx=0.325, rely=0.445, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="Change", fg_color="purple", command=lambda: change_password_successfully(self))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button.place(relx=0.5, rely=0.545, anchor=tkinter.CENTER)
-
-        def change_password_successfully(self):
-            employee = the_company.logged_in_employee
-
-            old_password = self.entry1.get()
-            new_password = self.entry2.get()
-            confirm_password = self.entry3.get()
-
-            if old_password == "" or new_password == "" or confirm_password == "":
-                msgbox.showerror("Error", "Please enter a valid password")
-                return
-            if new_password != confirm_password:
-                msgbox.showerror("Error", "New password and confirm password do not match")
-                return
-
-            if hash(employee.name, old_password) != employee.hashed_password:
-                msgbox.showerror("Error", "Incorrect current password")
-                return
-
-            employee.hashed_password = hash(employee.name, new_password)
-            if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"hashed_password"})}, upsert=True)
-
-            msgbox.showinfo("Success", "Password changed successfully")
+        ctk.CTkButton(master=main_frame, text="View", command=_display_employee, **btn_action_style).grid(
+            row=3, column=0, columnspan=2, pady=(20, 0)
+        )
 
     # endregion
 
     # region: employee functions
 
     def __employee_view_employee(self):
-        self.button2_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button2_frame, text="View Employee", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Employee ID: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.145, rely=0.15, anchor=tkinter.CENTER)
-
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="View", fg_color="purple", command=(lambda: view_employee(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
-
-        self.button2_frame.pack(pady=20)
-
-        def view_employee(self):
-            id = self.entry1.get()
-            employees = the_company.employees
-
-            if id == "":
-                msgbox.showerror("Error", "Please enter an ID")
-            else:
-                for employee in employees:
-                    if employee.employee_id == id:
-                        msgbox.showinfo(
-                            "Employee Details",
-                            f"Name: {employee.name}\nDate of Birth: {employee.dob}\nEmployee ID: {employee.employee_id}\nPhone Number: {employee.phone}\nEmail: {employee.email}",
-                        )
-                        break
-                else:
-                    msgbox.showerror("Error", "Employee not found")
-
-    def __employee_change_password(self):
-        self.button4_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button4_frame, text="Change Password", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Old Password: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.15, rely=0.15, anchor=tkinter.CENTER)
-
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Old Password", show="*")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="New Password: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.15, rely=0.275, anchor=tkinter.CENTER)
-
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter New Password", show="*")
-        self.__style_input_box(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
-
-        self.label3 = ctk.CTkLabel(master=self.right_frame, text="Confirm Password: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.175, rely=0.4, anchor=tkinter.CENTER)
-
-        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Confirm New Password", show="*")
-        self.__style_input_box(self.entry3)
-        self.entry3.place(relx=0.325, rely=0.445, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(
-            master=self.right_frame,
-            text="Change",
-            fg_color="purple",
-            # command=(lambda: change_password_successfully(self)),
-            command=lambda self=self: change_password_successfully(self),
+        ctk.CTkLabel(master=main_frame, text="View Employee", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
         )
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button.place(relx=0.5, rely=0.545, anchor=tkinter.CENTER)
 
-        def change_password_successfully(self):
-            employee = the_company.logged_in_employee
+        def _display_employee():
+            _empl = the_company.logged_in_employee
+            _empl_info = (
+                f"Name: {_empl.name}\n"
+                f"Date of Birth: {_empl.dob}\n"
+                f"ID: {_empl.employee_id}\n"
+                f"Phone Number: {_empl.phone}\n"
+                f"Email: {_empl.email}\n"
+                f"Password: {_empl.hashed_password}\n"
+            )
+            ctk.CTkLabel(master=main_frame, text=_empl_info, **label_desc_style).grid(
+                row=2, column=0, columnspan=2, pady=20, padx=20
+            )
 
-            old_password = self.entry1.get()
-            new_password = self.entry2.get()
-            confirm_password = self.entry3.get()
-
-            if old_password == "" or new_password == "" or confirm_password == "":
-                msgbox.showerror("Error", "Please enter a valid password")
-                return
-            if new_password != confirm_password:
-                msgbox.showerror("Error", "New password and confirm password do not match")
-                return
-
-            if hash(employee.employee_id, old_password) != employee.hashed_password:
-                msgbox.showerror("Error", "Incorrect current password")
-                return
-
-            employee.hashed_password = hash(employee.employee_id, new_password)
-            if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"hashed_password"})}, upsert=True)
-
-            msgbox.showinfo("Success", "Password changed successfully")
+        ctk.CTkButton(master=main_frame, text="View", command=_display_employee, **btn_action_style).grid(
+            row=3, column=0, columnspan=2, pady=(20, 0)
+        )
 
     # endregion
+
+    def __change_password(self):
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
+
+        ctk.CTkLabel(master=main_frame, text="Change Password", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
+
+        ctk.CTkLabel(master=main_frame, text="Old Password: ", **label_desc_style).grid(row=1, column=0, pady=(20, 0))
+        old_password_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter old password", **input_box_style)
+        old_password_entry.grid(row=1, column=1, pady=(20, 0))
+
+        ctk.CTkLabel(master=main_frame, text="New Password: ", **label_desc_style).grid(row=2, column=0, pady=(20, 0))
+        new_password_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter new password", **input_box_style)
+        new_password_entry.grid(row=2, column=1, pady=(20, 0))
+
+        ctk.CTkLabel(master=main_frame, text="Confirm Password: ", **label_desc_style).grid(row=3, column=0, pady=(20, 0))
+        confirm_password_entry = ctk.CTkEntry(
+            master=main_frame, placeholder_text="Enter confirm password", **input_box_style
+        )
+        confirm_password_entry.grid(row=3, column=1, pady=(20, 0))
+
+        def _change_password_successfully():
+            logged_in_employee = the_company.logged_in_employee
+            if old_password_entry.get() != the_company.logged_in_employee.hashed_password:
+                msgbox.showerror("Error", "Old password is incorrect")
+            elif new_password_entry.get() != confirm_password_entry.get():
+                msgbox.showerror("Error", "New password and confirm password do not match")
+            else:
+                the_company.logged_in_employee.hashed_password = new_password_entry.get()
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one(
+                        {"_id": logged_in_employee.employee_id},
+                        {"$set": logged_in_employee.dict(include={"hashed_password"})},
+                        upsert=True,
+                    )
+
+                msgbox.showinfo("Success", "Password changed successfully")
+
+        ctk.CTkButton(master=main_frame, text="Change", command=_change_password_successfully, **btn_action_style).grid(
+            row=4, column=0, columnspan=2, pady=(20, 0)
+        )
