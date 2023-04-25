@@ -123,7 +123,7 @@ class EmployeeGui(ctk.CTk):
             msgbox.showinfo("Success", "Employee added successfully")
 
         ctk.CTkButton(master=main_frame, text="Add", command=_add_handler, **btn_action_style).grid(
-            row=7, column=0, columnspan=2, pady=(20, 0)
+            row=7, column=0, columnspan=2, pady=20
         )
 
     def __admin_remove_employee(self):
@@ -154,7 +154,7 @@ class EmployeeGui(ctk.CTk):
                 msgbox.showinfo("Success", "Employee removed successfully")
 
         ctk.CTkButton(master=main_frame, text="Remove", command=_remove_handler, **btn_action_style).grid(
-            row=2, column=0, columnspan=2, pady=(20, 0)
+            row=2, column=0, columnspan=2, pady=(10, 20)
         )
 
     def __admin_update_employee(self):
@@ -162,7 +162,7 @@ class EmployeeGui(ctk.CTk):
         main_frame.grid(row=0, column=0)
 
         ctk.CTkLabel(master=main_frame, text="Update Employee", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
+            row=0, column=0, columnspan=2, pady=20
         )
 
         # Select employee from a list
@@ -175,6 +175,7 @@ class EmployeeGui(ctk.CTk):
             ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
                 row=1, column=0, columnspan=2, pady=20, padx=20
             )
+        _display_list[1].grid(row=1, column=0, columnspan=2, pady=0, padx=20)
 
         name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry = (ctk.CTkEntry(None),) * 6
         for row, label, entry, placeholder in zip(
@@ -214,7 +215,7 @@ class EmployeeGui(ctk.CTk):
             msgbox.showinfo("Success", "Employee updated successfully")
 
         ctk.CTkButton(master=main_frame, text="Update", command=_update_handler, **btn_action_style).grid(
-            row=8, column=0, columnspan=2, pady=(20, 0)
+            row=8, column=0, columnspan=2, pady=20
         )
 
     def __admin_view_employee(self):
@@ -251,7 +252,7 @@ class EmployeeGui(ctk.CTk):
             )
 
         ctk.CTkButton(master=main_frame, text="View", command=_display_employee_handler, **btn_action_style).grid(
-            row=3, column=0, columnspan=2, pady=(20, 0)
+            row=3, column=0, columnspan=2, pady=(10, 20)
         )
 
     # endregion
@@ -291,7 +292,7 @@ class EmployeeGui(ctk.CTk):
         main_frame.grid(row=0, column=0)
 
         ctk.CTkLabel(master=main_frame, text="Change Password", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
+            row=0, column=0, columnspan=2, pady=(20, 0), padx=20
         )
 
         old_pwd_entry, new_pwd_entry, confirm_pwd_entry = (ctk.CTkEntry(None),) * 3
@@ -327,5 +328,5 @@ class EmployeeGui(ctk.CTk):
                 msgbox.showinfo("Success", "Password changed successfully")
 
         ctk.CTkButton(master=main_frame, text="Change", command=_change_password_handler, **btn_action_style).grid(
-            row=4, column=0, columnspan=2, pady=(20, 0)
+            row=4, column=0, columnspan=2, pady=20
         )
