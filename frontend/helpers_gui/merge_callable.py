@@ -1,6 +1,9 @@
-def merge_callable(callable_1, callable_2):
+from typing import Callable
+
+
+def merge_callable(*args: Callable) -> Callable:
     def wrapper():
-        callable_1()
-        callable_2()
+        for callable in args:
+            callable()
 
     return wrapper
