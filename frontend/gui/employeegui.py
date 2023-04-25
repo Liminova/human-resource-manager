@@ -76,29 +76,18 @@ class EmployeeGui(ctk.CTk):
             row=0, column=0, columnspan=2, pady=(20, 0)
         )
 
-        ctk.CTkLabel(master=main_frame, text="Name: ", **label_desc_style).grid(row=1, column=0, pady=(20, 0))
-        name_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter name", **input_box_style)
-        name_entry.grid(row=1, column=1, pady=(20, 0))
-
-        ctk.CTkLabel(master=main_frame, text="Date of birth: ", **label_desc_style).grid(row=2, column=0, pady=(20, 0))
-        dob_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter date of birth", **input_box_style)
-        dob_entry.grid(row=2, column=1, pady=(20, 0))
-
-        ctk.CTkLabel(master=main_frame, text="ID: ", **label_desc_style).grid(row=3, column=0, pady=(20, 0))
-        id_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter ID", **input_box_style)
-        id_entry.grid(row=3, column=1, pady=(20, 0))
-
-        ctk.CTkLabel(master=main_frame, text="Phone Number: ", **label_desc_style).grid(row=4, column=0, pady=(20, 0))
-        phone_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter phone number", **input_box_style)
-        phone_entry.grid(row=4, column=1, pady=(20, 0))
-
-        ctk.CTkLabel(master=main_frame, text="Email: ", **label_desc_style).grid(row=5, column=0, pady=(20, 0))
-        email_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter email", **input_box_style)
-        email_entry.grid(row=5, column=1, pady=(20, 0))
-
-        ctk.CTkLabel(master=main_frame, text="Password: ", **label_desc_style).grid(row=6, column=0, pady=(20, 0))
-        password_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter password", **input_box_style)
-        password_entry.grid(row=6, column=1, pady=(20, 0))
+        name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry = (ctk.CTkEntry(None),) * 6
+        for i, entry, label, placeholder in zip(
+            range(1, 7),
+            (name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry),
+            ("Name: ", "Date of birth: ", "ID: ", "Phone Number: ", "Email: ", "Password: "),
+            ("Alex", "2000-12-31", "1234ABC", "0123456789", "hello@wo.rld", "secure"),
+        ):
+            ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(
+                row=i, column=0, pady=(20, 0), padx=20, sticky="w"
+            )
+            entry = ctk.CTkEntry(master=main_frame, placeholder_text=placeholder, **input_box_style)
+            entry.grid(row=i, column=1, pady=(20, 0), padx=(0, 20))
 
         def _add_handler():
             nonlocal name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry
@@ -187,29 +176,19 @@ class EmployeeGui(ctk.CTk):
                 row=1, column=0, columnspan=2, pady=20, padx=20
             )
 
-        ctk.CTkLabel(master=main_frame, text="Name: ", **label_desc_style).grid(row=2, column=0, pady=(20, 0))
-        name_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter name", **input_box_style)
-        name_entry.grid(row=2, column=1, pady=(20, 0))
-
-        ctk.CTkLabel(master=main_frame, text="Date of Birth: ", **label_desc_style).grid(row=3, column=0, pady=(20, 0))
-        dob_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter date of birth", **input_box_style)
-        dob_entry.grid(row=3, column=1, pady=(20, 0))
-
-        ctk.CTkLabel(master=main_frame, text="ID: ", **label_desc_style).grid(row=4, column=0, pady=(20, 0))
-        id_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter ID", **input_box_style)
-        id_entry.grid(row=4, column=1, pady=(20, 0))
-
-        ctk.CTkLabel(master=main_frame, text="Phone Number: ", **label_desc_style).grid(row=5, column=0, pady=(20, 0))
-        phone_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter phone number", **input_box_style)
-        phone_entry.grid(row=5, column=1, pady=(20, 0))
-
-        ctk.CTkLabel(master=main_frame, text="Email: ", **label_desc_style).grid(row=6, column=0, pady=(20, 0))
-        email_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter email", **input_box_style)
-        email_entry.grid(row=6, column=1, pady=(20, 0))
-
-        ctk.CTkLabel(master=main_frame, text="Password: ", **label_desc_style).grid(row=7, column=0, pady=(20, 0))
-        password_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter password", **input_box_style)
-        password_entry.grid(row=7, column=1, pady=(20, 0))
+        name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry = (ctk.CTkEntry(None),) * 6
+        for row, label, entry, placeholder in zip(
+            range(2, 8),
+            ("Name: ", "Date of Birth: ", "ID: ", "Phone Number: ", "Email: ", "Password: "),
+            (name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry),
+            ("Alex", "2000-12-31", "1234ABC", "0123456789", "hello@wo.rld", "secure"),
+        ):
+            ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(
+                row=row, column=0, padx=(20, 0), pady=(20, 0), sticky="w"
+            )
+            entry = ctk.CTkEntry(master=main_frame, placeholder_text=placeholder, **input_box_style)
+            entry.configure(placeholder_text=placeholder, **input_box_style)
+            entry.grid(row=row, column=1, padx=20, pady=(20, 0))
 
         def _update_handler():
             nonlocal name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry
@@ -315,19 +294,18 @@ class EmployeeGui(ctk.CTk):
             row=0, column=0, columnspan=2, pady=(20, 0)
         )
 
-        ctk.CTkLabel(master=main_frame, text="Old Password: ", **label_desc_style).grid(row=1, column=0, pady=(20, 0))
-        old_password_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter old password", **input_box_style)
-        old_password_entry.grid(row=1, column=1, pady=(20, 0))
-
-        ctk.CTkLabel(master=main_frame, text="New Password: ", **label_desc_style).grid(row=2, column=0, pady=(20, 0))
-        new_password_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter new password", **input_box_style)
-        new_password_entry.grid(row=2, column=1, pady=(20, 0))
-
-        ctk.CTkLabel(master=main_frame, text="Confirm Password: ", **label_desc_style).grid(row=3, column=0, pady=(20, 0))
-        confirm_password_entry = ctk.CTkEntry(
-            master=main_frame, placeholder_text="Enter confirm password", **input_box_style
-        )
-        confirm_password_entry.grid(row=3, column=1, pady=(20, 0))
+        old_pwd_entry, new_pwd_entry, confirm_pwd_entry = (ctk.CTkEntry(None),) * 3
+        for row, entry, label, placeholder in zip(
+            range(1, 4),
+            (old_pwd_entry, new_pwd_entry, confirm_pwd_entry),
+            ("Old: ", "New: ", "Confirm: "),
+            ("secure", "newpass", "newpass"),
+        ):
+            ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(
+                row=row, column=0, pady=(20, 0), sticky="w", padx=20
+            )
+            entry = ctk.CTkEntry(master=main_frame, placeholder_text=placeholder, **input_box_style)
+            entry.grid(row=row, column=1, pady=(20, 0), padx=(0, 20))
 
         def _change_password_handler():
             logged_in_employee = the_company.logged_in_employee
