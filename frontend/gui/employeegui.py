@@ -101,7 +101,6 @@ class EmployeeGui(ctk.CTk):
         password_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter password", **input_box_style)
         password_entry.grid(row=6, column=1, pady=(20, 0))
 
-        def _add_successfully():
             name = name_entry.get()
             dob = dob_entry.get()
             empl_id = id_entry.get()
@@ -127,12 +126,13 @@ class EmployeeGui(ctk.CTk):
                 employee.email = email
                 employee.hashed_password = hash(employee.employee_id, password)
                 the_company.employees.append(employee)
+        def _add_handler():
 
                 if os.getenv("HRMGR_DB") == "TRUE":
                     employee_repo.insert_one(employee.dict(by_alias=True))
                 msgbox.showinfo("Success", "Employee added successfully")
 
-        ctk.CTkButton(master=main_frame, text="Add", command=_add_successfully, **btn_action_style).grid(
+        ctk.CTkButton(master=main_frame, text="Add", command=_add_handler, **btn_action_style).grid(
             row=7, column=0, columnspan=2, pady=(20, 0)
         )
 
@@ -155,7 +155,7 @@ class EmployeeGui(ctk.CTk):
                 row=1, column=0, columnspan=2, pady=20, padx=20
             )
 
-        def _remove_successfully():
+        def _remove_handler():
             if msgbox.askyesno("Confirmation", "Are you sure you want to remove this employee?"):
                 the_company.employees.pop(radio_empl_idx_select.get())
 
@@ -163,7 +163,7 @@ class EmployeeGui(ctk.CTk):
                     employee_repo.delete_one({"employee_id": the_company.employees[radio_empl_idx_select.get()].employee_id})
                 msgbox.showinfo("Success", "Employee removed successfully")
 
-        ctk.CTkButton(master=main_frame, text="Remove", command=_remove_successfully, **btn_action_style).grid(
+        ctk.CTkButton(master=main_frame, text="Remove", command=_remove_handler, **btn_action_style).grid(
             row=2, column=0, columnspan=2, pady=(20, 0)
         )
 
@@ -210,7 +210,6 @@ class EmployeeGui(ctk.CTk):
         password_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter password", **input_box_style)
         password_entry.grid(row=7, column=1, pady=(20, 0))
 
-        def _update_successfully():
             if msgbox.askyesno("Confirmation", "Are you sure you want to update this employee?"):
                 the_company.employees[radio_empl_idx_select.get()].name = name_entry.get()
                 the_company.employees[radio_empl_idx_select.get()].date_of_birth = dob_entry.get()
@@ -234,8 +233,9 @@ class EmployeeGui(ctk.CTk):
                         },
                     )
                 msgbox.showinfo("Success", "Employee updated successfully")
+        def _update_handler():
 
-        ctk.CTkButton(master=main_frame, text="Update", command=_update_successfully, **btn_action_style).grid(
+        ctk.CTkButton(master=main_frame, text="Update", command=_update_handler, **btn_action_style).grid(
             row=8, column=0, columnspan=2, pady=(20, 0)
         )
 
@@ -258,7 +258,7 @@ class EmployeeGui(ctk.CTk):
                 row=1, column=0, columnspan=2, pady=20, padx=20
             )
 
-        def _display_employee():
+        def _display_employee_handler():
             _empl = the_company.employees[radio_empl_idx_select.get()]
             _empl_info = (
                 f"Name: {_empl.name}\n"
@@ -272,7 +272,7 @@ class EmployeeGui(ctk.CTk):
                 row=2, column=0, columnspan=2, pady=20, padx=20
             )
 
-        ctk.CTkButton(master=main_frame, text="View", command=_display_employee, **btn_action_style).grid(
+        ctk.CTkButton(master=main_frame, text="View", command=_display_employee_handler, **btn_action_style).grid(
             row=3, column=0, columnspan=2, pady=(20, 0)
         )
 
@@ -288,7 +288,7 @@ class EmployeeGui(ctk.CTk):
             row=0, column=0, columnspan=2, pady=(20, 0)
         )
 
-        def _display_employee():
+        def _display_employee_handler():
             _empl = the_company.logged_in_employee
             _empl_info = (
                 f"Name: {_empl.name}\n"
@@ -302,7 +302,7 @@ class EmployeeGui(ctk.CTk):
                 row=2, column=0, columnspan=2, pady=20, padx=20
             )
 
-        ctk.CTkButton(master=main_frame, text="View", command=_display_employee, **btn_action_style).grid(
+        ctk.CTkButton(master=main_frame, text="View", command=_display_employee_handler, **btn_action_style).grid(
             row=3, column=0, columnspan=2, pady=(20, 0)
         )
 
@@ -330,7 +330,7 @@ class EmployeeGui(ctk.CTk):
         )
         confirm_password_entry.grid(row=3, column=1, pady=(20, 0))
 
-        def _change_password_successfully():
+        def _change_password_handler():
             logged_in_employee = the_company.logged_in_employee
             if old_password_entry.get() != the_company.logged_in_employee.hashed_password:
                 msgbox.showerror("Error", "Old password is incorrect")
@@ -347,6 +347,6 @@ class EmployeeGui(ctk.CTk):
 
                 msgbox.showinfo("Success", "Password changed successfully")
 
-        ctk.CTkButton(master=main_frame, text="Change", command=_change_password_successfully, **btn_action_style).grid(
+        ctk.CTkButton(master=main_frame, text="Change", command=_change_password_handler, **btn_action_style).grid(
             row=4, column=0, columnspan=2, pady=(20, 0)
         )
