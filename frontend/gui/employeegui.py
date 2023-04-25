@@ -212,30 +212,29 @@ class EmployeeGui(ctk.CTk):
         password_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter password", **input_box_style)
         password_entry.grid(row=7, column=1, pady=(20, 0))
 
-            if msgbox.askyesno("Confirmation", "Are you sure you want to update this employee?"):
-                the_company.employees[radio_empl_idx_select.get()].name = name_entry.get()
-                the_company.employees[radio_empl_idx_select.get()].date_of_birth = dob_entry.get()
-                the_company.employees[radio_empl_idx_select.get()].employee_id = id_entry.get()
-                the_company.employees[radio_empl_idx_select.get()].phone_number = phone_entry.get()
-                the_company.employees[radio_empl_idx_select.get()].email = email_entry.get()
-                the_company.employees[radio_empl_idx_select.get()].password = password_entry.get()
 
-                if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.update_one(
-                        {"employee_id": the_company.employees[radio_empl_idx_select.get()].employee_id},
-                        {
-                            "$set": {
-                                "name": the_company.employees[radio_empl_idx_select.get()].name,
-                                "date_of_birth": the_company.employees[radio_empl_idx_select.get()].dob,
-                                "employee_id": the_company.employees[radio_empl_idx_select.get()].employee_id,
-                                "phone_number": the_company.employees[radio_empl_idx_select.get()].phone,
-                                "email": the_company.employees[radio_empl_idx_select.get()].email,
-                                "password": the_company.employees[radio_empl_idx_select.get()].hashed_password,
-                            }
-                        },
-                    )
-                msgbox.showinfo("Success", "Employee updated successfully")
         def _update_handler():
+            nonlocal name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry
+            if not msgbox.askyesno("Confirmation", "Are you sure you want to update this employee?"):
+                return
+            _empl = the_company.employees[radio_empl_idx_select.get()]
+
+            for setter, value in zip(
+                (_empl.set_name, _empl.set_dob, _empl.set_id, _empl.set_phone, _empl.set_email, _empl.set_password),
+                (
+                    name_entry.get(),
+                    dob_entry.get(),
+                    id_entry.get(),
+                    phone_entry.get(),
+                    email_entry.get(),
+                    password_entry.get(),
+                ),
+            ):
+                setter(value).unwrap() if value else None
+
+            if os.getenv("HRMGR_DB") == "TRUE":
+                employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(exclude={"id"}, by_alias=True)}, upsert=True)
+            msgbox.showinfo("Success", "Employee updated successfully")
 
         ctk.CTkButton(master=main_frame, text="Update", command=_update_handler, **btn_action_style).grid(
             row=8, column=0, columnspan=2, pady=(20, 0)
