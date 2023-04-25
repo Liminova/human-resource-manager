@@ -4,15 +4,15 @@ from .COLORS import BCOLORS, FCOLORS
 from .get_user_option_from_list import get_user_option_from_list
 from .get_user_option_from_menu import get_user_option_from_menu
 from .listing import listing
-from .loop_til_valid_input import loop_til_valid_input
+from .loop_til_valid_input import loop_til_valid_input  # type: ignore
 from .refresh_tui import refresh
 
 
-def styling(x, y):
+def styling(x: str | int | float, y: str | int | float) -> str:
     return f"- {FCOLORS.CYAN}{x}{FCOLORS.END} {FCOLORS.GREEN}{y}{FCOLORS.END}"
 
 
-def __error_msg(x):
+def __error_msg(x: str) -> str:
     return FCOLORS.RED + x + FCOLORS.END
 
 
