@@ -1,11 +1,11 @@
-import customtkinter as ctk
-import tkinter
-from tkinter import messagebox
 import os
+import tkinter
+import customtkinter as ctk
+from tkinter import messagebox
 
 from models import Company, Payroll
 from database.mongo import employee_repo
-from frontend.helpers import merge_callable
+from frontend.helpers_gui import merge_callable
 
 the_company = Company()
 
