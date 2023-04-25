@@ -191,6 +191,10 @@ class AttendanceGui(ctk.CTk):
             # get the employee object
             empl = empls[empl_idx]
 
+            if not the_company.can_modify("attendance", empl):
+                messagebox.showerror("Error", "You don't have the permission to modify this employee's attendance")
+                return
+
             # update the attendance
             empl.attendance.attendances[date] = is_present
 
