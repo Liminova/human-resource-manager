@@ -28,46 +28,43 @@ class Login(ctk.CTk):
         self.resizable(True, True)
 
         # create a frame
-        self.frame = ctk.CTkFrame(master=self, width=320, height=360, corner_radius=20)
-        self.frame.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
-
-        # create labels
+        main_frame = ctk.CTkFrame(master=self, width=320, height=360, corner_radius=20)
+        main_frame.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
 
         # sign in label
-        self.label = ctk.CTkLabel(master=self.frame, text="Sign In", font=("Century Gothic", 30))
-        self.label.place(relx=0.5, rely=0.15, anchor=tkinter.CENTER)
-
-        # self.label1 = ctk.CTkLabel(master=self.frame, text="Forgot password?", font=('Century Gothic', 12))
-        # self.label1.place(x=155, y=195)
+        ctk.CTkLabel(master=main_frame, text="Sign In", font=("Century Gothic", 30)).place(
+            relx=0.5, rely=0.15, anchor=tkinter.CENTER
+        )
 
         # NOTE: we don't allow employees to sign up, they are added by the admin
-        self.label2 = ctk.CTkLabel(master=self.frame, text="Contact the HR", text_color="cyan", font=("Century Gothic", 12, "underline"))
-        self.label2.place(x=200, y=270)
+        ctk.CTkLabel(
+            master=self.frame, text="Contact the HR", text_color="cyan", font=("Century Gothic", 12, "underline")
+        ).place(x=200, y=270)
 
-        self.label3 = ctk.CTkLabel(master=self.frame, text="Don't have an account?", font=("Century Gothic", 12))
-        self.label3.place(x=50, y=270)
+        ctk.CTkLabel(master=main_frame, text="Don't have an account?", font=("Century Gothic", 12)).place(x=50, y=270)
 
         # create entries
-        # username entry
-        self.entry1 = ctk.CTkEntry(master=self.frame, width=220, placeholder_text="Username", font=("Century Gothic", 14))
-        self.entry1.place(x=50, y=110)
+        input_style = dict(font=("Century Gothic", 14), width=220)
+        input_username = ctk.CTkEntry(master=main_frame, placeholder_text="Username", **input_style)
+        input_username.place(x=50, y=110)
+        input_password = ctk.CTkEntry(master=main_frame, placeholder_text="Password", show="*", **input_style)
+        input_password.place(x=50, y=165)
 
-        # password entry
-        self.entry2 = ctk.CTkEntry(master=self.frame, width=220, placeholder_text="Password", show="*", font=("Century Gothic", 14))
-        self.entry2.place(x=50, y=165)
+        self.data = {"username": input_username, "password": input_password}
 
         # create sign in button
-        self.button1 = ctk.CTkButton(
-            master=self.frame, width=220, text="Sign in", command=self.login_button_handler, corner_radius=6, font=("Century Gothic", 14)
-        )
-        self.button1.place(x=50, y=220)
-
-        # listen for enter key
-        self.bind("<Return>", lambda event: self.login_button_handler())
+        ctk.CTkButton(
+            master=self.frame,
+            width=220,
+            text="Sign in",
+            command=self.login_button_handler,
+            corner_radius=6,
+            font=("Century Gothic", 14),
+        ).place(x=50, y=220)
+        self.bind("<Return>", lambda _: self.login_button_handler())
 
     def login_button_handler(self):
-        username = self.entry1.get()
-        password = self.entry2.get()
+        username, password = self.data["username"].get(), self.data["password"].get()
 
         if username == "" or password == "":
             messagebox.showerror("Error", "Please enter username and password")
