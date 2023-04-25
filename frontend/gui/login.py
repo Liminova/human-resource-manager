@@ -38,7 +38,7 @@ class Login(ctk.CTk):
 
         # NOTE: we don't allow employees to sign up, they are added by the admin
         ctk.CTkLabel(
-            master=self.frame, text="Contact the HR", text_color="cyan", font=("Century Gothic", 12, "underline")
+            master=main_frame, text="Contact the HR", text_color="cyan", font=("Century Gothic", 12, "underline")
         ).place(x=200, y=270)
 
         ctk.CTkLabel(master=main_frame, text="Don't have an account?", font=("Century Gothic", 12)).place(x=50, y=270)
@@ -54,7 +54,7 @@ class Login(ctk.CTk):
 
         # create sign in button
         ctk.CTkButton(
-            master=self.frame,
+            master=main_frame,
             width=220,
             text="Sign in",
             command=self.login_button_handler,
