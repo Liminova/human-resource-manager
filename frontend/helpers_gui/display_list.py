@@ -31,6 +31,10 @@ def display_list(
         colspan: depends on the master widget. If the design has x columns, then colspan should be x.
         cmd (Callable): The command to be executed when an option is selected.
     """
+    if selectable:
+        if len(returned_idx) != 1:
+            raise ValueError("returned_idx must be a list with 1 element")
+
     clustered = clustering(options, page_size)
     current_page = 0
     total_page = len(clustered)
@@ -55,9 +59,7 @@ def display_list(
                     row=i + 1, column=0, padx=20, columnspan=2, sticky=tk.W
                 )
             else:
-                ctk.CTkLabel(master=empl_page, text=option, **label_desc_style).grid(
-                    row=i + 1, column=0, padx=20, columnspan=2, sticky=tk.W
-                )
+                ctk.CTkLabel(master=empl_page, text=option).grid(row=i + 1, column=0, padx=20, columnspan=2, sticky=tk.W)
         btn_prev = ctk.CTkButton(master=empl_page, text="<", command=__prev_page, **btn_action_style)
         btn_prev.grid(row=page_size + 1, column=0, padx=20, pady=20)
         if no_button == "prev":
