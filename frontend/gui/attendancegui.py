@@ -243,7 +243,7 @@ class AttendanceGui(ctk.CTk):
             ).grid(row=2, column=0, pady=20)
 
         btn_action_report = ctk.CTkButton(master=main_frame, text="Report", command=_get_report, **btn_action_style)
-        btn_action_report.grid(row=2, column=0, pady=20)
+        btn_action_report.grid(row=2, column=0, pady=(10, 20))
 
     def __employee_attendance_report(self):
         main_frame = ctk.CTkFrame(master=self.right_frame)
