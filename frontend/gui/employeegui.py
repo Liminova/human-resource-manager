@@ -2,7 +2,7 @@ import os
 import customtkinter as ctk
 from tkinter import messagebox as msgbox
 
-from models import Company, Employee
+from models import Company, Employee, hash
 from database.mongo import employee_repo
 from frontend.helpers_gui import *
 from frontend.helpers_gui.global_styling import *
@@ -308,13 +308,15 @@ class EmployeeGui(ctk.CTk):
             entry.grid(row=row, column=1, pady=(20, 0), padx=(0, 20))
 
         def _change_password_handler():
+            nonlocal old_pwd_entry, new_pwd_entry, confirm_pwd_entry
+            old_pwd, new_pwd, confirm_pwd = old_pwd_entry.get(), new_pwd_entry.get(), confirm_pwd_entry.get()
             logged_in_employee = the_company.logged_in_employee
-            if old_password_entry.get() != the_company.logged_in_employee.hashed_password:
+            if hash(the_company.logged_in_employee.name, old_pwd) != the_company.logged_in_employee.hashed_password:
                 msgbox.showerror("Error", "Old password is incorrect")
-            elif new_password_entry.get() != confirm_password_entry.get():
+            elif new_pwd != confirm_pwd:
                 msgbox.showerror("Error", "New password and confirm password do not match")
             else:
-                the_company.logged_in_employee.hashed_password = new_password_entry.get()
+                logged_in_employee.set_password(new_pwd).unwrap()
                 if os.getenv("HRMGR_DB") == "TRUE":
                     employee_repo.update_one(
                         {"_id": logged_in_employee.employee_id},
