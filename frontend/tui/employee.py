@@ -203,7 +203,7 @@ class MenuEmployee:
                 return msg
 
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(by_alias=True)}, upsert=True)
+            employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(exclude={"id"}, by_alias=True)}, upsert=True)
 
         return "Employee {}{}{} ({}{}{}) updated successfully!".format(
             FCOLORS.GREEN,
