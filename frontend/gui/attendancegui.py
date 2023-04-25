@@ -24,10 +24,8 @@ class AttendanceGui(ctk.CTk):
         self.title("Attendance Management")
         self.geometry(f"{Width}x{Height}")
         self.resizable(False, False)
+
         self.left_frame = ctk.CTkFrame(master=self, corner_radius=10)
-
-        self.admin() if the_company.logged_in_employee.is_admin else self.employee()
-
         self.left_frame.pack(side=ctk.LEFT)
         self.left_frame.pack_propagate(False)
         self.left_frame.configure(width=320, height=760)
@@ -36,54 +34,32 @@ class AttendanceGui(ctk.CTk):
         self.right_frame.pack(side=ctk.RIGHT, expand=True)
         self.right_frame.pack_propagate(False)
 
+        self.admin() if the_company.logged_in_employee.is_admin else self.employee()
+
     def admin(self):
-        pos = Position(x=0.5, y=0.0, increment_by_x=0, increment_by_y=0.1)
-
-        ctk.CTkButton(
-            master=self.left_frame,
-            text="Check",
-            command=merge_callable(self.__destroy_all_frames, self.__attendance_check),
-            **btn_menu_style,
-        ).place(relx=pos.x, rely=pos.y, anchor=tkinter.CENTER)
-
-        ctk.CTkButton(
-            master=self.left_frame,
-            text="Update",
-            command=merge_callable(self.__destroy_all_frames, self.__admin_attendance_update),
-            **btn_menu_style,
-        ).place(relx=pos.x, rely=pos.y, anchor=tkinter.CENTER)
-
-        ctk.CTkButton(
-            master=self.left_frame,
-            text="Get report",
-            command=merge_callable(self.__destroy_all_frames, self.__admin_attendance_report),
-            **btn_menu_style,
-        ).place(relx=pos.x, rely=pos.y, anchor=tkinter.CENTER)
-
-        ctk.CTkButton(master=self.left_frame, text="Back", command=self.__back_to_homepage, **btn_exit_style).place(
-            relx=pos.x, rely=0.9, anchor=tkinter.CENTER
+        menu_buttons = MenuButtons(
+            self.left_frame,
+            self.right_frame,
+            {
+                "Check": self.__attendance_check,
+                "Update": self.__admin_attendance_update,
+                "Get report": self.__admin_attendance_report,
+                "Back": self.__back_to_homepage,
+            },
         )
+        menu_buttons.create()
 
     def employee(self):
-        pos = Position(x=0.5, y=0.0, increment_by_x=0, increment_by_y=0.1)
-
-        ctk.CTkButton(
-            master=self.left_frame,
-            text="Check",
-            command=merge_callable(self.__destroy_all_frames, self.__attendance_check),
-            **btn_menu_style,
-        ).place(relx=pos.x, rely=pos.y, anchor=tkinter.CENTER)
-
-        ctk.CTkButton(
-            master=self.left_frame,
-            text="Get report",
-            command=merge_callable(self.__destroy_all_frames, self.__employee_attendance_report),
-            **btn_menu_style,
-        ).place(relx=pos.x, rely=pos.y, anchor=tkinter.CENTER)
-
-        ctk.CTkButton(master=self.left_frame, text="Back", command=self.__back_to_homepage, **btn_exit_style).place(
-            relx=pos.x, rely=0.9, anchor=tkinter.CENTER
+        menu_buttons = MenuButtons(
+            self.left_frame,
+            self.right_frame,
+            {
+                "Check": self.__attendance_check,
+                "Get report": self.__employee_attendance_report,
+                "Back": self.__back_to_homepage,
+            },
         )
+        menu_buttons.create()
 
     def __destroy_all_frames(self):
         for widget in self.right_frame.winfo_children():
