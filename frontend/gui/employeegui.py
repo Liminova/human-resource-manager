@@ -22,10 +22,8 @@ class EmployeeGui(ctk.CTk):
         self.title("Employee Management")
         self.geometry(f"{Width}x{Height}")
         self.resizable(True, True)
+
         self.left_frame = ctk.CTkFrame(master=self, corner_radius=10)
-
-        self.admin() if the_company.logged_in_employee.is_admin else self.employee()
-
         self.left_frame.pack(side=ctk.LEFT)
         self.left_frame.pack_propagate(False)
         self.left_frame.configure(width=320, height=760)
@@ -33,6 +31,8 @@ class EmployeeGui(ctk.CTk):
         self.right_frame = ctk.CTkFrame(master=self)
         self.right_frame.pack(side=ctk.RIGHT, expand=True)
         self.right_frame.pack_propagate(False)
+
+        self.admin() if the_company.logged_in_employee.is_admin else self.employee()
 
     def admin(self):
         menu_buttons = MenuButtons(
