@@ -101,36 +101,38 @@ class EmployeeGui(ctk.CTk):
         password_entry = ctk.CTkEntry(master=main_frame, placeholder_text="Enter password", **input_box_style)
         password_entry.grid(row=6, column=1, pady=(20, 0))
 
-            name = name_entry.get()
-            dob = dob_entry.get()
-            empl_id = id_entry.get()
-            phone = phone_entry.get()
-            email = email_entry.get()
-            password = password_entry.get()
-            employee = Employee()
-            if name == "" or dob == "" or id == "" or phone == "" or email == "":
-                msgbox.showerror("Error", "Please fill in all the fields")
-            elif not name.isalpha():
-                msgbox.showerror("Error", "Please enter a valid name")
-            elif not phone.isdigit() and len(phone) != 10:
-                msgbox.showerror("Error", "Please enter a valid phone number")
-            elif "@" not in email:
-                msgbox.showerror("Error", "Please enter a valid email")
-            elif "-" not in dob:
-                msgbox.showerror("Error", "Please enter a valid date of birth")
-            else:
-                employee.name = name
-                employee.dob = dob
-                employee.employee_id = empl_id
-                employee.phone = phone
-                employee.email = email
-                employee.hashed_password = hash(employee.employee_id, password)
-                the_company.employees.append(employee)
         def _add_handler():
+            nonlocal name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry
+            name, dob, id, phone, email, password = (
+                name_entry.get(),
+                dob_entry.get(),
+                id_entry.get(),
+                phone_entry.get(),
+                email_entry.get(),
+                password_entry.get(),
+            )
 
-                if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.insert_one(employee.dict(by_alias=True))
-                msgbox.showinfo("Success", "Employee added successfully")
+            for field in [name, dob, id, phone, email, password]:
+                if field == "":
+                    msgbox.showerror("Error", "Please fill in all the fields")
+                    return
+
+            # fmt: off
+            employee = (
+                Employee()
+                .set_name(name).unwrap()
+                .set_dob(dob).unwrap()
+                .set_id(id).unwrap()
+                .set_phone(phone).unwrap()
+                .set_email(email).unwrap()
+                .set_password(password).unwrap()
+            )
+            # fmt: on
+            the_company.employees.append(employee)
+
+            if os.getenv("HRMGR_DB") == "TRUE":
+                employee_repo.insert_one(employee.dict(by_alias=True))
+            msgbox.showinfo("Success", "Employee added successfully")
 
         ctk.CTkButton(master=main_frame, text="Add", command=_add_handler, **btn_action_style).grid(
             row=7, column=0, columnspan=2, pady=(20, 0)
