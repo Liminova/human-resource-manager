@@ -6,7 +6,7 @@ from tkinter import messagebox as msgbox
 
 from models import Company, Sale
 from database.mongo import employee_repo
-from frontend.helpers_gui import merge_callable
+from frontend.helpers_gui import *
 from frontend.helpers_gui.global_styling import *
 
 the_company = Company()
