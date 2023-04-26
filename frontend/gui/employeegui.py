@@ -31,34 +31,27 @@ class EmployeeGui(ctk.CTk):
         self.right_frame.pack(side=ctk.RIGHT, expand=True)
         self.right_frame.pack_propagate(False)
 
-        self.admin() if the_company.logged_in_employee.is_admin else self.employee()
+        menu_buttons = MenuButtons(
+            self.left_frame, self.right_frame, self.admin() if the_company.logged_in_employee.is_admin else self.employee()
+        )
+        menu_buttons.create()
 
     def admin(self):
-        menu_buttons = MenuButtons(
-            self.left_frame,
-            self.right_frame,
-            {
-                "Add Employee": self.__admin_add_employee,
-                "Remove Employee": self.__admin_remove_employee,
-                "Update Employee": self.__admin_update_employee,
-                "View Employee": self.__admin_view_employee,
-                "Change Password": self.__change_password,
-                "Back": self.__back_to_homepage,
-            },
-        )
-        menu_buttons.create()
+        return {
+            "Add Employee": self.__admin_add_employee,
+            "Remove Employee": self.__admin_remove_employee,
+            "Update Employee": self.__admin_update_employee,
+            "View Employee": self.__admin_view_employee,
+            "Change Password": self.__change_password,
+            "Back": self.__back_to_homepage,
+        }
 
     def employee(self):
-        menu_buttons = MenuButtons(
-            self.left_frame,
-            self.right_frame,
-            {
-                "View Employee": self.__employee_view_employee,
-                "Change Password": self.__change_password,
-                "Back": self.__back_to_homepage,
-            },
-        )
-        menu_buttons.create()
+        return {
+            "View Employee": self.__employee_view_employee,
+            "Change Password": self.__change_password,
+            "Back": self.__back_to_homepage,
+        }
 
     def __back_to_homepage(self):
         from .homepage import Homepage
