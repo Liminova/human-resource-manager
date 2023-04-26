@@ -10,7 +10,6 @@ from frontend.helpers_gui import *
 from frontend.helpers_gui.global_styling import *
 
 the_company = Company()
-
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
 
@@ -21,7 +20,6 @@ Height = 768
 class PerformanceGui(ctk.CTk):
     def __init__(self, master=None):
         super().__init__()
-
         self.title("Performance Management System")
         self.geometry(f"{Width}x{Height}")
         self.resizable(True, True)
