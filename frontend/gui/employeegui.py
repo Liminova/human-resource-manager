@@ -65,54 +65,36 @@ class EmployeeGui(ctk.CTk):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
-        ctk.CTkLabel(master=main_frame, text="Add Employee", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
-        )
-
-        name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry = (ctk.CTkEntry(None),) * 6
-        for i, entry, label, placeholder in zip(
-            range(1, 7),
-            (name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry),
-            ("Name: ", "Date of birth: ", "ID: ", "Phone Number: ", "Email: ", "Password: "),
-            ("Alex", "2000-12-31", "1234ABC", "0123456789", "hello@wo.rld", "secure"),
-        ):
+        entries = [ctk.CTkEntry(master=main_frame) for _ in range(6)]
+        labels = ("Name: ", "Date of birth: ", "ID: ", "Phone Number: ", "Email: ", "Password: ")
+        placeholders = ("Alex", "2000-12-31", "1234ABC", "0123456789", "hello@wo.rld", "secure")
+        for row, entry, label, placeholder in zip(range(1, 7), entries, labels, placeholders):
             ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(
-                row=i, column=0, pady=(20, 0), padx=20, sticky="w"
+                row=row, column=0, pady=(20, 0), padx=20, sticky="w"
             )
-            entry = ctk.CTkEntry(master=main_frame, placeholder_text=placeholder, **input_box_style)
-            entry.grid(row=i, column=1, pady=(20, 0), padx=(0, 20))
+            entry.configure(placeholder_text=placeholder, **input_box_style)
+            entry.grid(row=row, column=1, pady=(20, 0), padx=(0, 20))
 
         def _add_handler():
-            nonlocal name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry
-            name, dob, id, phone, email, password = (
-                name_entry.get(),
-                dob_entry.get(),
-                id_entry.get(),
-                phone_entry.get(),
-                email_entry.get(),
-                password_entry.get(),
-            )
+            nonlocal entries
+            values = [entry.get() for entry in entries]
+            print("DEBUG", *values)
 
-            for field in [name, dob, id, phone, email, password]:
-                if field == "":
+            for value in values:
+                if not value:
                     msgbox.showerror("Error", "Please fill in all the fields")
                     return
 
-            # fmt: off
-            employee = (
-                Employee()
-                .set_name(name).unwrap()
-                .set_dob(dob).unwrap()
-                .set_id(id).unwrap()
-                .set_phone(phone).unwrap()
-                .set_email(email).unwrap()
-                .set_password(password).unwrap()
-            )
-            # fmt: on
-            the_company.employees.append(employee)
+            _empl = Employee()
+            for setter, value in zip(
+                (_empl.set_name, _empl.set_dob, _empl.set_id, _empl.set_phone, _empl.set_email, _empl.set_password), values
+            ):
+                setter(value).unwrap()
+
+            the_company.employees.append(_empl)
 
             if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.insert_one(employee.dict(by_alias=True))
+                employee_repo.insert_one(_empl.dict(by_alias=True))
             msgbox.showinfo("Success", "Employee added successfully")
 
         ctk.CTkButton(master=main_frame, text="Add", command=_add_handler, **btn_action_style).grid(
@@ -170,36 +152,26 @@ class EmployeeGui(ctk.CTk):
             )
         _display_list[1].grid(row=1, column=0, columnspan=2, pady=0, padx=20)
 
-        name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry = (ctk.CTkEntry(None),) * 6
-        for row, label, entry, placeholder in zip(
-            range(2, 8),
-            ("Name: ", "Date of Birth: ", "ID: ", "Phone Number: ", "Email: ", "Password: "),
-            (name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry),
-            ("Alex", "2000-12-31", "1234ABC", "0123456789", "hello@wo.rld", "secure"),
-        ):
+        entries = [ctk.CTkEntry(master=main_frame) for _ in range(6)]
+        labels = ("Name: ", "Date of birth: ", "ID: ", "Phone Number: ", "Email: ", "Password: ")
+        placeholder = ("Alex", "2000-12-31", "1234ABC", "0123456789", "hello@wo.rld", "secure")
+
+        for row, label, entry, placeholder in zip(range(2, 8), labels, entries, placeholder):
             ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(
                 row=row, column=0, padx=(20, 0), pady=(20, 0), sticky="w"
             )
-            entry = ctk.CTkEntry(master=main_frame, placeholder_text=placeholder, **input_box_style)
             entry.configure(placeholder_text=placeholder, **input_box_style)
             entry.grid(row=row, column=1, padx=20, pady=(20, 0))
 
         def _update_handler():
-            nonlocal name_entry, dob_entry, id_entry, phone_entry, email_entry, password_entry
+            nonlocal entries
+            values = [entry.get() for entry in entries]
             if not msgbox.askyesno("Confirmation", "Are you sure you want to update this employee?"):
                 return
             _empl = the_company.employees[radio_empl_idx_select.get()]
 
             for setter, value in zip(
-                (_empl.set_name, _empl.set_dob, _empl.set_id, _empl.set_phone, _empl.set_email, _empl.set_password),
-                (
-                    name_entry.get(),
-                    dob_entry.get(),
-                    id_entry.get(),
-                    phone_entry.get(),
-                    email_entry.get(),
-                    password_entry.get(),
-                ),
+                (_empl.set_name, _empl.set_dob, _empl.set_id, _empl.set_phone, _empl.set_email, _empl.set_password), values
             ):
                 setter(value).unwrap() if value else None
 
