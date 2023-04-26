@@ -56,6 +56,7 @@ class EmployeeGui(ctk.CTk):
     def __clear_right_frame(self):
         for widget in self.right_frame.winfo_children():
             widget.destroy()
+
     def __back_to_homepage(self):
         from .homepage import Homepage
 
@@ -158,6 +159,7 @@ class EmployeeGui(ctk.CTk):
                     department_repo.update_one({"_id": d.id}, {"$set": d.dict(include={"members"})}, upsert=True)
 
             msgbox.showinfo("Success", "Employee removed successfully")
+            merge_callable(self.__clear_right_frame, self.__admin_remove_employee)()
 
         ctk.CTkButton(master=main_frame, text="Remove", command=_remove_handler, **btn_action_style).grid(
             row=2, column=0, columnspan=2, pady=(10, 20)
@@ -213,6 +215,7 @@ class EmployeeGui(ctk.CTk):
                     upsert=True,
                 )
             msgbox.showinfo("Success", "Employee updated successfully")
+            merge_callable(self.__clear_right_frame, self.__admin_update_employee)()
 
         ctk.CTkButton(master=main_frame, text="Update", command=_update_handler, **btn_action_style).grid(
             row=8, column=0, columnspan=2, pady=20
