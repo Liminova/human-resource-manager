@@ -53,6 +53,9 @@ class EmployeeGui(ctk.CTk):
             "Back": self.__back_to_homepage,
         }
 
+    def __clear_right_frame(self):
+        for widget in self.right_frame.winfo_children():
+            widget.destroy()
     def __back_to_homepage(self):
         from .homepage import Homepage
 

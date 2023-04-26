@@ -56,7 +56,7 @@ class BenefitPlanGui(ctk.CTk):
             "Back": self.__back_to_homepage,
         }
 
-    def __destroy_all_frames(self):
+    def __clear_right_frame(self):
         for widget in self.right_frame.winfo_children():
             widget.destroy()
 
@@ -248,7 +248,7 @@ class BenefitPlanGui(ctk.CTk):
 
                     msgbox.showinfo("Success", "Benefit plan modified")
 
-            self.__destroy_all_frames()
+            self.__clear_right_frame()
             self.__admin_add_rm_modify(current_submenu)
 
         ctk.CTkButton(master=main_frame, text="Submit", command=_submit_handler, **btn_action_style).grid(
@@ -368,7 +368,7 @@ class BenefitPlanGui(ctk.CTk):
             if current_submenu == 1:  # apply
                 if not the_company.can_modify("benefits", _empl):
                     msgbox.showerror("Error", "Cannot modify benefits")
-                    self.__destroy_all_frames()
+                    self.__clear_right_frame()
                     self.__admin_apply_rm(current_submenu)
                     return
                 _empl.benefits.append(_bnf.name)
@@ -381,7 +381,7 @@ class BenefitPlanGui(ctk.CTk):
                     employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(include={"benefits"})}, upsert=True)
                 msgbox.showinfo("Success", f"Benefit plan {_bnf.name} removed from {_empl.name}")
 
-            self.__destroy_all_frames()
+            self.__clear_right_frame()
             self.__admin_apply_rm(current_submenu)
 
         ctk.CTkButton(master=main_frame, text="Submit", command=_submit_handler, **btn_action_style).grid(
@@ -432,7 +432,7 @@ class BenefitPlanGui(ctk.CTk):
             if os.getenv("HRMGR_DB") == "TRUE":
                 benefit_repo.update_one({"_id": _bnf.id}, {"$set": _bnf.dict(include={"pending_requests"})}, upsert=True)
             msgbox.showinfo("Success", f"Benefit plan {_bnf.name} requested")
-            merge_callable(self.__destroy_all_frames, self.__request)()
+            merge_callable(self.__clear_right_frame, self.__request)()
 
         ctk.CTkButton(master=main_frame, text="Request", command=_request_handler, **btn_action_style).grid(
             row=1, column=0, pady=20
@@ -518,7 +518,7 @@ class BenefitPlanGui(ctk.CTk):
                     {"_id": _bnf.id}, {"$set": _bnf.dict(include={"pending_requests", "enrolled_employees"})}, upsert=True
                 )
             msgbox.showinfo("Success", f"Benefit plan {_bnf.name} approved for {_empl.name}")
-            merge_callable(self.__destroy_all_frames, self.__admin_resolve)()
+            merge_callable(self.__clear_right_frame, self.__admin_resolve)()
 
         def _reject_handler():
             nonlocal bnf_idx_select, empl_idx_select, bnfs_have_pending, pending_empls
@@ -529,7 +529,7 @@ class BenefitPlanGui(ctk.CTk):
             if os.getenv("HRMGR_DB") == "TRUE":
                 benefit_repo.update_one({"_id": _bnf.id}, {"$set": _bnf.dict(include={"pending_requests"})}, upsert=True)
             msgbox.showinfo("Success", f"Benefit plan {_bnf.name} rejected for {_empl.name}")
-            merge_callable(self.__destroy_all_frames, self.__admin_resolve)()
+            merge_callable(self.__clear_right_frame, self.__admin_resolve)()
 
         btn_approve.configure(command=_approve_handler)
         btn_reject.configure(command=_reject_handler)

@@ -54,7 +54,7 @@ class AttendanceGui(ctk.CTk):
             "Back": self.__back_to_homepage,
         }
 
-    def __destroy_all_frames(self):
+    def __clear_right_frame(self):
         for widget in self.right_frame.winfo_children():
             widget.destroy()
 
