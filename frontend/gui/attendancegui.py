@@ -34,32 +34,25 @@ class AttendanceGui(ctk.CTk):
         self.right_frame.pack(side=ctk.RIGHT, expand=True)
         self.right_frame.pack_propagate(False)
 
-        self.admin() if the_company.logged_in_employee.is_admin else self.employee()
+        menu_buttons = MenuButtons(
+            self.left_frame, self.right_frame, self.admin() if the_company.logged_in_employee.is_admin else self.employee()
+        )
+        menu_buttons.create()
 
     def admin(self):
-        menu_buttons = MenuButtons(
-            self.left_frame,
-            self.right_frame,
-            {
-                "Check": self.__attendance_check,
-                "Update": self.__admin_attendance_update,
-                "Get report": self.__admin_attendance_report,
-                "Back": self.__back_to_homepage,
-            },
-        )
-        menu_buttons.create()
+        return {
+            "Check": self.__attendance_check,
+            "Update": self.__admin_attendance_update,
+            "Get report": self.__admin_attendance_report,
+            "Back": self.__back_to_homepage,
+        }
 
     def employee(self):
-        menu_buttons = MenuButtons(
-            self.left_frame,
-            self.right_frame,
-            {
-                "Check": self.__attendance_check,
-                "Get report": self.__employee_attendance_report,
-                "Back": self.__back_to_homepage,
-            },
-        )
-        menu_buttons.create()
+        return {
+            "Check": self.__attendance_check,
+            "Get report": self.__employee_attendance_report,
+            "Back": self.__back_to_homepage,
+        }
 
     def __destroy_all_frames(self):
         for widget in self.right_frame.winfo_children():
