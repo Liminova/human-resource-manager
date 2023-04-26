@@ -1,11 +1,12 @@
 import os
 import tkinter
 import customtkinter as ctk
-from tkinter import messagebox
+from tkinter import messagebox as msgbox
 
-from models import Company, Payroll
+from models import Company, Payroll, Employee
 from database.mongo import employee_repo
-from frontend.helpers_gui import merge_callable
+from frontend.helpers_gui import *
+from frontend.helpers_gui.global_styling import *
 
 the_company = Company()
 
@@ -17,70 +18,39 @@ Height = 768
 
 
 class PayrollGui(ctk.CTk):
-    def __init__(self, master=None):
+    def __init__(self):
         super().__init__()
         self.title("Payroll Management")
         self.geometry(f"{Width}x{Height}")
-        self.resizable(True, True)
+        self.resizable(False, False)
+
         self.left_frame = ctk.CTkFrame(master=self, corner_radius=10)
-
-        if the_company.logged_in_employee.is_admin:
-            self.admin()
-        else:
-            self.employee()
-
         self.left_frame.pack(side=ctk.LEFT)
         self.left_frame.pack_propagate(False)
         self.left_frame.configure(width=320, height=760)
 
-        self.right_frame = ctk.CTkFrame(master=self, border_width=2, corner_radius=10)
-        self.right_frame.pack(side=ctk.RIGHT)
+        self.right_frame = ctk.CTkFrame(master=self)
+        self.right_frame.pack(side=ctk.RIGHT, expand=True)
         self.right_frame.pack_propagate(False)
-        self.right_frame.configure(width=700, height=760)
+
+        menu_buttons = MenuButtons(
+            self.left_frame, self.right_frame, self.admin() if the_company.logged_in_employee.is_admin else self.employee()
+        )
+        menu_buttons.create()
 
     def admin(self):
-        self.button1 = ctk.CTkButton(
-            master=self.left_frame, text="Create Payroll", command=merge_callable(self.__destroy_all_frames, self.__admin_create_payroll)
-        )
-        self.__button_style(self.button1)
-        self.button1.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
-
-        self.button2 = ctk.CTkButton(
-            master=self.left_frame, text="Update Payroll", command=merge_callable(self.__destroy_all_frames, self.__admin_update_payroll)
-        )
-        self.__button_style(self.button2)
-        self.button2.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
-
-        self.button3 = ctk.CTkButton(
-            master=self.left_frame, text="View Payroll", command=merge_callable(self.__destroy_all_frames, self.__admin_view_payroll)
-        )
-        self.__button_style(self.button3)
-        self.button3.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
-
-        self.button4 = ctk.CTkButton(master=self.left_frame, text="Back", command=lambda self=self: self.__back_to_homepage())
-        self.button4.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
-        self.button4.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
+        return {
+            "Create Payroll": self.__admin_create_payroll,
+            "Update Payroll": self.__admin_update_payroll,
+            "View Payroll": self.__admin_view_payroll,
+            "Back": self.__back_to_homepage,
+        }
 
     def employee(self):
-        self.button1 = ctk.CTkButton(
-            master=self.left_frame, text="View Payroll", command=merge_callable(self.__destroy_all_frames, self.__employee_view_payroll)
-        )
-        self.__button_style(self.button1)
-        self.button1.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
-
-        self.button2 = ctk.CTkButton(master=self.left_frame, text="Back", command=lambda self=self: self.__back_to_homepage())
-        self.button2.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
-        self.button2.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
-
-    def __style_input_box(self, element):
-        element.configure(width=400, height=30, font=("Century Gothic", 14), corner_radius=10)
-
-    def __button_style(self, button):
-        button.configure(width=260, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-
-    def __destroy_all_frames(self):
-        for widget in self.right_frame.winfo_children():
-            widget.destroy()
+        return {
+            "View Payroll": self.__employee_view_payroll,
+            "Back": self.__back_to_homepage,
+        }
 
     def __back_to_homepage(self):
         from .homepage import Homepage
@@ -91,211 +61,172 @@ class PayrollGui(ctk.CTk):
     # region: admin functions
 
     def __admin_create_payroll(self):
-        self.button1_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button1_frame, text="Create Payroll", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        ctk.CTkLabel(master=main_frame, text="Create Payroll", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Employee ID: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
+        # Select employee from a list to create payroll for
+        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
+        _display_list = display_list(
+            _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
+                row=1, column=0, columnspan=2, pady=20, padx=20
+            )
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        entries = [ctk.CTkEntry(master=main_frame) for _ in range(4)]
+        labels = ("Salary", "Bonus", "Tax", "Punishment")
+        placeholders = ("100", "10", "5", "0")
+        for row, entry, label, placeholder in zip(range(1, 5), entries, labels, placeholders):
+            ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(
+                row=row, column=0, padx=0, pady=(20, 0), sticky="w"
+            )
+            entry.configure(placeholder_text=placeholder, **input_box_style)
+            entry.grid(row=row, column=1, padx=(0, 20), pady=(20, 0))
 
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="Salary: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.1, rely=0.25, anchor=tkinter.CENTER)
+        def _create_payroll():
+            nonlocal entries
+            values = [entry.get() for entry in entries]
+            print("DEBUG", *values)
 
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Salary")
-        self.__style_input_box(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.295, anchor=tkinter.CENTER)
+            for value in values:
+                if not value:
+                    msgbox.showerror("Error", "Please fill in all fields")
+                    return
 
-        self.label3 = ctk.CTkLabel(master=self.right_frame, text="Bonus: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.1, rely=0.35, anchor=tkinter.CENTER)
+            salary, bonus, tax, punishment = [int(value) for value in values]
+            selected_empl = the_company.employees[radio_empl_idx_select.get()]
+            payroll = Payroll()
+            for setter, value in zip((payroll.set_salary, payroll.set_bonus, payroll.set_tax, payroll.set_punish), values):
+                setter(value).unwrap()
+            selected_empl.set_payroll(payroll).unwrap()
+            if os.getenv("HRMGR_DB") == "TRUE":
+                employee_repo.update_one(
+                    {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"payroll"})}, upsert=True
+                )
+            msgbox.showinfo("Success", "Payroll created successfully")
 
-        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Bonus")
-        self.__style_input_box(self.entry3)
-        self.entry3.place(relx=0.325, rely=0.395, anchor=tkinter.CENTER)
+        ctk.CTkButton(master=main_frame, text="Create", command=_create_payroll, **btn_action_style).grid(
+            row=5, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.label4 = ctk.CTkLabel(master=self.right_frame, text="Tax: ", font=("Century Gothic", 20, "italic"))
-        self.label4.place(relx=0.1, rely=0.45, anchor=tkinter.CENTER)
-
-        self.entry4 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Tax")
-        self.__style_input_box(self.entry4)
-        self.entry4.place(relx=0.325, rely=0.495, anchor=tkinter.CENTER)
-
-        self.label5 = ctk.CTkLabel(master=self.right_frame, text="Punishment: ", font=("Century Gothic", 20, "italic"))
-        self.label5.place(relx=0.1, rely=0.55, anchor=tkinter.CENTER)
-
-        self.entry5 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Punishment")
-        self.__style_input_box(self.entry5)
-        self.entry5.place(relx=0.325, rely=0.595, anchor=tkinter.CENTER)
-
-        self.button1 = ctk.CTkButton(master=self.right_frame, text="Create", command=(lambda: create_successfully(self)))
-        self.button1.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button1.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
-
-        self.button1_frame.pack(pady=20)
-
-        def create_successfully(self):
-            input_id = self.entry1.get()
-            salary = self.entry2.get()
-            bonus = self.entry3.get()
-            tax = self.entry4.get()
-            punishment = self.entry5.get()
-            if salary == "" or bonus == "" or tax == "" or punishment == "":
-                messagebox.showerror("Error", "Please fill in all the fields")
-            elif not (salary.isdigit()) or not (bonus.isdigit()) or not (tax.isdigit()) or not (punishment.isdigit()):
-                messagebox.showerror("Error", "Please enter a valid number")
-            else:
-                for e in the_company.employees:
-                    if e.employee_id == input_id:
-                        e.payroll = (
-                            Payroll().set_salary(salary).unwrap().set_bonus(bonus).unwrap().set_tax(tax).unwrap().set_punish(punishment).unwrap()
-                        )
-                        if os.getenv("HRMGR_DB") == "TRUE":
-                            employee_repo.update_one({"_id": e.id}, {"$set": e.dict(include={"payroll"})}, upsert=True)
-                        messagebox.showinfo("Success", "Payroll created successfully")
-                    else:
-                        messagebox.showerror("Error", "Employee ID not found")
-                        
     def __admin_update_payroll(self):
-        self.button2_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button2_frame, text="Update Payroll", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        ctk.CTkLabel(master=main_frame, text="Update Payroll", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Employee ID: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
+        # Select employee from a list to update payroll for
+        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
+        _display_list = display_list(
+            _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
+                row=1, column=0, columnspan=2, pady=20, padx=20
+            )
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        entries = [ctk.CTkEntry(master=main_frame) for _ in range(4)]
+        labels = ("Salary", "Bonus", "Tax", "Punishment")
+        placeholders = ("100", "10", "5", "0")
+        for row, entry, label, placeholder in zip(range(1, 5), entries, labels, placeholders):
+            ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(
+                row=row, column=0, padx=0, pady=(20, 0), sticky="w"
+            )
+            entry.configure(placeholder_text=placeholder, **input_box_style)
+            entry.grid(row=row, column=1, padx=(0, 20), pady=(20, 0))
 
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="Salary: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.1, rely=0.25, anchor=tkinter.CENTER)
+        def _update_payroll():
+            nonlocal entries
+            values = [entry.get() for entry in entries]
+            print("DEBUG", *values)
 
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Salary")
-        self.__style_input_box(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.295, anchor=tkinter.CENTER)
+            for value in values:
+                if not value:
+                    msgbox.showerror("Error", "Please fill in all fields")
+                    return
 
-        self.label3 = ctk.CTkLabel(master=self.right_frame, text="Bonus: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.1, rely=0.35, anchor=tkinter.CENTER)
+            salary, bonus, tax, punishment = [int(value) for value in values]
+            selected_empl = the_company.employees[radio_empl_idx_select.get()]
+            payroll = selected_empl.payroll
+            for setter, value in zip((payroll.set_salary, payroll.set_bonus, payroll.set_tax, payroll.set_punish), values):
+                setter(value).unwrap()
+            selected_empl.set_payroll(payroll).unwrap()
+            if os.getenv("HRMGR_DB") == "TRUE":
+                employee_repo.update_one(
+                    {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"payroll"})}, upsert=True
+                )
+            msgbox.showinfo("Success", "Payroll updated successfully")
 
-        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Bonus")
-        self.__style_input_box(self.entry3)
-        self.entry3.place(relx=0.325, rely=0.395, anchor=tkinter.CENTER)
-
-        self.label4 = ctk.CTkLabel(master=self.right_frame, text="Tax: ", font=("Century Gothic", 20, "italic"))
-        self.label4.place(relx=0.1, rely=0.45, anchor=tkinter.CENTER)
-
-        self.entry4 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Tax")
-        self.__style_input_box(self.entry4)
-        self.entry4.place(relx=0.325, rely=0.495, anchor=tkinter.CENTER)
-
-        self.label5 = ctk.CTkLabel(master=self.right_frame, text="Punishment: ", font=("Century Gothic", 20, "italic"))
-        self.label5.place(relx=0.1, rely=0.55, anchor=tkinter.CENTER)
-
-        self.entry5 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Punishment")
-        self.__style_input_box(self.entry5)
-        self.entry5.place(relx=0.325, rely=0.595, anchor=tkinter.CENTER)
-
-        self.button2 = ctk.CTkButton(master=self.right_frame, text="Update", command=(lambda: update_successfully(self)))
-        self.button2.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button2.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
-
-        self.button2_frame.pack(pady=20)
-
-        def update_successfully(self):
-            input_id = self.entry1.get()
-            salary = self.entry2.get()
-            bonus = self.entry3.get()
-            tax = self.entry4.get()
-            punishment = self.entry5.get()
-            if salary == "" or bonus == "" or tax == "" or punishment == "":
-                messagebox.showerror("Error", "Please fill in all the fields")
-            elif not (salary.isdigit()) or not (bonus.isdigit()) or not (tax.isdigit()) or not (punishment.isdigit()):
-                messagebox.showerror("Error", "Please enter a valid number")
-            else:
-                for e in the_company.employees:
-                    if e.employee_id == input_id:
-                        e.payroll = (
-                            Payroll().set_salary(salary).unwrap().set_bonus(bonus).unwrap().set_tax(tax).unwrap().set_punish(punishment).unwrap()
-                        )
-                        if os.getenv("HRMGR_DB") == "TRUE":
-                            employee_repo.update_one({"_id": e.id}, {"$set": e.dict(include={"payroll"})}, upsert=True)
-                        messagebox.showinfo("Success", "Payroll created successfully")
-                    else:
-                        messagebox.showerror("Error", "Employee ID not found")
+        ctk.CTkButton(master=main_frame, text="Update", command=_update_payroll, **btn_action_style).grid(
+            row=5, column=0, columnspan=2, pady=(20, 0)
+        )
 
     def __admin_view_payroll(self):
-        self.button3_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button3_frame, text="View Payroll", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        ctk.CTkLabel(master=main_frame, text="View Payroll", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Employee ID: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
+        # Select employee from a list to view payroll
+        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
+        _display_list = display_list(
+            _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
+                row=1, column=0, columnspan=2, pady=20, padx=20
+            )
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        def _view_payroll():
+            selected_empl = the_company.employees[radio_empl_idx_select.get()]
+            payroll = selected_empl.payroll
+            msgbox.showinfo(
+                "Payroll",
+                f"Salary: {payroll.salary}\nBonus: {payroll.bonus}\nTax: {payroll.tax}\nPunishment: {payroll.punish}",
+            )
 
-        self.button3 = ctk.CTkButton(master=self.right_frame, text="View", command=(lambda: view_successfully(self)))
-        self.button3.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button3.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
-
-        self.button3_frame.pack(pady=20)
-
-        def view_successfully(self):
-            input_id = self.entry1.get()
-            if input_id == "":
-                messagebox.showerror("Error", "Please fill in all the fields")
-            else:
-                for e in the_company.employees:
-                    if e.employee_id == input_id:
-                        messagebox.showinfo(
-                            "Success", 
-                            f"Salary: {e.payroll.salary}\nBonus: {e.payroll.bonus}\nTax: {e.payroll.tax}\nPunishment: {e.payroll.punish}"
-                        )
-                    else:   
-                        messagebox.showerror("Error", "Employee ID not found")
+        ctk.CTkButton(master=main_frame, text="View", command=_view_payroll, **btn_action_style).grid(
+            row=2, column=0, columnspan=2, pady=(20, 0)
+        )
 
     # endregion
 
     # region: employee functions
 
     def __employee_view_payroll(self):
-        self.button4_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button4_frame, text="View Payroll", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        ctk.CTkLabel(master=main_frame, text="View Payroll", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Employee ID: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
+        def _view_payroll():
+            _empl = the_company.logged_in_employee
+            _empl_payroll = (
+                f"Salary: {_empl.payroll.salary}\n"
+                f"Bonus: {_empl.payroll.bonus}\n"
+                f"Tax: {_empl.payroll.tax}\n"
+                f"Punishment: {_empl.payroll.punish}"
+            )
+            ctk.CTkLabel(master=main_frame, text=_empl_payroll, **label_desc_style).grid(
+                row=1, column=0, columnspan=2, pady=20, padx=20
+            )
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        ctk.CTkButton(master=main_frame, text="View", command=_view_payroll, **btn_action_style).grid(
+            row=2, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.button4 = ctk.CTkButton(master=self.right_frame, text="View", command=(lambda: view_successfully(self)))
-        self.button4.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button4.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
-
-        self.button4_frame.pack(pady=20)
-
-        def view_successfully(self):
-            input_id = self.entry1.get()
-            if input_id == "":
-                messagebox.showerror("Error", "Please fill in all the fields")
-            else:
-                for e in the_company.employees:
-                    if e.employee_id == input_id:
-                        messagebox.showinfo(
-                            "Success", 
-                            f"Salary: {e.payroll.salary}\nBonus: {e.payroll.bonus}\nTax: {e.payroll.tax}\nPunishment: {e.payroll.punish}"
-                        )
-                    else:
-                        messagebox.showerror("Error", "Employee ID not found")
-                        
     # endregion
