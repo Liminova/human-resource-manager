@@ -210,7 +210,6 @@ class EmployeeGui(ctk.CTk):
                 f"ID: {_empl.employee_id}\n"
                 f"Phone Number: {_empl.phone}\n"
                 f"Email: {_empl.email}\n"
-                f"Password: {_empl.hashed_password}\n"
             )
             ctk.CTkLabel(master=main_frame, text=_empl_info, **label_desc_style).grid(
                 row=2, column=0, columnspan=2, pady=20, padx=20
