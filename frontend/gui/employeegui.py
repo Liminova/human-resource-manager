@@ -207,7 +207,11 @@ class EmployeeGui(ctk.CTk):
                 setter(value).unwrap() if value else None
 
             if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(exclude={"id"}, by_alias=True)}, upsert=True)
+                employee_repo.update_one(
+                    {"_id": _empl.id},
+                    {"$set": _empl.dict(include={"name", "dob", "id", "phone", "email", "password"})},
+                    upsert=True,
+                )
             msgbox.showinfo("Success", "Employee updated successfully")
 
         ctk.CTkButton(master=main_frame, text="Update", command=_update_handler, **btn_action_style).grid(
