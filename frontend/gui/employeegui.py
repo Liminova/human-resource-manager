@@ -3,7 +3,7 @@ import customtkinter as ctk
 from tkinter import messagebox as msgbox
 
 from models import Company, Employee, hash
-from database.mongo import employee_repo
+from database.mongo import employee_repo, department_repo, benefit_repo
 from frontend.helpers_gui import *
 from frontend.helpers_gui.global_styling import *
 
@@ -124,12 +124,40 @@ class EmployeeGui(ctk.CTk):
             )
 
         def _remove_handler():
-            if msgbox.askyesno("Confirmation", "Are you sure you want to remove this employee?"):
-                the_company.employees.pop(radio_empl_idx_select.get())
+            if not msgbox.askyesno("Confirmation", "Are you sure you want to remove this employee?"):
+                return
+            _empls = the_company.employees
+            _empl = _empls[radio_empl_idx_select.get()]
 
-                if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.delete_one({"employee_id": the_company.employees[radio_empl_idx_select.get()].employee_id})
-                msgbox.showinfo("Success", "Employee removed successfully")
+            _db_update_bnfs, _db_update_dept = [], []
+            # remove employee from benefits
+            for b in the_company.benefits:
+                if _empl in b.enrolled_employees:
+                    b.enrolled_employees.remove(_empl)
+                    _db_update_bnfs.append(b)
+                if _empl in b.pending_requests:
+                    b.pending_requests.remove(_empl)
+                    _db_update_bnfs.append(b)
+
+            # remove employee from departments
+            for d in the_company.departments:
+                if _empl in d.members:
+                    d.members.remove(_empl)
+                    _db_update_dept.append(d)
+
+            # remove employee from company
+            _empls.remove(_empl)
+
+            if os.getenv("HRMGR_DB") == "TRUE":
+                employee_repo.delete_one({"_id": _empl.id})
+                for b in _db_update_bnfs:
+                    benefit_repo.update_one(
+                        {"_id": b.id}, {"$set": b.dict(include={"enrolled_employees", "pending_requests"})}, upsert=True
+                    )
+                for d in _db_update_dept:
+                    department_repo.update_one({"_id": d.id}, {"$set": d.dict(include={"members"})}, upsert=True)
+
+            msgbox.showinfo("Success", "Employee removed successfully")
 
         ctk.CTkButton(master=main_frame, text="Remove", command=_remove_handler, **btn_action_style).grid(
             row=2, column=0, columnspan=2, pady=(10, 20)
