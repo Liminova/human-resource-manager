@@ -25,52 +25,38 @@ class PerformanceGui(ctk.CTk):
         self.resizable(True, True)
 
         self.left_frame = ctk.CTkFrame(master=self, corner_radius=10)
-
-        def button_size(button):
-            button.configure(width=260, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-
-        self.button1 = ctk.CTkButton(master=self.left_frame, text="Add Sale", command=merge_callable(self.__destroy_all_frames, self.__add_sale))
-        button_size(self.button1)
-        self.button1.place(relx=0.5, rely=0.15, anchor=tkinter.CENTER)
-
-        self.button2 = ctk.CTkButton(
-            master=self.left_frame, text="View Sales Performance", command=merge_callable(self.__destroy_all_frames, self.__view_sales_performance)
-        )
-        button_size(self.button2)
-        self.button2.place(relx=0.5, rely=0.25, anchor=tkinter.CENTER)
-
-        self.button3 = ctk.CTkButton(
-            master=self.left_frame, text="Remove Sale", command=merge_callable(self.__destroy_all_frames, self.__remove_sale)
-        )
-        button_size(self.button3)
-        self.button3.place(relx=0.5, rely=0.35, anchor=tkinter.CENTER)
-
-        self.button4 = ctk.CTkButton(
-            master=self.left_frame, text="Get Sale Info", command=merge_callable(self.__destroy_all_frames, self.__get_sale_info)
-        )
-        button_size(self.button4)
-        self.button4.place(relx=0.5, rely=0.45, anchor=tkinter.CENTER)
-
-        self.button5 = ctk.CTkButton(
-            master=self.left_frame, text="Find Sale By", command=merge_callable(self.__destroy_all_frames, self.__find_sale_by)
-        )
-        button_size(self.button5)
-        self.button5.place(relx=0.5, rely=0.55, anchor=tkinter.CENTER)
-
-        self.button6 = ctk.CTkButton(master=self.left_frame, text="Back", fg_color="red", command=lambda self=self: self._back_to_homepage())
-        self.button6.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
-        self.button6.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
-
         self.left_frame.pack(side=ctk.LEFT)
         self.left_frame.pack_propagate(False)
         self.left_frame.configure(width=320, height=760)
 
         self.right_frame = ctk.CTkFrame(master=self, border_width=2, corner_radius=10)
-        self.right_frame.pack(side=ctk.RIGHT)
+        self.right_frame.pack(side=ctk.RIGHT, expand=True)
         self.right_frame.pack_propagate(False)
-        self.right_frame.configure(width=700, height=760)
 
-    def __destroy_all_frames(self):
+        menu_buttons = MenuButtons(
+            self.left_frame, self.right_frame, self.admin() if the_company.logged_in_employee.is_admin else self.employee()
+        )
+        menu_buttons.create()
+
+    def admin(self):
+        return {
+            "Add sale": self.__admin_add_sale,
+            # "Remove sale": self.__admin_remove_sale,
+            # "View details of sale": self.__admin_view_sale,
+            # "Find sale(s) by...	": self.__admin_find_sale,
+            # "View sales performance	of all employees": self.__admin_view_sales_perf,
+            "Back": self.__back_to_homepage,
+        }
+
+    def employee(self):
+        return {
+            # "View sales performance": self.__employee_view_sales_perf,
+            # "View info about a sale": self.__employee_view_sale,
+            # "Find sale(s) by...": self.__employee_find_sale,
+            "Back": self.__back_to_homepage
+        }
+
+    def __clear_right_frame(self):
         for widget in self.right_frame.winfo_children():
             widget.destroy()
 
@@ -80,31 +66,87 @@ class PerformanceGui(ctk.CTk):
         self.destroy()
         Homepage().mainloop()
 
-    def __input_box_style(self, element):
-        element.configure(width=400, height=30, font=("Century Gothic", 14), corner_radius=10)
+    def __admin_add_sale(self):
+        # 0: table to choose empl
+        # input: 1: empl id
+        #        2. revenue
+        #        3. cost
+        #        4. client id
+        #        5. client rating
+        #        6. client comment
+        # 7: confirm button
 
-    def __add_sale(self):
-        self.button1_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button1_frame, text="Information", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        # region: variables
+        _empl_idx_select = tkinter.IntVar()
+        # endregion
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="ID: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
+        entries = [ctk.CTkEntry(master=main_frame) for _ in range(7)]
+        labels = ("Employee ID", "Revenue", "Cost", "Client ID", "Client rating (1-5)", "Client comment")
+        placeholders = ("abcxyz", "1000000", "500000", "123", "5", "Good")
+        for row, entry, lable, placeholder in zip(range(7), entries, labels, placeholders):
+            ctk.CTkLabel(master=main_frame, text=lable, **label_desc_style).grid(row=row, column=0, pady=10)
+            entry.configure(placeholder_text=placeholder, **input_box_style)
+            entry.grid(row=row, column=1, pady=10)
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter employee's ID")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        # region: select an employee
+        display_list(
+            _master=main_frame,
+            options=tuple(f"{e.name} - {e.employee_id}" for e in the_company.employees),
+            returned_idx=[_empl_idx_select],
+            selectable=True,
+            err_msg="No employee yet",
+            colspan=1,
+        )
+        # endregion
 
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="Revenue: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.1, rely=0.25, anchor=tkinter.CENTER)
+        # region: confirm button
+        btn_submit = ctk.CTkButton(master=main_frame, text="Add", **btn_action_style)
 
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter revenue")
-        self.__input_box_style(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.295, anchor=tkinter.CENTER)
+        def _add_sale_handler():
+            nonlocal _empl_idx_select, entries
+            values = [e.get().strip() for e in entries]
+            if not all(values):
+                msgbox.showerror("Error", "Please fill in all fields")
+                return
+            _empl = the_company.employees[_empl_idx_select.get()]
 
-        self.label3 = ctk.CTkLabel(master=self.right_frame, text="Cost: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.1, rely=0.35, anchor=tkinter.CENTER)
+            new_sale = Sale()
+            for setter, value in zip(
+                (
+                    new_sale.set_revenue,
+                    new_sale.set_cost,
+                    new_sale.set_client_id,
+                    new_sale.set_client_rating,
+                    new_sale.set_client_comment,
+                ),
+                values[1:],
+            ):
+                setter(value).unwrap()
+
+            new_sale.employee_id = _empl.employee_id
+            new_sale.employee_name = _empl.name
+            new_sale.profit = float(new_sale.revenue) - float(new_sale.cost)
+            _empl.performance.add_sale(new_sale)
+
+            if os.getenv("HRMGR_DB") == "TRUE":
+                employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(include={"performance"})}, upsert=True)
+
+            msgbox.showinfo("Success", "Sale added successfully")
+
+        btn_submit.configure(command=_add_sale_handler)
+        # endregion
+
+        button2_frame = ctk.CTkFrame(master=self.right_frame)
+        ctk.CTkLabel(master=button2_frame, text="Sales performance", **label_title_style).pack()
+
+        ctk.CTkLabel(
+            master=self.right_frame, text="Enter numerical order of employee you want to choose: ", **label_desc_style
+        ).place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
+        self.entry = ctk.CTkEntry(master=self.right_frame, **input_box_style)
+        self.entry.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
 
         self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter cost")
         self.__input_box_style(self.entry3)
