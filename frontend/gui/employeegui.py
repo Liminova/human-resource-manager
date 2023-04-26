@@ -277,7 +277,7 @@ class EmployeeGui(ctk.CTk):
 
         def _change_password_handler():
             nonlocal old_pwd_entry, new_pwd_entry, confirm_pwd_entry
-            old_pwd, new_pwd, confirm_pwd = old_pwd_entry.get(), new_pwd_entry.get(), confirm_pwd_entry.get()
+            old_pwd, new_pwd, confirm_pwd = (old_pwd_entry.get(), new_pwd_entry.get(), confirm_pwd_entry.get())
             logged_in_employee = the_company.logged_in_employee
             if hash(the_company.logged_in_employee.name, old_pwd) != the_company.logged_in_employee.hashed_password:
                 msgbox.showerror("Error", "Old password is incorrect")
