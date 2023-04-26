@@ -176,7 +176,9 @@ class MenuBenefits:
                 return msg
 
         if os.getenv("HRMGR_DB") == "TRUE":
-            benefit_repo.update_one({"_id": _bnf.id}, {"$set": _bnf.dict()}, upsert=True)
+            benefit_repo.update_one(
+                {"_id": _bnf.id}, {"$set": _bnf.dict(include={"name", "description", "cost"})}, upsert=True
+            )
         return f"Benefit {FCOLORS.GREEN}{_bnf.name}{FCOLORS.END} updated successfully!"
 
     def __view(self) -> str:
