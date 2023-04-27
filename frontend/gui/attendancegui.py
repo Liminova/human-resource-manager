@@ -111,10 +111,12 @@ class AttendanceGui(ctk.CTk):
         )
 
         # Select employee from a list
-        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
+        empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
         _display_list = display_list(
-            _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
+            _master=main_frame,
+            options=tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees),
+            returned_idx=[empl_idx_select],
+            selectable=True,
         )
         if _display_list[0] is False:
             ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
@@ -137,14 +139,13 @@ class AttendanceGui(ctk.CTk):
         )
 
         # Update button + handler
-        data = {"is_present": radio_is_present, "empl_idx": radio_empl_idx_select, "date": input_date}
+        data = {"is_present": radio_is_present, "empl_idx": empl_idx_select, "date": input_date}
 
         def _attendance_update():
             nonlocal data
-            empls = the_company.employees
-            empl_idx: int = data["empl_idx"].get()
             date: str = data["date"].get()
             is_present: bool = data["is_present"].get()
+            selected_empl = the_company.employees[data["empl_idx"].get()]
 
             # Try to validate the date
             try:
@@ -153,23 +154,21 @@ class AttendanceGui(ctk.CTk):
                 messagebox.showerror("Error", "Invalid date, please enter in YYYY-MM-DD format")
                 return
 
-            # get the employee object
-            empl = empls[empl_idx]
-
-            if not the_company.can_modify("attendance", empl):
+            if not the_company.can_modify("attendance", selected_empl):
                 messagebox.showerror("Error", "You don't have the permission to modify this employee's attendance")
                 return
 
             # update the attendance
-            empl.attendance.attendances[date] = is_present
+            selected_empl.attendance.attendances[date] = is_present
 
             # show success message and update the database
             messagebox.showinfo(
-                "Success", f"Attendance for {empl.name} on {date} updated to {'Present' if is_present else 'Absent'}"
+                "Success",
+                f"Attendance for {selected_empl.name} on {date} updated to {'Present' if is_present else 'Absent'}",
             )
             if os.getenv("HRMGR_DB") == "TRUE":
                 employee_repo.update_one(
-                    {"_id": empls[empl_idx].id}, {"$set": empls[empl_idx].dict(include={"attendance"})}, upsert=True
+                    {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"attendance"})}, upsert=True
                 )
 
         ctk.CTkButton(master=main_frame, text="Update", command=_attendance_update, **btn_action_style).grid(
@@ -186,23 +185,21 @@ class AttendanceGui(ctk.CTk):
         )
 
         # Select employee from a list
-        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
-        err = display_list(
-            _master=main_frame, options=empl_items, selectable=True, returned_idx=[radio_empl_idx_select], page_size=9
+        empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        empl_select_frame = display_list(
+            _master=main_frame,
+            options=tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees),
+            selectable=True,
+            returned_idx=[empl_idx_select],
+            page_size=9,
         )
-        if err is None:
+        if empl_select_frame is None:
             messagebox.showerror("Error", "No employees found")
 
         # Generate report button + handler
         def _get_report():
-            nonlocal radio_empl_idx_select
-            nonlocal main_frame
-            nonlocal btn_action_report
-            nonlocal self
-
-            # Get the selected employee
-            empl_idx = radio_empl_idx_select.get()
+            nonlocal empl_idx_select, main_frame, self
+            selected_empl = the_company.employees[empl_idx_select.get()]
 
             # Destroy the current report frame
             main_frame.destroy()
@@ -210,17 +207,21 @@ class AttendanceGui(ctk.CTk):
             # Create a new frame for the report
             main_frame = ctk.CTkFrame(master=self.right_frame)
             main_frame.grid(row=0, column=0)
-            ctk.CTkLabel(
-                master=main_frame, text="Attendance Report for " + the_company.employees[empl_idx].name, **label_title_style
-            ).grid(row=0, column=0, pady=20, padx=20)
+            ctk.CTkLabel(master=main_frame, text="Attendance Report for " + selected_empl.name, **label_title_style).grid(
+                row=0, column=0, pady=20, padx=20
+            )
 
             # Display the report
-            _attendances = the_company.employees[empl_idx].attendance.attendances
-            attendance_items = tuple(
-                f"{date} - {'Present' if is_present else 'Absent'}" for date, is_present in _attendances.items()
-            )
+            empl_attds = selected_empl.attendance.attendances
+            # attendance_items =
             display_list(
-                _master=main_frame, options=attendance_items, selectable=False, page_size=9, err_msg="No attendance found"
+                _master=main_frame,
+                options=tuple(
+                    f"{date} - {'Present' if is_present else 'Absent'}" for date, is_present in empl_attds.items()
+                ),
+                selectable=False,
+                page_size=9,
+                err_msg="No attendance found",
             )
 
             # Create a new button to go back to the attendance report page
@@ -231,8 +232,9 @@ class AttendanceGui(ctk.CTk):
                 **btn_action_style,
             ).grid(row=2, column=0, pady=20)
 
-        btn_action_report = ctk.CTkButton(master=main_frame, text="Report", command=_get_report, **btn_action_style)
-        btn_action_report.grid(row=2, column=0, pady=(10, 20))
+        ctk.CTkButton(master=main_frame, text="Report", command=_get_report, **btn_action_style).grid(
+            row=2, column=0, pady=(10, 20)
+        )
 
     def __employee_attendance_report(self):
         main_frame = ctk.CTkFrame(master=self.right_frame)
@@ -244,10 +246,11 @@ class AttendanceGui(ctk.CTk):
         ).grid(row=0, column=0, pady=(20, 0), padx=20)
 
         # Display the report
-        _attendances = the_company.logged_in_employee.attendance.attendances
-        attendance_items = tuple(
-            f"{date} - {'Present' if is_present else 'Absent'}" for date, is_present in _attendances.items()
-        )
+        empl_attds = the_company.logged_in_employee.attendance.attendances
         display_list(
-            _master=main_frame, options=attendance_items, selectable=False, page_size=9, err_msg="No attendance found"
+            _master=main_frame,
+            options=tuple(f"{date} - {'Present' if is_present else 'Absent'}" for date, is_present in empl_attds.items()),
+            selectable=False,
+            page_size=9,
+            err_msg="No attendance found",
         )
