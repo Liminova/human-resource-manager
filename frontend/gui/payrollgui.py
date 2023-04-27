@@ -1,9 +1,8 @@
 import os
-import tkinter
 import customtkinter as ctk
 from tkinter import messagebox as msgbox
 
-from models import Company, Payroll, Employee
+from models import Company
 from database.mongo import employee_repo
 from frontend.helpers_gui import *
 from frontend.helpers_gui.global_styling import *
