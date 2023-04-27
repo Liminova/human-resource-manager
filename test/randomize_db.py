@@ -10,7 +10,6 @@ __current_employee_count = len(the_company.employees)
 
 
 def generate_random_data_into_db():
-    os.environ["HRMGR_DB"] = "TRUE"
 
     fake = Faker()
 
