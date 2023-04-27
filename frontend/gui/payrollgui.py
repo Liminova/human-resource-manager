@@ -45,10 +45,7 @@ class PayrollGui(ctk.CTk):
         }
 
     def employee(self):
-        return {
-            "View Payroll": self.__employee_view_payroll,
-            "Back": self.__back_to_homepage,
-        }
+        return {"View Payroll": self.__employee_view_payroll, "Back": self.__back_to_homepage}
 
     def __back_to_homepage(self):
         from .homepage import Homepage
