@@ -138,90 +138,50 @@ class PayrollGui(ctk.CTk):
         submit_btn.configure(command=_create_update_payroll_handler)
         # endregion
 
-        main_frame = ctk.CTkFrame(master=self.right_frame)
-        main_frame.grid(row=0, column=0)
-
-        ctk.CTkLabel(master=main_frame, text="Update Payroll", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
-        )
-
-        # Select employee from a list to update payroll for
-        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
-        _display_list = display_list(
-            _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
-        )
-        if _display_list[0] is False:
-            ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
-                row=1, column=0, columnspan=2, pady=20, padx=20
-            )
-
-        entries = [ctk.CTkEntry(master=main_frame) for _ in range(4)]
-        labels = ("Salary", "Bonus", "Tax", "Punishment")
-        placeholders = ("100", "10", "5", "0")
-        for row, entry, label, placeholder in zip(range(1, 5), entries, labels, placeholders):
-            ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(
-                row=row, column=0, padx=0, pady=(20, 0), sticky="w"
-            )
-            entry.configure(placeholder_text=placeholder, **input_box_style)
-            entry.grid(row=row, column=1, padx=(0, 20), pady=(20, 0))
-
-        def _update_payroll():
-            nonlocal entries
-            values = [entry.get() for entry in entries]
-            print("DEBUG", *values)
-
-            for value in values:
-                if not value:
-                    msgbox.showerror("Error", "Please fill in all fields")
-                    return
-
-            salary, bonus, tax, punishment = [int(value) for value in values]
-            selected_empl = the_company.employees[radio_empl_idx_select.get()]
-            payroll = selected_empl.payroll
-            for setter, value in zip((payroll.set_salary, payroll.set_bonus, payroll.set_tax, payroll.set_punish), values):
-                setter(value).unwrap()
-            selected_empl.set_payroll(payroll).unwrap()
-            if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.update_one(
-                    {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"payroll"})}, upsert=True
-                )
-            msgbox.showinfo("Success", "Payroll updated successfully")
-
-        ctk.CTkButton(master=main_frame, text="Update", command=_update_payroll, **btn_action_style).grid(
-            row=5, column=0, columnspan=2, pady=(20, 0)
-        )
-
     def __admin_view_payroll(self):
+        # 0: select employee from a list
+        # 1: payroll table
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
-        ctk.CTkLabel(master=main_frame, text="View Payroll", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
-        )
+        payrol_table_frame = ctk.CTkFrame(None)
 
         # Select employee from a list to view payroll
-        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
-        _display_list = display_list(
-            _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
+        empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
+
+        def update_payroll_table():
+            nonlocal empl_idx_select, payrol_table_frame, main_frame
+            selected_empl = the_company.employees[empl_idx_select.get()]
+            payroll = selected_empl.payroll
+
+            payrol_table_frame.destroy()
+            payrol_table_frame = ctk.CTkFrame(master=main_frame)
+            payrol_table_frame.grid(row=1, column=0, columnspan=2, pady=(0, 15), padx=20)
+
+            titles = ("Salary", "Bonus", "Tax", "Penalty", "Total")
+            values = (payroll.salary, payroll.bonus, payroll.tax, payroll.punish, payroll.total)
+            for row, title, value in zip(range(5), titles, values):
+                ctk.CTkLabel(master=payrol_table_frame, text=title).grid(row=row, column=0, padx=20, sticky="w")
+                ctk.CTkLabel(master=payrol_table_frame, text=str(value)).grid(row=row, column=1, padx=(0, 20), sticky="e")
+
+        update_payroll_table()
+
+        empl_select_frame = display_list(
+            _master=main_frame,
+            options=tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees),
+            returned_idx=[empl_idx_select],
+            selectable=True,
+            place_col=0,
+            place_row=0,
+            colspan=1,
+            cmd=update_payroll_table,
         )
-        if _display_list[0] is False:
+
+        if empl_select_frame[0] is False:
             ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
                 row=1, column=0, columnspan=2, pady=20, padx=20
             )
-
-        def _view_payroll():
-            selected_empl = the_company.employees[radio_empl_idx_select.get()]
-            payroll = selected_empl.payroll
-            msgbox.showinfo(
-                "Payroll",
-                f"Salary: {payroll.salary}\nBonus: {payroll.bonus}\nTax: {payroll.tax}\nPunishment: {payroll.punish}",
-            )
-
-        ctk.CTkButton(master=main_frame, text="View", command=_view_payroll, **btn_action_style).grid(
-            row=2, column=0, columnspan=2, pady=(20, 0)
-        )
 
     # endregion
 
@@ -230,25 +190,12 @@ class PayrollGui(ctk.CTk):
     def __employee_view_payroll(self):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
+        empl = the_company.logged_in_employee
 
-        ctk.CTkLabel(master=main_frame, text="View Payroll", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
-        )
-
-        def _view_payroll():
-            _empl = the_company.logged_in_employee
-            _empl_payroll = (
-                f"Salary: {_empl.payroll.salary}\n"
-                f"Bonus: {_empl.payroll.bonus}\n"
-                f"Tax: {_empl.payroll.tax}\n"
-                f"Punishment: {_empl.payroll.punish}"
-            )
-            ctk.CTkLabel(master=main_frame, text=_empl_payroll, **label_desc_style).grid(
-                row=1, column=0, columnspan=2, pady=20, padx=20
-            )
-
-        ctk.CTkButton(master=main_frame, text="View", command=_view_payroll, **btn_action_style).grid(
-            row=2, column=0, columnspan=2, pady=(20, 0)
-        )
+        labels = ("Salary", "Bonus", "Tax", "Penalty", "Total")
+        values = (empl.payroll.salary, empl.payroll.bonus, empl.payroll.tax, empl.payroll.punish, empl.payroll.total)
+        for row, label, value in zip(range(5), labels, values):
+            ctk.CTkLabel(master=main_frame, text=label).grid(row=row, column=0, padx=20, sticky="w")
+            ctk.CTkLabel(master=main_frame, text=str(value)).grid(row=row, column=1, padx=(0, 20), sticky="e")
 
     # endregion
