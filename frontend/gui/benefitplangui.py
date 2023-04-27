@@ -362,24 +362,28 @@ class BenefitPlanGui(ctk.CTk):
         # region: submit button
         def _submit_handler():
             nonlocal empl_idx_select, bnf_idx_select, current_submenu
-            _empl = the_company.employees[empl_idx_select.get()]
-            _bnf = custom_bnfs[bnf_idx_select.get()]
+            selected_empl = the_company.employees[empl_idx_select.get()]
+            selected_bnf = custom_bnfs[bnf_idx_select.get()]
 
             if current_submenu == 1:  # apply
-                if not the_company.can_modify("benefits", _empl):
+                if not the_company.can_modify("benefits", selected_empl):
                     msgbox.showerror("Error", "Cannot modify benefits")
                     self.__clear_right_frame()
                     self.__admin_apply_rm(current_submenu)
                     return
-                _empl.benefits.append(_bnf.name)
+                selected_empl.benefits.append(selected_bnf.name)
                 if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(include={"benefits"})}, upsert=True)
-                msgbox.showinfo("Success", f"Benefit plan {_bnf.name} applied to {_empl.name}")
+                    employee_repo.update_one(
+                        {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"benefits"})}, upsert=True
+                    )
+                msgbox.showinfo("Success", f"Benefit plan {selected_bnf.name} applied to {selected_empl.name}")
             elif current_submenu == 2:  # remove
-                _empl.benefits.remove(_bnf.name)
+                selected_empl.benefits.remove(selected_bnf.name)
                 if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(include={"benefits"})}, upsert=True)
-                msgbox.showinfo("Success", f"Benefit plan {_bnf.name} removed from {_empl.name}")
+                    employee_repo.update_one(
+                        {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"benefits"})}, upsert=True
+                    )
+                msgbox.showinfo("Success", f"Benefit plan {selected_bnf.name} removed from {selected_empl.name}")
 
             self.__clear_right_frame()
             self.__admin_apply_rm(current_submenu)
@@ -403,13 +407,12 @@ class BenefitPlanGui(ctk.CTk):
         bnfs_empl_not_in = tuple(
             bnf for bnf in the_company.benefits if bnf.name not in the_company.logged_in_employee.benefits
         )
-        bnf_items = tuple(f"{bnf.name} - {bnf.cost}" for bnf in bnfs_empl_not_in)
         # endregion
 
         # region: table to choose benefit
         display_list(
             _master=zero_row,
-            options=bnf_items,
+            options=tuple(f"{bnf.name} - {bnf.cost}" for bnf in bnfs_empl_not_in),
             returned_idx=[bnf_idx_select],
             err_msg="No benefits",
             place_row=1,
@@ -421,17 +424,19 @@ class BenefitPlanGui(ctk.CTk):
         # region: request button
         def _request_handler():
             nonlocal bnf_idx_select
-            _bnf = bnfs_empl_not_in[bnf_idx_select.get()]
+            selected_bnf = bnfs_empl_not_in[bnf_idx_select.get()]
 
-            if the_company.logged_in_employee in _bnf.pending_requests:
+            if the_company.logged_in_employee in selected_bnf.pending_requests:
                 msgbox.showinfo("Error", "You have already requested this benefit")
                 return
 
-            _bnf.pending_requests.append(the_company.logged_in_employee)
+            selected_bnf.pending_requests.append(the_company.logged_in_employee)
 
             if os.getenv("HRMGR_DB") == "TRUE":
-                benefit_repo.update_one({"_id": _bnf.id}, {"$set": _bnf.dict(include={"pending_requests"})}, upsert=True)
-            msgbox.showinfo("Success", f"Benefit plan {_bnf.name} requested")
+                benefit_repo.update_one(
+                    {"_id": selected_bnf.id}, {"$set": selected_bnf.dict(include={"pending_requests"})}, upsert=True
+                )
+            msgbox.showinfo("Success", f"Benefit plan {selected_bnf.name} requested")
             merge_callable(self.__clear_right_frame, self.__request)()
 
         ctk.CTkButton(master=main_frame, text="Request", command=_request_handler, **btn_action_style).grid(
@@ -504,31 +509,35 @@ class BenefitPlanGui(ctk.CTk):
 
         def _approve_handler():
             nonlocal bnf_idx_select, empl_idx_select, bnfs_have_pending, pending_empls
-            _bnf = bnfs_have_pending[bnf_idx_select.get()]
-            _empl = pending_empls[empl_idx_select.get()]
+            selected_bnf = bnfs_have_pending[bnf_idx_select.get()]
+            selected_empl = pending_empls[empl_idx_select.get()]
 
-            if not the_company.can_modify("benefits", _empl):
+            if not the_company.can_modify("benefits", selected_empl):
                 msgbox.showinfo("Error", "You do not have permission to modify this employee")
                 return
 
-            _bnf.pending_requests.remove(_empl)
-            _bnf.enrolled_employees.append(_empl)
+            selected_bnf.pending_requests.remove(selected_empl)
+            selected_bnf.enrolled_employees.append(selected_empl)
             if os.getenv("HRMGR_DB") == "TRUE":
                 benefit_repo.update_one(
-                    {"_id": _bnf.id}, {"$set": _bnf.dict(include={"pending_requests", "enrolled_employees"})}, upsert=True
+                    {"_id": selected_bnf.id},
+                    {"$set": selected_bnf.dict(include={"pending_requests", "enrolled_employees"})},
+                    upsert=True,
                 )
-            msgbox.showinfo("Success", f"Benefit plan {_bnf.name} approved for {_empl.name}")
+            msgbox.showinfo("Success", f"Benefit plan {selected_bnf.name} approved for {selected_empl.name}")
             merge_callable(self.__clear_right_frame, self.__admin_resolve)()
 
         def _reject_handler():
             nonlocal bnf_idx_select, empl_idx_select, bnfs_have_pending, pending_empls
-            _bnf = bnfs_have_pending[bnf_idx_select.get()]
-            _empl = pending_empls[empl_idx_select.get()]
+            selected_bnf = bnfs_have_pending[bnf_idx_select.get()]
+            selected_empl = pending_empls[empl_idx_select.get()]
 
-            _bnf.pending_requests.remove(_empl)
+            selected_bnf.pending_requests.remove(selected_empl)
             if os.getenv("HRMGR_DB") == "TRUE":
-                benefit_repo.update_one({"_id": _bnf.id}, {"$set": _bnf.dict(include={"pending_requests"})}, upsert=True)
-            msgbox.showinfo("Success", f"Benefit plan {_bnf.name} rejected for {_empl.name}")
+                benefit_repo.update_one(
+                    {"_id": selected_bnf.id}, {"$set": selected_bnf.dict(include={"pending_requests"})}, upsert=True
+                )
+            msgbox.showinfo("Success", f"Benefit plan {selected_bnf.name} rejected for {selected_empl.name}")
             merge_callable(self.__clear_right_frame, self.__admin_resolve)()
 
         btn_approve.configure(command=_approve_handler)
@@ -566,13 +575,12 @@ class BenefitPlanGui(ctk.CTk):
 
         def bnf_select_handler():
             nonlocal bnf_idx_select, bnfs_items, zero_row, bnf_detail_widget, empl_list_frame
-            _bnf = the_company.benefits[bnf_idx_select.get()]
-            _empls_in_bnf = _bnf.enrolled_employees
-            _empl_items = tuple(f"{empl.name} - {empl.employee_id}" for empl in _empls_in_bnf)
+            selected_bnf = the_company.benefits[bnf_idx_select.get()]
+            _empls_in_bnf = selected_bnf.enrolled_employees
             empl_list_frame[1].destroy()
             empl_list_frame = display_list(
                 _master=zero_row,
-                options=_empl_items,
+                options=tuple(f"{empl.name} - {empl.employee_id}" for empl in _empls_in_bnf),
                 err_msg="No employees enrolled",
                 place_row=1,
                 place_col=1,
@@ -582,7 +590,7 @@ class BenefitPlanGui(ctk.CTk):
 
             # update description
             bnf_detail_widget.destroy()
-            bnf_detail_widget = ctk.CTkLabel(master=main_frame, text=_bnf.description)
+            bnf_detail_widget = ctk.CTkLabel(master=main_frame, text=selected_bnf.description)
             bnf_detail_widget.grid(row=1, column=0, columnspan=2, pady=20, padx=20)
 
         display_list(
