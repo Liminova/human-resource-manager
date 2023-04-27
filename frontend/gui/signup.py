@@ -91,8 +91,16 @@ class Signup(ctk.CTk):
     def click_signup(self):
         if self.get_username() and self.get_password():
             msgbox.showinfo("Sign up", "Sign up successful!")
-            self.destroy()
             self.create_owner()
+
+            if os.getenv("HRMGR_DB") == "TRUE":
+                confirm = msgbox.askyesno("Confirm", "Do you want to generate random data into the database?")
+                if confirm:
+                    from test.randomize_db import generate_random_data_into_db
+
+                    generate_random_data_into_db()
+
+            self.destroy()
 
     def click_signin(self):
         self.destroy()
