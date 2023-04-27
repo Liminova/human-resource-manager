@@ -55,26 +55,20 @@ def generate_random_data_into_db():
                 employee.payroll.set_punish("10")
 
     # Generate 5 random departments
+    depts = ["HR", "IT", "Marketing", "Sales", "Finance"]
     for _ in range(5):
         department = (
-            Department()
-            .set_name(random.choice(["HR", "IT", "Marketing", "Sales", "Finance"]))
-            .unwrap()
-            .set_id(str(random.randint(100000000, 999999999)))
-            .unwrap()
+            Department().set_name(random.choice(depts)).unwrap().set_id(str(random.randint(100000000, 999999999))).unwrap()
         )
         the_company.departments.append(department)
+        depts.remove(department.name)
 
     # Generate 4 random benefit plans
+    benfit_plans = ["Health Insurance", "Dental Insurance", "Vision Insurance", "401K"]
     for _ in range(4):
-        benefit = (
-            BenefitPlan()
-            .set_name(random.choice(["Health Insurance", "Dental Insurance", "Vision Insurance", "401K"]))
-            .unwrap()
-            .set_cost(random.randint(100, 1000))
-            .unwrap()
-        )
+        benefit = BenefitPlan().set_name(random.choice(benfit_plans)).unwrap().set_cost(random.randint(100, 1000)).unwrap()
         the_company.benefits.append(benefit)
+        benfit_plans.remove(benefit.name)
 
     # Randomize assign employees to departments, each employee has 1 department and only contains department_id
     for employee in the_company.employees:
