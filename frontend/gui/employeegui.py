@@ -116,15 +116,17 @@ class EmployeeGui(ctk.CTk):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
-        ctk.CTkLabel(master=main_frame, text="Remove Employee", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
-        )
-
         # Select employee from a list
         radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
         empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
         empl_select_frame = display_list(
-            _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
+            _master=main_frame,
+            options=empl_items,
+            returned_idx=[radio_empl_idx_select],
+            selectable=True,
+            place_col=0,
+            place_row=0,
+            colspan=2,
         )
         if empl_select_frame[0] is False:
             ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
@@ -170,16 +172,12 @@ class EmployeeGui(ctk.CTk):
             merge_callable(self.__clear_right_frame, self.__admin_remove_employee)()
 
         ctk.CTkButton(master=main_frame, text="Remove", command=_remove_handler, **btn_action_style).grid(
-            row=2, column=0, columnspan=2, pady=(10, 20)
+            row=1, column=0, columnspan=2, pady=(10, 20)
         )
 
     def __admin_update_employee(self):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
-
-        ctk.CTkLabel(master=main_frame, text="Update Employee", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=20
-        )
 
         # Select employee from a list
         radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
@@ -192,15 +190,15 @@ class EmployeeGui(ctk.CTk):
         )
         if empl_select_frame[0] is False:
             ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
-                row=1, column=0, columnspan=2, pady=20, padx=20
+                row=0, column=0, columnspan=2, pady=20, padx=20
             )
-        empl_select_frame[1].grid(row=1, column=0, columnspan=2, pady=0, padx=20)
+        empl_select_frame[1].grid(row=0, column=0, columnspan=2, pady=(20, 0), padx=20)
 
         entries = [ctk.CTkEntry(master=main_frame) for _ in range(6)]
         labels = ("Name: ", "Date of birth: ", "ID: ", "Phone Number: ", "Email: ", "Password: ")
         placeholder = ("Alex", "2000-12-31", "1234ABC", "0123456789", "hello@wo.rld", "secure")
 
-        for row, label, entry, placeholder in zip(range(2, 8), labels, entries, placeholder):
+        for row, label, entry, placeholder in zip(range(1, 7), labels, entries, placeholder):
             ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(
                 row=row, column=0, padx=(20, 0), pady=(20, 0), sticky="w"
             )
@@ -209,11 +207,10 @@ class EmployeeGui(ctk.CTk):
 
         def _update_handler():
             nonlocal entries
-            values = [entry.get() for entry in entries]
+            values = [entry.get().strip() for entry in entries]
             if not msgbox.askyesno("Confirmation", "Are you sure you want to update this employee?"):
                 return
             _empl = the_company.employees[radio_empl_idx_select.get()]
-
             for setter, value in zip(
                 (_empl.set_name, _empl.set_dob, _empl.set_id, _empl.set_phone, _empl.set_email, _empl.set_password), values
             ):
@@ -222,51 +219,57 @@ class EmployeeGui(ctk.CTk):
             if os.getenv("HRMGR_DB") == "TRUE":
                 employee_repo.update_one(
                     {"_id": _empl.id},
-                    {"$set": _empl.dict(include={"name", "dob", "id", "phone", "email", "password"})},
+                    {"$set": _empl.dict(include={"name", "dob", "employee_id", "phone", "email", "password"})},
                     upsert=True,
                 )
             msgbox.showinfo("Success", "Employee updated successfully")
             merge_callable(self.__clear_right_frame, self.__admin_update_employee)()
 
         ctk.CTkButton(master=main_frame, text="Update", command=_update_handler, **btn_action_style).grid(
-            row=8, column=0, columnspan=2, pady=20
+            row=7, column=0, columnspan=2, pady=20
         )
 
     def __admin_view_employee(self):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
-        ctk.CTkLabel(master=main_frame, text="View Employee", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
-        )
+        empl_info_frame = ctk.CTkFrame(master=main_frame)
 
-        # Select employee from a list
+        def update_empl_info_frame():
+            nonlocal empl_info_frame
+            selected_empl = the_company.employees[radio_empl_idx_select.get()]
+            labels = ("Name: ", "Date of birth: ", "ID: ", "Phone Number: ", "Email: ")
+            values = (
+                selected_empl.name,
+                selected_empl.dob,
+                selected_empl.employee_id,
+                selected_empl.phone,
+                selected_empl.email,
+            )
+            empl_info_frame.destroy()
+            empl_info_frame = ctk.CTkFrame(master=main_frame)
+            empl_info_frame.grid(row=1, column=0, columnspan=2, pady=(0, 20), padx=20)
+            for row, label, value in zip(range(1, 6), labels, values):
+                ctk.CTkLabel(master=empl_info_frame, text=label).grid(row=row, column=0, padx=(20, 0), sticky="w")
+                ctk.CTkLabel(master=empl_info_frame, text=value).grid(row=row, column=1, padx=20, sticky="e")
+
         radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
         empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
         empl_select_frame = display_list(
-            _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
+            _master=main_frame,
+            options=empl_items,
+            returned_idx=[radio_empl_idx_select],
+            selectable=True,
+            cmd=update_empl_info_frame,
+            place_col=0,
+            place_row=0,
+            colspan=2,
+            err_msg="No employee found",
         )
         if empl_select_frame[0] is False:
             ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
                 row=1, column=0, columnspan=2, pady=20, padx=20
             )
-
-        def _display_employee_handler():
-            _empl = the_company.employees[radio_empl_idx_select.get()]
-            _empl_info = (
-                f"Name: {_empl.name}\n"
-                f"Date of Birth: {_empl.dob}\n"
-                f"ID: {_empl.employee_id}\n"
-                f"Phone Number: {_empl.phone}\n"
-                f"Email: {_empl.email}\n"
-            )
-            ctk.CTkLabel(master=main_frame, text=_empl_info, **label_desc_style).grid(
-                row=2, column=0, columnspan=2, pady=20, padx=20
-            )
-
-        ctk.CTkButton(master=main_frame, text="View", command=_display_employee_handler, **btn_action_style).grid(
-            row=3, column=0, columnspan=2, pady=(10, 20)
-        )
 
     # endregion
 
@@ -280,23 +283,13 @@ class EmployeeGui(ctk.CTk):
             row=0, column=0, columnspan=2, pady=(20, 0)
         )
 
-        def _display_employee_handler():
-            _empl = the_company.logged_in_employee
-            _empl_info = (
-                f"Name: {_empl.name}\n"
-                f"Date of Birth: {_empl.dob}\n"
-                f"ID: {_empl.employee_id}\n"
-                f"Phone Number: {_empl.phone}\n"
-                f"Email: {_empl.email}\n"
-                f"Password: {_empl.hashed_password}\n"
-            )
-            ctk.CTkLabel(master=main_frame, text=_empl_info, **label_desc_style).grid(
-                row=2, column=0, columnspan=2, pady=20, padx=20
-            )
+        empl = the_company.logged_in_employee
 
-        ctk.CTkButton(master=main_frame, text="View", command=_display_employee_handler, **btn_action_style).grid(
-            row=3, column=0, columnspan=2, pady=(20, 0)
-        )
+        labels = ("Name: ", "Date of birth: ", "ID: ", "Phone Number: ", "Email: ")
+        values = (empl.name, empl.dob, empl.employee_id, empl.phone, empl.email)
+        for row, label, value in zip(range(0, 5), labels, values):
+            ctk.CTkLabel(master=main_frame, text=label).grid(row=row, column=0, padx=(20, 0), pady=(20, 0), sticky="w")
+            ctk.CTkLabel(master=main_frame, text=value).grid(row=row, column=1, padx=20, pady=(20, 0), sticky="w")
 
     # endregion
 
@@ -304,29 +297,24 @@ class EmployeeGui(ctk.CTk):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
-        ctk.CTkLabel(master=main_frame, text="Change Password", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0), padx=20
-        )
-
-        old_pwd_entry, new_pwd_entry, confirm_pwd_entry = (ctk.CTkEntry(None),) * 3
+        entries = [ctk.CTkEntry(master=main_frame) for _ in range(3)]
         for row, entry, label, placeholder in zip(
-            range(1, 4),
-            (old_pwd_entry, new_pwd_entry, confirm_pwd_entry),
-            ("Old: ", "New: ", "Confirm: "),
-            ("secure", "newpass", "newpass"),
+            range(0, 3), entries, ("Old: ", "New: ", "Confirm: "), ("secure", "newpass", "newpass")
         ):
             ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(
                 row=row, column=0, pady=(20, 0), sticky="w", padx=20
             )
-            entry = ctk.CTkEntry(master=main_frame, placeholder_text=placeholder, **input_box_style)
+            entry.configure(placeholder_text=placeholder, **input_box_style)
             entry.grid(row=row, column=1, pady=(20, 0), padx=(0, 20))
 
         def _change_password_handler():
-            nonlocal old_pwd_entry, new_pwd_entry, confirm_pwd_entry
-            old_pwd, new_pwd, confirm_pwd = (old_pwd_entry.get(), new_pwd_entry.get(), confirm_pwd_entry.get())
+            nonlocal entries
+            old_pwd, new_pwd, confirm_pwd = (entry.get() for entry in entries)
             logged_in_employee = the_company.logged_in_employee
-            if hash(the_company.logged_in_employee.name, old_pwd) != the_company.logged_in_employee.hashed_password:
+
+            if hash(logged_in_employee.employee_id, old_pwd) != logged_in_employee.hashed_password:
                 msgbox.showerror("Error", "Old password is incorrect")
+                print(old_pwd)
             elif new_pwd != confirm_pwd:
                 msgbox.showerror("Error", "New password and confirm password do not match")
             else:
@@ -341,5 +329,5 @@ class EmployeeGui(ctk.CTk):
                 msgbox.showinfo("Success", "Password changed successfully")
 
         ctk.CTkButton(master=main_frame, text="Change", command=_change_password_handler, **btn_action_style).grid(
-            row=4, column=0, columnspan=2, pady=20
+            row=3, column=0, columnspan=2, pady=20
         )
