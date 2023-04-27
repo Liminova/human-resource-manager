@@ -82,23 +82,30 @@ class EmployeeGui(ctk.CTk):
         def _add_handler():
             nonlocal entries
             values = [entry.get() for entry in entries]
-            print("DEBUG", *values)
 
             for value in values:
                 if not value:
                     msgbox.showerror("Error", "Please fill in all the fields")
                     return
 
-            _empl = Employee()
+            new_empl = Employee()
             for setter, value in zip(
-                (_empl.set_name, _empl.set_dob, _empl.set_id, _empl.set_phone, _empl.set_email, _empl.set_password), values
+                (
+                    new_empl.set_name,
+                    new_empl.set_dob,
+                    new_empl.set_id,
+                    new_empl.set_phone,
+                    new_empl.set_email,
+                    new_empl.set_password,
+                ),
+                values,
             ):
                 setter(value).unwrap()
 
-            the_company.employees.append(_empl)
+            the_company.employees.append(new_empl)
 
             if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.insert_one(_empl.dict(by_alias=True))
+                employee_repo.insert_one(new_empl.dict(by_alias=True))
             msgbox.showinfo("Success", "Employee added successfully")
 
         ctk.CTkButton(master=main_frame, text="Add", command=_add_handler, **btn_action_style).grid(
@@ -116,47 +123,48 @@ class EmployeeGui(ctk.CTk):
         # Select employee from a list
         radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
         empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
-        _display_list = display_list(
+        empl_select_frame = display_list(
             _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
         )
-        if _display_list[0] is False:
+        if empl_select_frame[0] is False:
             ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
                 row=1, column=0, columnspan=2, pady=20, padx=20
             )
 
         def _remove_handler():
+            nonlocal radio_empl_idx_select
             if not msgbox.askyesno("Confirmation", "Are you sure you want to remove this employee?"):
                 return
-            _empls = the_company.employees
-            _empl = _empls[radio_empl_idx_select.get()]
+            empls = the_company.employees
+            selected_empl = empls[radio_empl_idx_select.get()]
 
-            _db_update_bnfs, _db_update_dept = [], []
+            updated_bnfs, updated_depts = [], []
             # remove employee from benefits
-            for b in the_company.benefits:
-                if _empl in b.enrolled_employees:
-                    b.enrolled_employees.remove(_empl)
-                    _db_update_bnfs.append(b)
-                if _empl in b.pending_requests:
-                    b.pending_requests.remove(_empl)
-                    _db_update_bnfs.append(b)
+            for bnf in the_company.benefits:
+                if selected_empl in bnf.enrolled_employees:
+                    bnf.enrolled_employees.remove(selected_empl)
+                    updated_bnfs.append(bnf)
+                if selected_empl in bnf.pending_requests:
+                    bnf.pending_requests.remove(selected_empl)
+                    updated_bnfs.append(bnf)
 
             # remove employee from departments
-            for d in the_company.departments:
-                if _empl in d.members:
-                    d.members.remove(_empl)
-                    _db_update_dept.append(d)
+            for dept in the_company.departments:
+                if selected_empl in dept.members:
+                    dept.members.remove(selected_empl)
+                    updated_depts.append(dept)
 
             # remove employee from company
-            _empls.remove(_empl)
+            empls.remove(selected_empl)
 
             if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.delete_one({"_id": _empl.id})
-                for b in _db_update_bnfs:
+                employee_repo.delete_one({"_id": selected_empl.id})
+                for bnf in updated_bnfs:
                     benefit_repo.update_one(
-                        {"_id": b.id}, {"$set": b.dict(include={"enrolled_employees", "pending_requests"})}, upsert=True
+                        {"_id": bnf.id}, {"$set": bnf.dict(include={"enrolled_employees", "pending_requests"})}, upsert=True
                     )
-                for d in _db_update_dept:
-                    department_repo.update_one({"_id": d.id}, {"$set": d.dict(include={"members"})}, upsert=True)
+                for dept in updated_depts:
+                    department_repo.update_one({"_id": dept.id}, {"$set": dept.dict(include={"members"})}, upsert=True)
 
             msgbox.showinfo("Success", "Employee removed successfully")
             merge_callable(self.__clear_right_frame, self.__admin_remove_employee)()
@@ -175,15 +183,18 @@ class EmployeeGui(ctk.CTk):
 
         # Select employee from a list
         radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
-        _display_list = display_list(
-            _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
+        empl_select_frame = display_list(
+            _master=main_frame,
+            options=tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees),
+            returned_idx=[radio_empl_idx_select],
+            selectable=True,
+            err_msg="No employee found",
         )
-        if _display_list[0] is False:
+        if empl_select_frame[0] is False:
             ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
                 row=1, column=0, columnspan=2, pady=20, padx=20
             )
-        _display_list[1].grid(row=1, column=0, columnspan=2, pady=0, padx=20)
+        empl_select_frame[1].grid(row=1, column=0, columnspan=2, pady=0, padx=20)
 
         entries = [ctk.CTkEntry(master=main_frame) for _ in range(6)]
         labels = ("Name: ", "Date of birth: ", "ID: ", "Phone Number: ", "Email: ", "Password: ")
@@ -232,10 +243,10 @@ class EmployeeGui(ctk.CTk):
         # Select employee from a list
         radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
         empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
-        _display_list = display_list(
+        empl_select_frame = display_list(
             _master=main_frame, options=empl_items, returned_idx=[radio_empl_idx_select], selectable=True
         )
-        if _display_list[0] is False:
+        if empl_select_frame[0] is False:
             ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
                 row=1, column=0, columnspan=2, pady=20, padx=20
             )
