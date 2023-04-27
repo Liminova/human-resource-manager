@@ -26,8 +26,7 @@ def display_list(
         selectable (bool): Whether the options are selectable or not.
         page_size (int): The number of options to be displayed in a page.
         err_msg (str): The error message to be displayed when there is no option to be displayed.
-        place_row (int): The row to place the list in the subwidget, this should be 1 because the first row is reserved for the page indicator.
-        place_col (int): The column to place the list in the subwidget, useful if you want to place multiple lists in the same subwidget.
+        place_row/col: The row/column to place the widget in the parent window.
         colspan: depends on the master widget. If the design has x columns, then colspan should be x.
         cmd (Callable): The command to be executed when an option is selected.
     """
