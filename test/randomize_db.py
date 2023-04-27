@@ -6,6 +6,7 @@ from models import Employee, Department, BenefitPlan, Company
 from database.mongo import employee_repo, department_repo, benefit_repo
 
 the_company = Company()
+__current_employee_count = len(the_company.employees)
 
 
 def generate_random_data_into_db():
@@ -103,7 +104,7 @@ def generate_random_data_into_db():
             .unwrap()
         )
     if os.getenv("HRMGR_DB") == "TRUE":
-        for employee in the_company.employees:
+        for employee in the_company.employees[__current_employee_count:]:
             employee_repo.insert_one(employee.dict(by_alias=True))
 
         for department in the_company.departments:
