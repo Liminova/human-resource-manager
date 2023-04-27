@@ -1,5 +1,4 @@
 import os
-import tkinter
 import customtkinter as ctk
 from tkinter import messagebox as msgbox
 
@@ -54,7 +53,7 @@ class DepartmentGui(ctk.CTk):
         return {
             # "View Department": self.__employee_view_department,
             # "List All Departments": self.__employee_list_all_department,
-            "Back": self.__back_to_homepage,
+            "Back": self.__back_to_homepage
         }
 
     def __clear_right_frame(self):
@@ -332,8 +331,7 @@ class DepartmentGui(ctk.CTk):
             # update db
             if os.getenv("HRMGR_DB") == "TRUE":
                 department_repo.update_one(
-                    {"id": the_company.departments[0].id},
-                    {"$set": {"employees": the_company.departments[0].members}},
+                    {"id": the_company.departments[0].id}, {"$set": {"employees": the_company.departments[0].members}}
                 )
 
             msgbox.showinfo("Success", "Employee added successfully")
