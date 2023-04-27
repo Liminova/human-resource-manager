@@ -10,27 +10,36 @@ __current_employee_count = len(the_company.employees)
 
 
 def generate_random_data_into_db():
+    def rand_id():
+        return "".join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=10))
+
+    def rand_phone():
+        return random.choice("123456789") + "".join(random.choices(string.digits, k=9))
 
     fake = Faker()
 
     # Generate 20 random employees
+    taken_ids, taken_phones = [], []
     for _ in range(20):
+        random_id = rand_id()
+        while random_id in taken_ids:
+            random_id = rand_id()
+
+        random_phone = rand_phone()
+        while random_phone in taken_phones:
+            random_phone = rand_phone()
+
+        # fmt: off
         employee = (
             Employee()
-            .set_name(fake.name())
-            .unwrap()
-            .set_dob(fake.date())
-            .unwrap()
-            .set_email(fake.email())
-            .unwrap()
-            .set_phone(str(random.randint(2000, 9999)))
-            .unwrap()
-            .set_id(str(random.randint(100000000, 999999999)))
-            .unwrap()
-            .set_password("".join(random.choices(string.ascii_letters + string.digits, k=10)))
-            .unwrap()
+            .set_name(fake.name()).unwrap()
+            .set_dob(fake.date()).unwrap()
+            .set_email(fake.email()).unwrap()
+            .set_phone(random_phone).unwrap()
+            .set_id(random_id).unwrap()
+            .set_password("".join(random.choices(string.ascii_letters + string.digits, k=10))).unwrap()
         )
-
+        # fmt: on
         the_company.employees.append(employee)
 
     # Generate 5 random attendance records for each in employee.attendance.attendances: dict[str<from datetime.strftime("%Y-%m-%d")>, bool<is_present>]
