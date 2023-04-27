@@ -1,11 +1,11 @@
 import os
 import tkinter
 import customtkinter as ctk
-from tkinter import messagebox
+from tkinter import messagebox as msgbox
 
 from models import Company, Department
 from database.mongo import department_repo, employee_repo
-from frontend.helpers_gui import merge_callable
+from frontend.helpers_gui import *
 from frontend.helpers_gui.global_styling import *
 
 the_company = Company()
@@ -18,108 +18,46 @@ Height = 768
 
 
 class DepartmentGui(ctk.CTk):
-    def __init__(self, master=None):
+    def __init__(self):
         super().__init__()
         self.title("Department Management")
         self.geometry(f"{Width}x{Height}")
         self.resizable(True, True)
+
         self.left_frame = ctk.CTkFrame(master=self, corner_radius=10)
-
-        if the_company.logged_in_employee.is_admin:
-            self.admin()
-        else:
-            self.employee()
-
         self.left_frame.pack(side=ctk.LEFT)
         self.left_frame.pack_propagate(False)
         self.left_frame.configure(width=320, height=760)
 
-        self.right_frame = ctk.CTkFrame(master=self, border_width=2, corner_radius=10)
-        self.right_frame.pack(side=ctk.RIGHT)
+        self.right_frame = ctk.CTkFrame(master=self)
+        self.right_frame.pack(side=ctk.RIGHT, expand=True)
         self.right_frame.pack_propagate(False)
-        self.right_frame.configure(width=700, height=760)
+
+        menu_buttons = MenuButtons(
+            self.left_frame, self.right_frame, self.admin() if the_company.logged_in_employee.is_admin else self.employee()
+        )
+        menu_buttons.create()
 
     def admin(self):
-        self.button1 = ctk.CTkButton(
-            master=self.left_frame, text="Add Department", command=merge_callable(self.__destroy_all_frames, self.__admin_add_department)
-        )
-        self.__button_style(self.button1)
-        self.button1.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
-
-        self.button2 = ctk.CTkButton(
-            master=self.left_frame, text="Remove Department", command=merge_callable(self.__destroy_all_frames, self.__admin_remove_department)
-        )
-        self.__button_style(self.button2)
-        self.button2.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
-
-        self.button3 = ctk.CTkButton(
-            master=self.left_frame, text="Update Department", command=merge_callable(self.__destroy_all_frames, self.__admin_update_department)
-        )
-        self.__button_style(self.button3)
-        self.button3.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
-
-        self.button4 = ctk.CTkButton(
-            master=self.left_frame, text="View Department", command=merge_callable(self.__destroy_all_frames, self.__admin_view_department)
-        )
-        self.__button_style(self.button4)
-        self.button4.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
-
-        self.button5 = ctk.CTkButton(
-            master=self.left_frame, text="List All Departments", command=merge_callable(self.__destroy_all_frames, self.__admin_list_all_department)
-        )
-        self.__button_style(self.button5)
-        self.button5.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
-
-        self.button6 = ctk.CTkButton(
-            master=self.left_frame,
-            text="List Employees Without Department",
-            command=merge_callable(self.__destroy_all_frames, self.__admin_list_employees_wo_department),
-        )
-        self.__button_style(self.button6)
-        self.button6.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
-
-        self.button7 = ctk.CTkButton(
-            master=self.left_frame, text="Add Employee", command=merge_callable(self.__destroy_all_frames, self.__admin_add_employee)
-        )
-        self.__button_style(self.button7)
-        self.button7.place(relx=0.5, rely=0.7, anchor=tkinter.CENTER)
-
-        self.button8 = ctk.CTkButton(
-            master=self.left_frame, text="Remove Employee", command=merge_callable(self.__destroy_all_frames, self.__admin_remove_employee)
-        )
-        self.__button_style(self.button8)
-        self.button8.place(relx=0.5, rely=0.8, anchor=tkinter.CENTER)
-
-        self.button9 = ctk.CTkButton(master=self.left_frame, text="Back", command=lambda self=self: self.__back_to_homepage())
-        self.button9.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
-        self.button9.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
+        return {
+            "Add Department": self.__admin_add_department,
+            "Remove Department": self.__admin_remove_department,
+            "Update Department": self.__admin_update_department,
+            "View Department": self.__view_department,
+            "List Employees Without Department": self.__admin_list_employees_wo_department,
+            "Add Employee": self.__admin_add_employee,
+            "Remove Employee": self.__admin_remove_employee,
+            "Back": self.__back_to_homepage,
+        }
 
     def employee(self):
-        self.button1 = ctk.CTkButton(
-            master=self.left_frame, text="View Department", command=merge_callable(self.__destroy_all_frames, self.__employee_view_department)
-        )
-        self.__button_style(self.button1)
-        self.button1.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
+        return {
+            # "View Department": self.__employee_view_department,
+            # "List All Departments": self.__employee_list_all_department,
+            "Back": self.__back_to_homepage,
+        }
 
-        self.button2 = ctk.CTkButton(
-            master=self.left_frame,
-            text="List All Departments",
-            command=merge_callable(self.__destroy_all_frames, self.__employee_list_all_department),
-        )
-        self.__button_style(self.button2)
-        self.button2.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
-
-        self.button3 = ctk.CTkButton(master=self.left_frame, text="Back", command=lambda self=self: self.__back_to_homepage())
-        self.button3.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
-        self.button3.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
-
-    def __input_box_style(self, element):
-        element.configure(width=400, height=30, font=("Century Gothic", 14), corner_radius=10)
-
-    def __button_style(self, button):
-        button.configure(width=260, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-
-    def __destroy_all_frames(self):
+    def __clear_right_frame(self):
         for widget in self.right_frame.winfo_children():
             widget.destroy()
 
@@ -130,401 +68,306 @@ class DepartmentGui(ctk.CTk):
         Homepage().mainloop()
 
     # region: admin functions
+
     def __admin_add_department(self):
-        self.button1_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button1_frame, text="Information", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        ctk.CTkLabel(master=main_frame, text="Add Department", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Department Name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.185, rely=0.15, anchor=tkinter.CENTER)
+        entries = [ctk.CTkEntry(master=main_frame) for _ in range(2)]
+        labels = ("Name: ", "ID: ")
+        placeholders = ("BHYT", "1")
+        for row, entry, label, placeholder in zip(range(1, 3), entries, labels, placeholders):
+            ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(
+                row=row, column=0, pady=(20, 0), padx=20, sticky="w"
+            )
+            entry.configure(placeholder_text=placeholder, **input_box_style)
+            entry.grid(row=row, column=1, pady=(20, 0), padx=(0, 20))
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Name")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        def _add_department():
+            nonlocal entries
+            values = [entry.get() for entry in entries]
+            print("DEBUG", *values)  # tang Kien <3
 
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="Department ID: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.155, rely=0.275, anchor=tkinter.CENTER)
+            for value in values:
+                if not value:
+                    msgbox.showerror("Error", "Please fill in all the fields")
+                    return
 
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__input_box_style(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
+            _dept = Department()
+            for setter, value in zip((_dept.set_name, _dept.set_id), values):
+                setter(value).unwrap()
 
-        self.button = ctk.CTkButton(master=self.right_frame, text="Confirm", command=(lambda: add_successfully(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.425, anchor=tkinter.CENTER)
+            the_company.departments.append(_dept)
 
-        self.button1_frame.pack(pady=20)
+            if os.getenv("HRMGR_DB") == "TRUE":
+                department_repo.insert_one(_dept.dict(by_alias=True))
+            msgbox.showinfo("Success", "Department added successfully")
 
-        def add_successfully(self):
-            name = self.entry1.get()
-            id = self.entry2.get()
-            # create a blank Department object
-            new_department = Department()
-            if name == "" or id == "":
-                messagebox.showerror("Error", "Please fill in all the fields")
-            elif not name.isalpha():
-                messagebox.showerror("Error", "Please enter a valid name")
-            else:
-                # assign values to the department object
-                new_department.name = name
-                new_department.dept_id = id
-                # add the department to the company and database
-                the_company.departments.append(new_department)
-
-                if os.getenv("HRMGR_DB") == "TRUE":
-                    department_repo.insert_one(new_department.dict(by_alias=True))
-                messagebox.showinfo("Success", "Department added successfully")
+        ctk.CTkButton(master=main_frame, text="Add", command=_add_department, **btn_action_style).grid(
+            row=3, column=0, columnspan=2, pady=20
+        )
 
     def __admin_remove_department(self):
-        self.button2_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button2_frame, text="Remove Department", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        ctk.CTkLabel(master=main_frame, text="Remove Department", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Department Name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.185, rely=0.15, anchor=tkinter.CENTER)
+        # Select a department from a list
+        radio_dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        dept_items = tuple(f"{dept.dept_id} - {dept.name}" for dept in the_company.departments)
+        _display_list = display_list(
+            _master=main_frame, options=dept_items, returned_idx=[radio_dept_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No department to remove", **label_desc_style).grid(
+                row=1, column=0, columnspan=2, pady=(20, 0)
+            )
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Name")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        def _remove_department():
+            if not msgbox.askyesno("Confirmation", "Are you sure you want to remove this department?"):
+                return
+            _depts = the_company.departments
+            _dept = _depts[radio_dept_idx_select.get()]
 
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="Department ID: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.155, rely=0.275, anchor=tkinter.CENTER)
+            _db_update_emps = []
+            # remove department from company
+            _depts.remove(_dept)
 
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__input_box_style(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
+            # remove department from employees
+            for emp in the_company.employees:
+                if emp.department_id == _dept.id:
+                    emp.department_id = ""
+                    _db_update_emps.append(emp)
 
-        self.button = ctk.CTkButton(master=self.right_frame, text="Remove", command=(lambda: remove_successfully(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
-        self.button.place(relx=0.5, rely=0.425, anchor=tkinter.CENTER)
+            # update db
+            if os.getenv("HRMGR_DB") == "TRUE":
+                department_repo.delete_one(_dept.dict(by_alias=True))
+                for emp in _db_update_emps:
+                    employee_repo.update_one({"id": emp.id}, {"$set": {"department_id": emp.department_id}})
+            msgbox.showinfo("Success", "Department removed successfully")
+            merge_callable(self.__clear_right_frame, self.__admin_remove_department)()
 
-        self.button2_frame.pack(pady=20)
-
-        def remove_successfully(self):
-            name = self.entry1.get()
-            id = self.entry2.get()
-
-            departments = the_company.departments
-
-            if name == "" or id == "":
-                messagebox.showerror("Error", "Please fill in all the fields")
-            elif not name.isalpha():
-                messagebox.showerror("Error", "Please enter a valid name")
-            elif not id.isdigit():
-                messagebox.showerror("Error", "Please enter a valid ID")
-            else:
-                for department in departments:
-                    if department.name == name and department.dept_id == id:
-                        the_company.departments.remove(department)
-                        if os.getenv("HRMGR_DB") == "TRUE":
-                            department_repo.delete_one({"name": name, "id": id})
-                        break
-                messagebox.showinfo("Success", "Department removed successfully")
+        ctk.CTkButton(master=main_frame, text="Remove", command=_remove_department, **btn_action_style).grid(
+            row=2, column=0, columnspan=2, pady=20
+        )
 
     def __admin_update_department(self):
-        self.button3_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button3_frame, text="Update Department", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.label0 = ctk.CTkLabel(
-            master=self.right_frame, text="(You are currently update the information of: ) ", font=("Century Gothic", 14, "italic")
+        ctk.CTkLabel(master=main_frame, text="Update Department", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
         )
-        self.label0.place(relx=0.5, rely=0.095, anchor=tkinter.CENTER)
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Old Name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.135, rely=0.15, anchor=tkinter.CENTER)
+        # Select a department from a list
+        radio_dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        dept_items = tuple(f"{dept.dept_id} - {dept.name}" for dept in the_company.departments)
+        _display_list = display_list(
+            _master=main_frame, options=dept_items, returned_idx=[radio_dept_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No department found", **label_desc_style).grid(
+                row=1, column=0, columnspan=2, pady=20, padx=20
+            )
+        _display_list[1].grid(row=1, column=0, columnspan=2, pady=0, padx=20)
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter old name")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        # Input new department name
+        entries = [ctk.CTkEntry(master=main_frame) for _ in range(1)]
+        for row, (entry, label, placeholder) in enumerate(zip(entries, ("New Department Name",), ("BHYT",))):
+            ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(row=2, column=0, pady=(20, 0), padx=20)
+            entry.configure(placeholder_text=placeholder, **input_box_style)
+            entry.grid(row=2, column=1, pady=(20, 0), padx=(0, 20))
 
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="Old ID: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.105, rely=0.275, anchor=tkinter.CENTER)
+        def _update_department():
+            # thich thi viet Debug nha, Pechy luoi roi
+            _dept = the_company.departments[radio_dept_idx_select.get()]
 
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter old ID")
-        self.__input_box_style(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
+            # update department
+            _dept.name = entries[0].get()
 
-        self.label3 = ctk.CTkLabel(master=self.right_frame, text="New name: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.135, rely=0.4, anchor=tkinter.CENTER)
+            # update db
+            if os.getenv("HRMGR_DB") == "TRUE":
+                department_repo.update_one({"id": _dept.id}, {"$set": {"name": _dept.name}})
 
-        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter new name")
-        self.__input_box_style(self.entry3)
-        self.entry3.place(relx=0.325, rely=0.445, anchor=tkinter.CENTER)
+            msgbox.showinfo("Success", "Department updated successfully")
+            merge_callable(self.__clear_right_frame, self.__admin_update_department)()
 
-        self.label4 = ctk.CTkLabel(master=self.right_frame, text="New ID: ", font=("Century Gothic", 20, "italic"))
-        self.label4.place(relx=0.105, rely=0.525, anchor=tkinter.CENTER)
-
-        self.entry4 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter new ID")
-        self.__input_box_style(self.entry4)
-        self.entry4.place(relx=0.325, rely=0.57, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="Update", command=(lambda: update_successfully(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.685, anchor=tkinter.CENTER)
-
-        self.button3_frame.pack(pady=20)
-
-        def update_successfully(self):
-            name = self.entry1.get()
-            id = self.entry2.get()
-            new_name = self.entry3.get()
-            new_id = self.entry4.get()
-
-            departments = the_company.departments
-
-            # if exist new_name or new_id -> update them. if it doesn't exist, skip
-            if name == "" or id == "":
-                messagebox.showerror("Error", "Please fill in all the fields")
-            elif not name.isalpha():
-                messagebox.showerror("Error", "Please enter a valid name")
-            elif not id.isdigit():
-                messagebox.showerror("Error", "Please enter a valid ID")
-            else:
-                for department in departments:
-                    if department.name == name and department.dept_id == id:
-                        if new_name != "":
-                            department.name = new_name
-                            if os.getenv("HRMGR_DB") == "TRUE":
-                                department_repo.update_one({"name": name, "dept_id": id}, {"$set": {"name": new_name}})
-                        if new_id != "":
-                            department.dept_id = new_id
-                            if os.getenv("HRMGR_DB") == "TRUE":
-                                department_repo.update_one({"name": name, "dept_id": id}, {"$set": {"dept_id": new_id}})
-                        break
-                messagebox.showinfo("Success", "Department updated successfully")
-
-    def __admin_view_department(self):
-        self.button2_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button2_frame, text="View Department", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Department ID: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.155, rely=0.15, anchor=tkinter.CENTER)
-
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="View", fg_color="purple", command=(lambda: view(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
-
-        self.button2_frame.pack(pady=20)
-
-        def view(self):
-            id = self.entry1.get()
-            departments = the_company.departments
-            if id == "":
-                messagebox.showerror("Error", "Please enter a valid ID")
-            else:
-                for department in departments:
-                    if department.dept_id == id:
-                        messagebox.showinfo("Department", f"Name: {department.name}\nID: {department.dept_id}")
-                        break
-                else:
-                    messagebox.showerror("Error", "Department not found")
+        ctk.CTkButton(master=main_frame, text="Update", command=_update_department, **btn_action_style).grid(
+            row=3, column=0, columnspan=2, pady=20
+        )
 
     def __admin_add_employee(self):
-        self.button3_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button3_frame, text="Add Employee", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        ctk.CTkLabel(master=main_frame, text="Add Employee", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Department ID: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.155, rely=0.15, anchor=tkinter.CENTER)
+        # Select employee from list
+        radio_emp_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        empl_items = tuple(f"{empl.name} - ({empl.id})" for empl in the_company.employees)
+        _display_list = display_list(
+            _master=main_frame, options=empl_items, returned_idx=[radio_emp_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No employee to add", **label_desc_style).grid(
+                row=1, column=0, columnspan=2, pady=(20, 0)
+            )
+        _display_list[1].grid(row=1, column=0, columnspan=2, pady=(20, 0))
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        # Select department from list
+        radio_dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        dept_items = tuple(f"{dept.dept_id} - {dept.name}" for dept in the_company.departments)
+        _display_list = display_list(
+            _master=main_frame, options=dept_items, returned_idx=[radio_dept_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No department to add", **label_desc_style).grid(
+                row=2, column=0, columnspan=2, pady=(20, 0)
+            )
+        _display_list[1].grid(row=2, column=0, columnspan=2, pady=(20, 0))
 
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="Employee ID: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.155, rely=0.25, anchor=tkinter.CENTER)
+        def _add_employee():
+            _empl = the_company.employees[radio_emp_idx_select.get()]
+            _dept = the_company.departments[radio_dept_idx_select.get()]
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.295, anchor=tkinter.CENTER)
+            # add employee to department
+            _dept.members.append(_empl)
 
-        self.button = ctk.CTkButton(master=self.right_frame, text="Add", command=lambda self=self: added_successfully(self))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.395, anchor=tkinter.CENTER)
+            # update db
+            if os.getenv("HRMGR_DB") == "TRUE":
+                department_repo.update_one({"id": _dept.id}, {"$set": {"employees": _dept.members}})
 
-        self.button3_frame.pack(pady=20)
+            msgbox.showinfo("Success", "Employee added successfully")
+            merge_callable(self.__clear_right_frame, self.__admin_add_employee)()
 
-        def added_successfully(self):
-            input_employee_id = self.entry1.get()
-            input_department_id = self.entry2.get()
-            
-            if input_department_id == "":
-                messagebox.showerror("Error", "Please enter a valid department ID")
-                return
-            if input_employee_id == "": 
-                messagebox.showerror("Error", "Please enter a valid employee ID")
-                return
-    
-            for dept in the_company.departments:
-                if dept.dept_id != input_department_id:
-                    continue
-                for emp in the_company.employees:
-                    if emp.employee_id != input_employee_id:
-                        continue
-                    emp.department_id = input_department_id
-                    dept.members.append(emp)
-                    messagebox.showinfo("Success", "Employee added successfully")
-                    if os.getenv("HRMGR_DB") == "TRUE":
-                        employee_repo.update_one({"_id": emp.id}, {"$set": emp.dict(include={"department_id"})}, upsert=True)
-                        department_repo.update_one({"_id": dept.id}, {"$set": dept.dict(include={"members"})}, upsert=True)
+        ctk.CTkButton(master=main_frame, text="Add", command=_add_employee, **btn_action_style).grid(
+            row=3, column=0, columnspan=2, pady=20
+        )
 
-                else:
-                    messagebox.showerror("Error", "Enter valid ID")
-                        
     def __admin_remove_employee(self):
-        self.button4_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button4_frame, text="Remove Employee", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        ctk.CTkLabel(master=main_frame, text="Remove Employee", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Enter Department ID: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.155, rely=0.15, anchor=tkinter.CENTER)
+        # Select employee from list
+        radio_emp_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        empl_items = tuple(f"{empl.name} - {empl.id}" for empl in the_company.employees)
+        _display_list = display_list(
+            _master=main_frame, options=empl_items, returned_idx=[radio_emp_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No employee to remove", **label_desc_style).grid(
+                row=1, column=0, columnspan=2, pady=(20, 0)
+            )
+        _display_list[1].grid(row=1, column=0, columnspan=2, pady=(20, 0))
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        # Select department from list
+        radio_dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        dept_items = tuple(f"{dept.dept_id} - {dept.name}" for dept in the_company.departments)
+        _display_list = display_list(
+            _master=main_frame, options=dept_items, returned_idx=[radio_dept_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No department to remove", **label_desc_style).grid(
+                row=2, column=0, columnspan=2, pady=(20, 0)
+            )
+        _display_list[1].grid(row=2, column=0, columnspan=2, pady=(20, 0))
 
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="Employee ID: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.155, rely=0.25, anchor=tkinter.CENTER)
+        def _remove_employee():
+            _empl = the_company.employees[radio_emp_idx_select.get()]
+            _dept = the_company.departments[radio_dept_idx_select.get()]
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.295, anchor=tkinter.CENTER)
+            # remove employee from department
+            _dept.members.remove(_empl)
 
-        self.button = ctk.CTkButton(master=self.right_frame, text="Remove", command=(lambda: removed_successfully(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.395, anchor=tkinter.CENTER)
+            # update db
+            if os.getenv("HRMGR_DB") == "TRUE":
+                department_repo.update_one({"id": _dept.id}, {"$set": {"employees": _dept.members}})
 
-        self.button4_frame.pack(pady=20)
+            msgbox.showinfo("Success", "Employee removed successfully")
+            merge_callable(self.__clear_right_frame, self.__admin_remove_employee)()
 
-        def removed_successfully(self):
-            input_employee_id = self.entry1.get()
-            input_department_id = self.entry2.get()
-            
-            if input_department_id == "":
-                messagebox.showerror("Error", "Please enter a valid department ID")
-                return
-            if input_employee_id == "": 
-                messagebox.showerror("Error", "Please enter a valid employee ID")
-                return
-    
-            for dept in the_company.departments:
-                if dept.dept_id != input_department_id:
-                    continue
-                for emp in the_company.employees:
-                    if emp.employee_id != input_employee_id:
-                        continue
-                    emp.department_id = ""
-                    dept.members.remove(emp)
-                    messagebox.showinfo("Success", "Employee removed successfully")
-                    if os.getenv("HRMGR_DB") == "TRUE":
-                        employee_repo.update_one({"_id": emp.id}, {"$set": emp.dict(include={"department_id"})}, upsert=True)
-                        department_repo.update_one({"_id": dept.id}, {"$set": dept.dict(include={"members"})}, upsert=True)
-
-                else:
-                    messagebox.showerror("Error", "Enter valid ID")
-
-    def __admin_list_all_department(self):
-        self.button5_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button5_frame, text="List All Departments", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="List", command=(lambda: list_departments(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.395, anchor=tkinter.CENTER)
-
-        self.button5_frame.pack(pady=20)
-
-        def list_departments(self):
-            departments = the_company.departments
-            if len(departments) == 0:
-                messagebox.showerror("Error", "No departments found")
-            else:
-                messagebox.showinfo("Departments", "Departments: " + ", ".join([department.name for department in departments]))
+        ctk.CTkButton(master=main_frame, text="Remove", command=_remove_employee, **btn_action_style).grid(
+            row=3, column=0, columnspan=2, pady=20
+        )
 
     def __admin_list_employees_wo_department(self):
-        self.button6_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button6_frame, text="List Employees Without Department", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        ctk.CTkLabel(master=main_frame, text="Employees without department", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
 
-        self.button = ctk.CTkButton(master=self.right_frame, text="List", command=(lambda: list_employees(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.395, anchor=tkinter.CENTER)
+        # Select employee from list
+        radio_emp_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        empl_items = tuple(f"{empl.name} - {empl.id}" for empl in the_company.employees if empl.department_id is None)
+        _display_list = display_list(
+            _master=main_frame, options=empl_items, returned_idx=[radio_emp_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No employee without department", **label_desc_style).grid(
+                row=1, column=0, columnspan=2, pady=(20, 0)
+            )
+        _display_list[1].grid(row=1, column=0, columnspan=2, pady=(20, 0))
 
-        self.button6_frame.pack(pady=20)
+        def _add_employee():
+            _empl = the_company.employees[radio_emp_idx_select.get()]
 
-        def list_employees(self):
-            employees = the_company.employees
-            if len(employees) == 0:
-                messagebox.showerror("Error", "No employees found")
-            else:
-                messagebox.showinfo(
-                    "Employees", "Employees: " + ", ".join([employee.employee_id for employee in employees if employee.department_id == ""])
+            # add employee to department
+            the_company.departments[0].members.append(_empl)
+
+            # update db
+            if os.getenv("HRMGR_DB") == "TRUE":
+                department_repo.update_one(
+                    {"id": the_company.departments[0].id},
+                    {"$set": {"employees": the_company.departments[0].members}},
                 )
 
-    # endregion
+            msgbox.showinfo("Success", "Employee added successfully")
+            merge_callable(self.__clear_right_frame, self.__admin_list_employees_wo_department)()
 
-    # region: employee functions
-    def __employee_view_department(self):
-        self.button1_frame = ctk.CTkFrame(master=self.right_frame, corner_radius=10)
-        self.label = ctk.CTkLabel(master=self.button1_frame, text="View Department", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Department ID: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
-
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__input_box_style(self.entry1)
-        self.entry1.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
-
-        self.button1 = ctk.CTkButton(master=self.right_frame, text="View", fg_color="purple", command=(lambda: view(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button1.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
-
-        self.button1_frame.pack()
-
-        def view(self):
-            id = self.entry1.get()
-            departments = the_company.departments
-            if id == "":
-                messagebox.showerror("Error", "Please enter a valid ID")
-            else:
-                for department in departments:
-                    if department.dept_id == id:
-                        messagebox.showinfo("Department", "Department: " + department.name)
-                        break
-                else:
-                    messagebox.showerror("Error", "Department not found")
-
-    def __employee_list_all_department(self):
-        self.button2_frame = ctk.CTkFrame(master=self.right_frame, corner_radius=10)
-        self.label = tkinter.Label(master=self.button2_frame, text="List All Departments", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.button2 = ctk.CTkButton(master=self.right_frame, text="List", fg_color="purple", command=(lambda: list_departments(self)))
-        self.button2.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button2.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
-
-        self.button2_frame.pack()
-
-        def list_departments(self):
-            departments = the_company.departments
-            if len(departments) == 0:
-                messagebox.showerror("Error", "No departments found")
-            else:
-                messagebox.showinfo("Departments", "Departments: " + ", ".join([department.name for department in departments]))
+        ctk.CTkButton(master=main_frame, text="Add", command=_add_employee, **btn_action_style).grid(
+            row=2, column=0, columnspan=2, pady=20
+        )
 
     # endregion
+
+    def __view_department(self):
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
+
+        ctk.CTkLabel(master=main_frame, text="View Department", **label_title_style).grid(
+            row=0, column=0, columnspan=2, pady=(20, 0)
+        )
+
+        # Select a department from a list
+        radio_dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        dept_items = tuple(f"{dept.name} - {dept.dept_id}" for dept in the_company.departments)
+        _display_list = display_list(
+            _master=main_frame, options=dept_items, returned_idx=[radio_dept_idx_select], selectable=True
+        )
+        if _display_list[0] is False:
+            ctk.CTkLabel(master=main_frame, text="No department to view", **label_desc_style).grid(
+                row=1, column=0, columnspan=2, pady=(20, 0)
+            )
+
+        def _view_department():
+            _dept = the_company.departments[radio_dept_idx_select.get()]
+            msgbox.showinfo("Department", f"Name: {_dept.name}\nID: {_dept.dept_id}")
+
+        ctk.CTkButton(master=main_frame, text="View", command=_view_department, **btn_action_style).grid(
+            row=2, column=0, columnspan=2, pady=20
+        )
