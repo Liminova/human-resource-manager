@@ -77,9 +77,10 @@ class AttendanceGui(ctk.CTk):
         if today not in logged_in_employee.attendance.attendances:
             logged_in_employee.attendance.attendances[today] = False
 
-        _status: bool = the_company.logged_in_employee.attendance.attendances[today]
-        status: str = "Present" if _status else "Absent"
-        ctk.CTkLabel(master=main_frame, text="Status", **label_desc_style).grid(row=1, column=0, pady=20, padx=20)
+        # Status | present or absent
+        is_present_today: bool = the_company.logged_in_employee.attendance.attendances[today]
+        status: str = "Present" if is_present_today else "Absent"
+        ctk.CTkLabel(master=main_frame, text="Status", **label_desc_style).grid(row=1, column=0, pady=10, padx=20)
         status_label = ctk.CTkLabel(master=main_frame, text=status, **label_desc_style)
         status_label.grid(row=1, column=1, pady=10, padx=20)
 
