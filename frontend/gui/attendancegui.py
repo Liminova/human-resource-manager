@@ -69,6 +69,7 @@ class AttendanceGui(ctk.CTk):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
+        # Date | today
         ctk.CTkLabel(master=main_frame, text="Date", **label_desc_style).grid(row=0, column=0, pady=(20, 10), padx=20)
         today: str = datetime.now().strftime("%Y-%m-%d")
         ctk.CTkLabel(master=main_frame, text=today, **label_desc_style).grid(row=0, column=1, pady=(20, 10), padx=20)
@@ -82,6 +83,7 @@ class AttendanceGui(ctk.CTk):
         status_label = ctk.CTkLabel(master=main_frame, text=status, **label_desc_style)
         status_label.grid(row=1, column=1, pady=10, padx=20)
 
+        # Check button
         def _check_attendance():
             logged_in_employee = the_company.logged_in_employee
             nonlocal today
