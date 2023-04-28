@@ -80,11 +80,10 @@ class AttendanceGui(ctk.CTk):
             attds[today] = False
 
         # Status | present or absent
-        is_present_today: bool = the_company.logged_in_employee.attendance.attendances[today]
-        status: str = "Present" if is_present_today else "Absent"
-        ctk.CTkLabel(master=main_frame, text="Status", **label_desc_style).grid(row=1, column=0, pady=10, padx=20)
-        status_label = ctk.CTkLabel(master=main_frame, text=status, **label_desc_style)
-        status_label.grid(row=1, column=1, pady=10, padx=20)
+        # is_present_today: bool =
+        ctk.CTkLabel(master=main_frame, text="Status", **label_desc_style).grid(row=1, column=0, pady=5, padx=20)
+        status_label = ctk.CTkLabel(master=main_frame, text=("Present" if attds[today] else "Absent"), **label_desc_style)
+        status_label.grid(row=1, column=1, pady=5, padx=20)
 
         # Check button
         def _check_attendance():
@@ -137,10 +136,10 @@ class AttendanceGui(ctk.CTk):
         radio_is_present: ctk.Variable = ctk.BooleanVar(value=True)
         ctk.CTkLabel(master=main_frame, text="Status: ", **label_desc_style).grid(row=2, column=0, sticky=tkinter.W, padx=20)
         ctk.CTkRadioButton(master=main_frame, text="Present", variable=radio_is_present, value=True).grid(
-            row=2, column=1, sticky=tkinter.W, pady=10, padx=20
+            row=2, column=1, sticky=tkinter.W, pady=(10, 5), padx=20
         )
         ctk.CTkRadioButton(master=main_frame, text="Absent", variable=radio_is_present, value=False).grid(
-            row=3, column=1, sticky=tkinter.W, pady=10, padx=20
+            row=3, column=1, sticky=tkinter.W, pady=(5, 10), padx=20
         )
 
         # Update button + handler
