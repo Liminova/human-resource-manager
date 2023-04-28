@@ -69,10 +69,10 @@ class AttendanceGui(ctk.CTk):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
-        ctk.CTkLabel(master=main_frame, text="Date", **label_desc_style).grid(row=0, column=0, pady=20, padx=20)
+        ctk.CTkLabel(master=main_frame, text="Date", **label_desc_style).grid(row=0, column=0, pady=(20, 10), padx=20)
         today: str = datetime.now().strftime("%Y-%m-%d")
 
-        ctk.CTkLabel(master=main_frame, text=today, **label_desc_style).grid(row=0, column=1, pady=20, padx=20)
+        ctk.CTkLabel(master=main_frame, text=today, **label_desc_style).grid(row=0, column=1, pady=(20, 10), padx=20)
 
         if today not in logged_in_employee.attendance.attendances:
             logged_in_employee.attendance.attendances[today] = False
@@ -81,7 +81,7 @@ class AttendanceGui(ctk.CTk):
         status: str = "Present" if _status else "Absent"
         ctk.CTkLabel(master=main_frame, text="Status", **label_desc_style).grid(row=1, column=0, pady=20, padx=20)
         status_label = ctk.CTkLabel(master=main_frame, text=status, **label_desc_style)
-        status_label.grid(row=1, column=1, pady=20, padx=20)
+        status_label.grid(row=1, column=1, pady=10, padx=20)
 
         def _check_attendance():
             logged_in_employee = the_company.logged_in_employee
@@ -99,7 +99,7 @@ class AttendanceGui(ctk.CTk):
                 )
 
         ctk.CTkButton(master=main_frame, text="Check", command=_check_attendance, **btn_action_style).grid(
-            row=2, column=0, pady=20, padx=20, columnspan=2
+            row=2, column=0, pady=(10, 20), padx=20, columnspan=2
         )
 
     def __admin_attendance_update(self):
@@ -131,16 +131,16 @@ class AttendanceGui(ctk.CTk):
         # Input date
         ctk.CTkLabel(master=main_frame, text="Date: ", **label_desc_style).grid(row=1, column=0, sticky=tkinter.W, padx=20)
         input_date = ctk.CTkEntry(master=main_frame, placeholder_text="YYYY-MM-DD", **input_box_style)
-        input_date.grid(row=1, column=1, sticky=tkinter.W, pady=5, padx=20)
+        input_date.grid(row=1, column=1, sticky=tkinter.W, pady=10, padx=20)
 
         # Select present or absent
         radio_is_present: ctk.Variable = ctk.BooleanVar(value=True)
         ctk.CTkLabel(master=main_frame, text="Status: ", **label_desc_style).grid(row=2, column=0, sticky=tkinter.W, padx=20)
         ctk.CTkRadioButton(master=main_frame, text="Present", variable=radio_is_present, value=True).grid(
-            row=2, column=1, sticky=tkinter.W, pady=5, padx=20
+            row=2, column=1, sticky=tkinter.W, pady=10, padx=20
         )
         ctk.CTkRadioButton(master=main_frame, text="Absent", variable=radio_is_present, value=False).grid(
-            row=3, column=1, sticky=tkinter.W, pady=5, padx=20
+            row=3, column=1, sticky=tkinter.W, pady=10, padx=20
         )
 
         # Update button + handler
@@ -177,7 +177,7 @@ class AttendanceGui(ctk.CTk):
                 )
 
         ctk.CTkButton(master=main_frame, text="Update", command=_attendance_update, **btn_action_style).grid(
-            row=4, column=0, columnspan=2, pady=20
+            row=4, column=0, columnspan=2, pady=(10, 20), padx=20
         )
 
     def __admin_attendance_report(self):
@@ -217,7 +217,7 @@ class AttendanceGui(ctk.CTk):
             main_frame = ctk.CTkFrame(master=self.right_frame)
             main_frame.grid(row=0, column=0)
             ctk.CTkLabel(master=main_frame, text="Attendance Report for " + selected_empl.name, **label_title_style).grid(
-                row=0, column=0, pady=20, padx=20
+                row=0, column=0, pady=(20, 0), padx=20
             )
 
             # Display the report
@@ -239,10 +239,10 @@ class AttendanceGui(ctk.CTk):
                 text="Back",
                 command=merge_callable(main_frame.destroy, self.__admin_attendance_report),
                 **btn_action_style,
-            ).grid(row=2, column=0, pady=20)
+            ).grid(row=2, column=0, pady=(0, 20))
 
         ctk.CTkButton(master=main_frame, text="Report", command=_get_report, **btn_action_style).grid(
-            row=2, column=0, pady=(10, 20), columnspan=2
+            row=1, column=0, pady=(0, 20), columnspan=2
         )
 
     def __employee_attendance_report(self):
