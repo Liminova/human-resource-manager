@@ -130,7 +130,9 @@ class AttendanceGui(ctk.CTk):
             )
 
         # Input date
-        ctk.CTkLabel(master=main_frame, text="Date: ", **label_desc_style).grid(row=1, column=0, sticky=tkinter.W, padx=20)
+        ctk.CTkLabel(master=main_frame, text="Date: ", **label_desc_style).grid(
+            row=1, column=0, sticky=tkinter.W, padx=20, pady=(0, 10)
+        )
         input_date = ctk.CTkEntry(master=main_frame, placeholder_text="YYYY-MM-DD", **input_box_style)
         input_date.grid(row=1, column=1, sticky=tkinter.W, pady=10, padx=20)
 
