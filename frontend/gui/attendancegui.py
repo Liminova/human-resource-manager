@@ -61,6 +61,10 @@ class AttendanceGui(ctk.CTk):
         Homepage().mainloop()
 
     def __attendance_check(self):
+        # - 2 columns
+        # 0: Date | today
+        # 1: Status | present or absent
+
         logged_in_employee = the_company.logged_in_employee
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
@@ -99,6 +103,13 @@ class AttendanceGui(ctk.CTk):
         )
 
     def __admin_attendance_update(self):
+        # - 2 columns
+        # 0: Select employee from a list
+        # 1: Input date
+        # 2: Status | present
+        # 3:          absent
+        # 4: Update button
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
@@ -170,6 +181,15 @@ class AttendanceGui(ctk.CTk):
         )
 
     def __admin_attendance_report(self):
+        # - 1 column
+        # 0: Select employee from a list
+        # 1: Generate report button
+
+        # - 1 column
+        # 0: title of the report
+        # 1: table of attendance
+        # 2: back button
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
@@ -226,6 +246,9 @@ class AttendanceGui(ctk.CTk):
         )
 
     def __employee_attendance_report(self):
+        # - 1 column
+        # 0: frame for the report
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
