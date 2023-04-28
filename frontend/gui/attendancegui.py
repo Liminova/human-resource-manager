@@ -71,7 +71,6 @@ class AttendanceGui(ctk.CTk):
 
         ctk.CTkLabel(master=main_frame, text="Date", **label_desc_style).grid(row=0, column=0, pady=(20, 10), padx=20)
         today: str = datetime.now().strftime("%Y-%m-%d")
-
         ctk.CTkLabel(master=main_frame, text=today, **label_desc_style).grid(row=0, column=1, pady=(20, 10), padx=20)
 
         if today not in logged_in_employee.attendance.attendances:
