@@ -66,6 +66,8 @@ class AttendanceGui(ctk.CTk):
         # 1: Status | present or absent
 
         logged_in_employee = the_company.logged_in_employee
+        attds = logged_in_employee.attendance.attendances
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
@@ -74,8 +76,8 @@ class AttendanceGui(ctk.CTk):
         today: str = datetime.now().strftime("%Y-%m-%d")
         ctk.CTkLabel(master=main_frame, text=today, **label_desc_style).grid(row=0, column=1, pady=(20, 10), padx=20)
 
-        if today not in logged_in_employee.attendance.attendances:
-            logged_in_employee.attendance.attendances[today] = False
+        if today not in attds:
+            attds[today] = False
 
         # Status | present or absent
         is_present_today: bool = the_company.logged_in_employee.attendance.attendances[today]
@@ -86,15 +88,14 @@ class AttendanceGui(ctk.CTk):
 
         # Check button
         def _check_attendance():
-            logged_in_employee = the_company.logged_in_employee
-            nonlocal today
-            nonlocal status_label
-            if logged_in_employee.attendance.attendances[today]:
+            nonlocal today, status_label, logged_in_employee, attds
+
+            if attds[today]:
                 messagebox.showinfo("Present", f"You are already present today ({today})")
                 return
 
             status_label.configure(text="Present")
-            logged_in_employee.attendance.attendances[today] = True
+            attds[today] = True
             if os.getenv("HRMGR_DB") == "TRUE":
                 employee_repo.update_one(
                     {"_id": logged_in_employee.id}, {"$set": logged_in_employee.dict(include={"attendance"})}, upsert=True
