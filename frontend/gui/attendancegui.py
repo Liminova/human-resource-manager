@@ -116,18 +116,13 @@ class AttendanceGui(ctk.CTk):
 
         # Select employee from a list
         empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        _display_list = display_list(
+        display_list(
             _master=main_frame,
+            err_msg="No employee found",
             options=tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees),
             returned_idx=[empl_idx_select],
-            selectable=True,
-            place_row=0,
-            place_col=0,
+            place=(0, 0),
         )
-        if _display_list[0] is False:
-            ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
-                row=0, column=0, columnspan=2, pady=20, padx=20
-            )
 
         # Input date
         ctk.CTkLabel(master=main_frame, text="Date: ", **label_desc_style).grid(
@@ -198,15 +193,15 @@ class AttendanceGui(ctk.CTk):
 
         # Select employee from a list
         empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        empl_select_frame = display_list(
+        display_list(
             _master=main_frame,
+            err_msg="No employee found",
             options=tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees),
-            selectable=True,
             returned_idx=[empl_idx_select],
             page_size=9,
+            place=(0, 0),
+            colspan=1,
         )
-        if empl_select_frame is None:
-            messagebox.showerror("Error", "No employees found")
 
         # Generate report button + handler
         def _get_report():
@@ -231,9 +226,10 @@ class AttendanceGui(ctk.CTk):
                 options=tuple(
                     f"{date} - {'Present' if is_present else 'Absent'}" for date, is_present in empl_attds.items()
                 ),
-                selectable=False,
                 page_size=9,
                 err_msg="No attendance found",
+                place=(1, 0),
+                colspan=1,
             )
 
             # Create a new button to go back to the attendance report page
