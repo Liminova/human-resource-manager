@@ -285,25 +285,25 @@ class BenefitPlanGui(ctk.CTk):
             # this list will be refreshed every time user select an employee
             bnf_list_frame[1].destroy()
             bnf_list_frame = display_list(
-                _master=first_row,
+                _master=main_frame,
                 options=custom_bnf_items,
                 returned_idx=[bnf_idx_select],
                 err_msg="No benefits",
-                place_row=1,
-                place_col=1,
+                place=(1, 1),
                 colspan=1,
+                pady=0,
             )
 
         # this list is persistent so we can leave it out here
         display_list(
-            _master=first_row,
+            _master=main_frame,
             options=tuple([f"{empl.employee_id} - {empl.name}" for empl in the_company.employees]),
             returned_idx=[empl_idx_select],
             err_msg="No employees",
-            place_row=1,
-            place_col=0,
+            place=(1, 0),
             colspan=1,
             cmd=_update_bnf_list,
+            pady=0,
         )
         # endregion
 
@@ -391,13 +391,13 @@ class BenefitPlanGui(ctk.CTk):
 
         # region: table to choose benefit
         display_list(
-            _master=zero_row,
+            _master=main_frame,
             options=tuple(f"{bnf.name} - {bnf.cost}" for bnf in bnfs_empl_not_in),
             returned_idx=[bnf_idx_select],
             err_msg="No benefits",
-            place_row=1,
-            place_col=0,
+            place=(0, 0),
             colspan=1,
+            pady=(20, 0),
         )
         # endregion
 
@@ -459,26 +459,26 @@ class BenefitPlanGui(ctk.CTk):
 
             empl_list_frame[1].destroy()
             empl_list_frame = display_list(
-                _master=zero_row,
+                _master=main_frame,
                 options=tuple(f"{empl.name} - {empl.employee_id}" for empl in pending_empls),
                 returned_idx=[empl_idx_select],
                 err_msg="No pending requests",
-                place_row=1,
-                place_col=1,
+                place=(0, 1),
                 colspan=1,
+                pady=(20, 0),
             )
 
         _update_empl_list()
         display_list(
-            _master=zero_row,
+            _master=main_frame,
             options=bnf_item_have_pending,
             returned_idx=[bnf_idx_select],
-            err_msg="No benefits",
-            place_row=1,
-            place_col=0,
+            err_msg="No employees requesting",
+            place=(0, 0),
             colspan=1,
             cmd=_update_empl_list,
-        ) if len(bnfs_have_pending) > 0 else None
+            pady=(20, 0),
+        )
         # endregion
 
         # region: approve button | reject button
@@ -559,13 +559,12 @@ class BenefitPlanGui(ctk.CTk):
             _empls_in_bnf = selected_bnf.enrolled_employees
             empl_list_frame[1].destroy()
             empl_list_frame = display_list(
-                _master=zero_row,
-                options=tuple(f"{empl.name} - {empl.employee_id}" for empl in _empls_in_bnf),
+                _master=main_frame,
+                options=tuple(f"{empl.name} - {empl.employee_id}" for empl in selected_bnf.enrolled_employees),
                 err_msg="No employees enrolled",
-                place_row=1,
-                place_col=1,
+                place=(0, 1),
                 colspan=1,
-                selectable=False,
+                padx=(0, 20),
             )
 
             # update description
@@ -574,14 +573,13 @@ class BenefitPlanGui(ctk.CTk):
             bnf_detail_widget.grid(row=1, column=0, columnspan=2, pady=20, padx=20)
 
         display_list(
-            _master=zero_row,
+            _master=main_frame,
             options=bnfs_items,
             returned_idx=[bnf_idx_select],
             err_msg="No benefits",
-            place_row=1,
-            place_col=0,
+            place=(0, 0),
             colspan=1,
-            cmd=bnf_select_handler,
+            cmd=_update_empl_list,
         ) if len(bnfs_items) > 0 else None
         # endregion
 
@@ -603,10 +601,8 @@ class BenefitPlanGui(ctk.CTk):
         )
         display_list(
             _master=main_frame,
-            options=empls_w_o_bnf,
+            options=tuple(f"{e.name} - {e.employee_id}" for e in the_company.employees if len(e.benefits) == 0),
             err_msg="No employees",
-            place_row=1,
-            place_col=0,
+            place=(1, 0),
             colspan=1,
-            selectable=False,
         )
