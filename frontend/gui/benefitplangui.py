@@ -330,6 +330,7 @@ class BenefitPlanGui(ctk.CTk):
                     self.__clear_right_frame()
                     self.__admin_apply_rm(current_submenu)
                     return
+
                 selected_empl.benefits.append(selected_bnf.name)
                 if os.getenv("HRMGR_DB") == "TRUE":
                     employee_repo.update_one(
