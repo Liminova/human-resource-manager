@@ -571,6 +571,7 @@ class BenefitPlanGui(ctk.CTk):
             )
             bnf_detail_widget.grid(row=1, column=0, columnspan=2, pady=(0, 20), padx=20)
 
+        _update_empl_list()
         display_list(
             _master=main_frame,
             options=bnfs_items,
