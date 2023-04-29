@@ -336,14 +336,19 @@ class BenefitPlanGui(ctk.CTk):
                     employee_repo.update_one(
                         {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"benefits"})}, upsert=True
                     )
-                msgbox.showinfo("Success", f"Benefit plan {selected_bnf.name} applied to {selected_empl.name}")
             elif current_submenu == 2:  # remove
                 selected_empl.benefits.remove(selected_bnf.name)
                 if os.getenv("HRMGR_DB") == "TRUE":
                     employee_repo.update_one(
                         {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"benefits"})}, upsert=True
                     )
-                msgbox.showinfo("Success", f"Benefit plan {selected_bnf.name} removed from {selected_empl.name}")
+
+            msgbox.showinfo(
+                "Success",
+                "Benefit plan {} {} employee {} successfully".format(
+                    selected_bnf.name, "added to" if current_submenu == 1 else "removed from", selected_empl.name
+                ),
+            )
 
             self.__clear_right_frame()
             self.__admin_apply_rm(current_submenu)
