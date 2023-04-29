@@ -123,36 +123,6 @@ class Performance(BaseModel):
         else:
             self.average_rating = round(total_rating / self.sales_count, 1)
 
-    def get_sale_by_id(self, sale_id: str) -> Sale | None:
-        for sale in self.sale_list:
-            if sale.sale_id == sale_id:
-                return sale
-        return None
-
-    def get_sales_by_client_id(self, client_id: str) -> list[Sale]:
-        sales: list[Sale] = []
-        for sale in self.sale_list:
-            if sale.client_id == client_id:
-                sales.append(sale)
-        return sales
-
-    def get_sales_by_rating(self, rating: int) -> list[Sale]:
-        sales: list[Sale] = []
-        if rating == 0:
-            return self.sale_list
-        else:
-            for sale in self.sale_list:
-                if sale.client_rating >= rating and sale.client_rating < rating + 1:
-                    sales.append(sale)
-            return sales
-
-    def get_sales_by_date(self, date: datetime) -> list[Sale]:
-        sales: list[Sale] = []
-        for sale in self.sale_list:
-            if sale.date == date:
-                sales.append(sale)
-        return sales
-
     def __str__(self) -> str:
         data = textwrap.dedent(
             f"""\
