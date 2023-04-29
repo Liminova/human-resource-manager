@@ -7,16 +7,15 @@ from typing import Callable
 
 def display_list(
     _master,
+    err_msg: str,
     options: tuple[str],
+    place: tuple[int, int] = (1, 0),
     returned_idx: list[ctk.IntVar] = [],
-    selectable: bool = True,
     page_size: int = 5,
-    err_msg: str = "",
-    place_row: int = 1,
-    place_col: int = 0,
     colspan: int = 2,
     cmd: Callable = lambda: None,
-) -> tuple[bool, ctk.CTkFrame]:
+    **kwargs,
+) -> ctk.CTkFrame:
     """Create a page with multiple options to choose from. The options are clustered into groups of 5 (by default).
 
     Parameters:
@@ -26,24 +25,35 @@ def display_list(
         selectable (bool): Whether the options are selectable or not.
         page_size (int): The number of options to be displayed in a page.
         err_msg (str): The error message to be displayed when there is no option to be displayed.
-        place_row/col: The row/column to place the widget in the parent window.
-        colspan: depends on the master widget. If the design has x columns, then colspan should be x.
+        place: The row/column to place the widget in the parent window.
+        colspan: int result of x/y; x: # of cols in the parent window, y: # how many cols the widget should occupy. E.g. colspan=2 means the widget will occupy 2 cols in the parent window.
         cmd (Callable): The command to be executed when an option is selected.
+        **kwargs: The keyword arguments to be passed to the child widgets `grid` method, created from the _master
     """
-    if selectable:
-        if len(returned_idx) != 1:
-            raise ValueError("returned_idx must be a list with 1 element")
+
+    selectable = False
+    if len(returned_idx) > 0:
+        selectable = True
+
+    # add padding to **kwargs if not specified
+    if "padx" not in kwargs:
+        kwargs["padx"] = 20
+    if "pady" not in kwargs:
+        kwargs["pady"] = 20
 
     clustered = clustering(options, page_size)
     current_page = 0
     total_page = len(clustered)
     empl_page = ctk.CTkFrame(master=_master)
-    empl_page.grid(row=place_row, column=place_col, columnspan=colspan, padx=20, pady=10)
+    empl_page.grid(row=place[0], column=place[1], columnspan=colspan, **kwargs)
     if total_page == 0:
-        ctk.CTkLabel(master=empl_page, text=err_msg, **label_desc_style).grid(row=2, column=0, padx=20, pady=20)
-        return False, empl_page
+        ctk.CTkLabel(master=empl_page, text=err_msg, **label_desc_style).grid(
+            row=2, column=0, padx=20, pady=20, columnspan=colspan
+        )
+        return empl_page
 
     def __update_empl_page(no_button: str = ""):
+        nonlocal selectable, current_page, total_page
         for widget in empl_page.winfo_children():
             widget.destroy()
 
@@ -70,10 +80,6 @@ def display_list(
 
     def __prev_page():
         nonlocal current_page
-        # if current_page > 0:
-        #     current_page -= 1
-        #     __update_empl_page()
-
         if current_page > 0:
             current_page -= 1
             __update_empl_page(no_button=("prev" if current_page == 0 else ""))
@@ -86,4 +92,4 @@ def display_list(
 
     __update_empl_page()
 
-    return True, empl_page
+    return empl_page
