@@ -466,6 +466,7 @@ class BenefitPlanGui(ctk.CTk):
             )
 
         _update_empl_list()
+
         display_list(
             _master=main_frame,
             options=bnf_item_have_pending,
@@ -476,6 +477,17 @@ class BenefitPlanGui(ctk.CTk):
             cmd=_update_empl_list,
             pady=(20, 0),
         )
+        if len(bnf_item_have_pending) == 0:
+            display_list(
+                _master=main_frame,
+                options=tuple(),
+                err_msg="No employees requesting",
+                place=(0, 1),
+                colspan=1,
+                pady=(20, 0),
+                padx=(0, 20),
+            )
+
         # endregion
 
         # region: approve button | reject button
