@@ -173,11 +173,11 @@ class DepartmentGui(ctk.CTk):
         )
 
         # Input new department name
-        for row, (entry, label, placeholder) in enumerate(zip(entries, ("New Department Name",), ("BHYT",))):
-            ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(row=2, column=0, pady=(20, 0), padx=20)
         entries = [ctk.CTkEntry(master=main_frame) for _ in range(2)]
+        for row, entry, label, placeholder in zip((1, 2), entries, ("New name", "New ID"), ("BHYT", "BHYT")):
+            ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(row=row, column=0, pady=(20, 0), padx=20)
             entry.configure(placeholder_text=placeholder, **input_box_style)
-            entry.grid(row=2, column=1, pady=(20, 0), padx=(0, 20))
+            entry.grid(row=row, column=1, pady=(20, 0), padx=(0, 20))
 
         def _update_department():
             # thich thi viet Debug nha, Pechy luoi roi
