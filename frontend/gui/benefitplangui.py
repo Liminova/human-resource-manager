@@ -583,22 +583,9 @@ class BenefitPlanGui(ctk.CTk):
         ) if len(bnfs_items) > 0 else None
         # endregion
 
-        # if there's no benefit, display err msg instead of `display_list`
-        if len(bnfs_items) == 0:
-            for widget in zero_row.winfo_children():
-                widget.destroy()
-            zero_row.destroy()
-            zero_row = ctk.CTkLabel(master=main_frame, text="No benefits", **label_desc_style)
-            zero_row.grid(row=0, column=0, pady=20, padx=20, columnspan=2)
-
     def __admin_empls_w_o_benefit(self):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
-
-        # empls_w_o_bnf = tuple(empl for empl in the_company.employees if len(empl.benefits) == 0)
-        empls_w_o_bnf = tuple(
-            f"{empl.name} - {empl.employee_id}" for empl in the_company.employees if len(empl.benefits) == 0
-        )
         display_list(
             _master=main_frame,
             options=tuple(f"{e.name} - {e.employee_id}" for e in the_company.employees if len(e.benefits) == 0),
