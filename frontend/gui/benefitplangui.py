@@ -289,7 +289,7 @@ class BenefitPlanGui(ctk.CTk):
             returned_idx=[empl_idx_select],
             err_msg="No employees",
             place=(1, 0),
-            colspan=1,
+            colspan=(1 if len(the_company.employees) > 0 else 2),
             cmd=_update_bnf_list,
             pady=0,
         )
@@ -476,7 +476,7 @@ class BenefitPlanGui(ctk.CTk):
             returned_idx=[bnf_idx_select],
             err_msg="No employees requesting",
             place=(0, 0),
-            colspan=1,
+            colspan=(1 if len(bnf_item_have_pending) > 0 else 2),
             cmd=_update_empl_list,
             pady=(20, 0),
         )
@@ -581,7 +581,7 @@ class BenefitPlanGui(ctk.CTk):
             returned_idx=[bnf_idx_select],
             err_msg="No benefits",
             place=(0, 0),
-            colspan=1,
+            colspan=(1 if len(bnfs_items) > 0 else 2),
             cmd=_update_empl_list,
         ) if len(bnfs_items) > 0 else None
         # endregion
