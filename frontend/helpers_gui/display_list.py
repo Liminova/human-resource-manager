@@ -52,7 +52,7 @@ def display_list(
         )
         return empl_page
 
-    def __update_empl_page(no_button: str = ""):
+    def __update_empl_page():
         nonlocal selectable, current_page, total_page
         for widget in empl_page.winfo_children():
             widget.destroy()
@@ -69,26 +69,26 @@ def display_list(
                 )
             else:
                 ctk.CTkLabel(master=empl_page, text=option).grid(row=i + 1, column=0, padx=20, columnspan=2, sticky=tk.W)
+
         btn_prev = ctk.CTkButton(master=empl_page, text="<", command=__prev_page, **btn_action_style)
         btn_prev.grid(row=page_size + 1, column=0, padx=20, pady=20)
-        if no_button == "prev":
-            btn_prev.configure(state=tk.DISABLED)
+        btn_prev.configure(state=(tk.DISABLED if current_page == 0 else tk.NORMAL))
+
         btn_next = ctk.CTkButton(master=empl_page, text=">", command=__next_page, **btn_action_style)
         btn_next.grid(row=page_size + 1, column=1, padx=20, pady=20)
-        if no_button == "next":
-            btn_next.configure(state=tk.DISABLED)
+        btn_next.configure(state=(tk.DISABLED if current_page + 1 == total_page else tk.NORMAL))
 
     def __prev_page():
         nonlocal current_page
         if current_page > 0:
             current_page -= 1
-            __update_empl_page(no_button=("prev" if current_page == 0 else ""))
+            __update_empl_page()
 
     def __next_page():
         nonlocal current_page
         if current_page + 1 < total_page:
             current_page += 1
-            __update_empl_page(no_button=("next" if current_page + 1 == total_page else ""))
+            __update_empl_page()
 
     __update_empl_page()
 
