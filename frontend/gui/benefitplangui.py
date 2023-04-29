@@ -301,30 +301,21 @@ class BenefitPlanGui(ctk.CTk):
         btn_apply.grid(row=0, column=0, padx=(20, 10), pady=20)
         btn_remove.grid(row=0, column=1, padx=(10, 20), pady=20)
 
-        def _apply():
+        def _switch_mode_handler():
             nonlocal btn_apply, btn_remove, current_submenu, bnf_list_frame, _update_bnf_list
-            btn_apply.configure(state=DISABLED)
-            btn_remove.configure(state=NORMAL)
-            current_submenu = 1
-            bnf_list_frame[1].destroy()
+            current_submenu = 3 - current_submenu
+
+            if current_submenu == 1:
+                btn_apply.configure(state=DISABLED)
+                btn_remove.configure(state=NORMAL)
+            else:
+                btn_apply.configure(state=NORMAL)
+                btn_remove.configure(state=DISABLED)
+            bnf_list_frame.destroy()
             _update_bnf_list()
 
-        def _remove():
-            nonlocal btn_apply, btn_remove, current_submenu, bnf_list_frame, _update_bnf_list
-            btn_apply.configure(state=NORMAL)
-            btn_remove.configure(state=DISABLED)
-            current_submenu = 2
-            bnf_list_frame[1].destroy()
-            _update_bnf_list()
-
-        btn_apply.configure(command=_apply)
-        btn_remove.configure(command=_remove)
-
-        match default_submenu:
-            case 1:
-                _apply()
-            case 2:
-                _remove()
+        btn_apply.configure(command=_switch_mode_handler)
+        btn_remove.configure(command=_switch_mode_handler)
         # endregion
 
         # region: submit button
