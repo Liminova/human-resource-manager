@@ -259,22 +259,16 @@ class BenefitPlanGui(ctk.CTk):
             nonlocal bnf_idx_select, empl_idx_select, current_submenu, custom_bnf_items, bnf_list_frame, custom_bnfs
 
             # get the employee
-            _empl = the_company.employees[empl_idx_select.get()]
+            selected_empl = the_company.employees[empl_idx_select.get()]
 
-            # get the benefits (in/not in) the employee's benefits
-            if current_submenu == 1:
-                custom_bnf_items = tuple(
-                    [f"{bnf.name} - {bnf.cost}" for bnf in the_company.benefits if bnf.name not in _empl.benefits]
-                )
-                custom_bnfs = [bnf for bnf in the_company.benefits if bnf.name not in _empl.benefits]
-            if current_submenu == 2:
-                custom_bnf_items = tuple()
-                for bnf in _empl.benefits:
-                    for _bnf in the_company.benefits:
-                        if _bnf.name == bnf:
-                            custom_bnf_items += (f"{_bnf.name} - {_bnf.cost}",)
-                            break
-                custom_bnfs = [bnf for bnf in the_company.benefits if bnf.name in _empl.benefits]
+            bnfs = the_company.benefits
+            custom_bnfs = [bnf for bnf in bnfs if (current_submenu == 1) ^ (bnf.name in selected_empl.benefits)]
+            # Explanation:
+            # the ^ operator is XOR, which means it will return True if only one of the two operands is True
+            # so if it's in apply mode, we want to show only the benefits that are not in the employee's benefits list
+            # if it's in remove mode, we want to show only the benefits that are in the employee's benefits list
+
+            custom_bnf_items = tuple([f"{bnf.name} - {bnf.cost}" for bnf in custom_bnfs])
 
             # this list will be refreshed every time user select an employee
             bnf_list_frame[1].destroy()
