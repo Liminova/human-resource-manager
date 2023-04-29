@@ -72,10 +72,6 @@ class DepartmentGui(ctk.CTk):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
-        ctk.CTkLabel(master=main_frame, text="Add Department", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
-        )
-
         entries = [ctk.CTkEntry(master=main_frame) for _ in range(2)]
         labels = ("Name: ", "ID: ")
         placeholders = ("BHYT", "1")
@@ -117,10 +113,6 @@ class DepartmentGui(ctk.CTk):
 
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
-
-        ctk.CTkLabel(master=main_frame, text="Remove Department", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
-        )
 
         # Select a department from a list
         radio_dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
@@ -171,10 +163,6 @@ class DepartmentGui(ctk.CTk):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
-        ctk.CTkLabel(master=main_frame, text="Update Department", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
-        )
-
         # Select a department from a list
         radio_dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
         dept_items = tuple(f"{dept.dept_id} - {dept.name}" for dept in the_company.departments)
@@ -221,9 +209,6 @@ class DepartmentGui(ctk.CTk):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
-        ctk.CTkLabel(master=main_frame, text="Add Employee", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
-        )
 
         # Select employee from list
         radio_emp_idx_select: ctk.Variable = ctk.IntVar(value=0)
@@ -323,10 +308,6 @@ class DepartmentGui(ctk.CTk):
 
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
-
-        ctk.CTkLabel(master=main_frame, text="Employees without department", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
-        )
 
         # Select employee from list
         radio_emp_idx_select: ctk.Variable = ctk.IntVar(value=0)
