@@ -66,6 +66,15 @@ class EmployeeGui(ctk.CTk):
     # region: admin functions
 
     def __admin_add_employee(self):
+        # - 2 columns
+        # 0: label + input name
+        # 1:               dob
+        # 2:               id
+        # 3:               phone
+        # 4:               email
+        # 5:               password
+        # 6: add button
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
@@ -113,6 +122,10 @@ class EmployeeGui(ctk.CTk):
         )
 
     def __admin_remove_employee(self):
+        # - 1 column
+        # 0: select employee from a list
+        # 1: remove button
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
@@ -176,6 +189,16 @@ class EmployeeGui(ctk.CTk):
         )
 
     def __admin_update_employee(self):
+        # - 2 columns
+        # 0: select employee from a list
+        # 1: label + input name
+        # 2:               dob
+        # 3:               id
+        # 4:               phone
+        # 5:               email
+        # 6:               password
+        # 7: update button
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
@@ -230,6 +253,10 @@ class EmployeeGui(ctk.CTk):
         )
 
     def __admin_view_employee(self):
+        # - 2 columns
+        # 0: select employee from a list
+        # 1: info frame
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
@@ -294,6 +321,12 @@ class EmployeeGui(ctk.CTk):
     # endregion
 
     def __change_password(self):
+        # - 2 columns
+        # 0: label + input old password
+        # 1:               new password
+        # 2:               confirm password
+        # 3: change button
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
