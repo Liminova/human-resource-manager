@@ -426,6 +426,10 @@ class BenefitPlanGui(ctk.CTk):
         main_frame.grid(row=0, column=0)
 
         # region: variables
+        # we need them here to disable the buttons when there is no pending request
+        btn_approve = ctk.CTkButton(master=main_frame, text="Approve", **btn_action_style)
+        btn_reject = ctk.CTkButton(master=main_frame, text="Reject", **btn_action_style)
+
         bnf_idx_select = ctk.IntVar()
         empl_idx_select = ctk.IntVar()
 
@@ -443,6 +447,8 @@ class BenefitPlanGui(ctk.CTk):
             bnfs_have_pending = [bnf for bnf in the_company.benefits if bnf.pending_requests]
 
             if len(bnfs_have_pending) == 0:
+                btn_approve.configure(state=DISABLED)
+                btn_reject.configure(state=DISABLED)
                 return
 
             bnf_item_have_pending = tuple(f"{bnf.name} - {bnf.cost}" for bnf in bnfs_have_pending)
