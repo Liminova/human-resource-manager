@@ -84,21 +84,17 @@ class PayrollGui(ctk.CTk):
 
         _update_btn_label()
 
-        # Select employee from a list to create payroll for
-        empl_select_frame = display_list(
+        # Select employee from a list to create/update payroll for
+        display_list(
             _master=main_frame,
             options=tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees),
             returned_idx=[empl_idx_select],
-            selectable=True,
-            place_col=0,
-            place_row=0,
+            err_msg="No employee found",
+            place=(0, 0),
             colspan=2,
             cmd=_update_btn_label,
+            pady=(20, 0),
         )
-        if empl_select_frame[0] is False:
-            ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
-                row=1, column=0, columnspan=2, pady=20, padx=20
-            )
 
         # region: input boxes
         entries = [ctk.CTkEntry(master=main_frame) for _ in range(1, 5)]
@@ -167,21 +163,14 @@ class PayrollGui(ctk.CTk):
 
         update_payroll_table()
 
-        empl_select_frame = display_list(
+        display_list(
             _master=main_frame,
             options=tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees),
             returned_idx=[empl_idx_select],
-            selectable=True,
-            place_col=0,
-            place_row=0,
-            colspan=1,
+            place=(0, 0),
             cmd=update_payroll_table,
+            err_msg="No employee found",
         )
-
-        if empl_select_frame[0] is False:
-            ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
-                row=1, column=0, columnspan=2, pady=20, padx=20
-            )
 
     # endregion
 
