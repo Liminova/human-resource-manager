@@ -130,7 +130,6 @@ class EmployeeGui(ctk.CTk):
         main_frame.grid(row=0, column=0)
 
         # Select employee from a list
-        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
         empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
         display_list(
             _master=main_frame,
@@ -141,11 +140,11 @@ class EmployeeGui(ctk.CTk):
         )
 
         def _remove_handler():
-            nonlocal radio_empl_idx_select
+            nonlocal empl_idx_select
             if not msgbox.askyesno("Confirmation", "Are you sure you want to remove this employee?"):
                 return
             empls = the_company.employees
-            selected_empl = empls[radio_empl_idx_select.get()]
+            selected_empl = empls[empl_idx_select.get()]
 
             updated_bnfs, updated_depts = [], []
             # remove employee from benefits
@@ -179,7 +178,7 @@ class EmployeeGui(ctk.CTk):
             merge_callable(self.__clear_right_frame, self.__admin_remove_employee)()
 
         ctk.CTkButton(master=main_frame, text="Remove", command=_remove_handler, **btn_action_style).grid(
-            row=1, column=0, columnspan=2, pady=(10, 20)
+            row=1, column=0, columnspan=2, pady=(0, 20)
         )
 
     def __admin_update_employee(self):
@@ -197,7 +196,6 @@ class EmployeeGui(ctk.CTk):
         main_frame.grid(row=0, column=0)
 
         # Select employee from a list
-        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
         empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
         display_list(
             _master=main_frame,
@@ -212,7 +210,6 @@ class EmployeeGui(ctk.CTk):
         entries = [ctk.CTkEntry(master=main_frame) for _ in range(6)]
         labels = ("Name: ", "Date of birth: ", "ID: ", "Phone Number: ", "Email: ", "Password: ")
         placeholder = ("Alex", "2000-12-31", "1234ABC", "0123456789", "hello@wo.rld", "secure")
-
         for row, label, entry, placeholder in zip(range(1, 7), labels, entries, placeholder):
             ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(
                 row=row, column=0, padx=(20, 0), pady=(20, 0), sticky="w"
@@ -225,16 +222,24 @@ class EmployeeGui(ctk.CTk):
             values = [entry.get().strip() for entry in entries]
             if not msgbox.askyesno("Confirmation", "Are you sure you want to update this employee?"):
                 return
-            _empl = the_company.employees[radio_empl_idx_select.get()]
+            selected_empl = the_company.employees[empl_idx_select.get()]
             for setter, value in zip(
-                (_empl.set_name, _empl.set_dob, _empl.set_id, _empl.set_phone, _empl.set_email, _empl.set_password), values
+                (
+                    selected_empl.set_name,
+                    selected_empl.set_dob,
+                    selected_empl.set_id,
+                    selected_empl.set_phone,
+                    selected_empl.set_email,
+                    selected_empl.set_password,
+                ),
+                values,
             ):
                 setter(value).unwrap() if value else None
 
             if os.getenv("HRMGR_DB") == "TRUE":
                 employee_repo.update_one(
-                    {"_id": _empl.id},
-                    {"$set": _empl.dict(include={"name", "dob", "employee_id", "phone", "email", "password"})},
+                    {"_id": selected_empl.id},
+                    {"$set": selected_empl.dict(include={"name", "dob", "employee_id", "phone", "email", "password"})},
                     upsert=True,
                 )
             msgbox.showinfo("Success", "Employee updated successfully")
@@ -252,11 +257,12 @@ class EmployeeGui(ctk.CTk):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
-        empl_info_frame = ctk.CTkFrame(master=main_frame)
+        empl_info_frame = ctk.CTkBaseClass(None)
+        empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
 
         def update_empl_info_frame():
-            nonlocal empl_info_frame
-            selected_empl = the_company.employees[radio_empl_idx_select.get()]
+            nonlocal empl_info_frame, empl_idx_select
+            selected_empl = the_company.employees[empl_idx_select.get()]
             labels = ("Name: ", "Date of birth: ", "ID: ", "Phone Number: ", "Email: ")
             values = (
                 selected_empl.name,
@@ -267,12 +273,11 @@ class EmployeeGui(ctk.CTk):
             )
             empl_info_frame.destroy()
             empl_info_frame = ctk.CTkFrame(master=main_frame)
-            empl_info_frame.grid(row=1, column=0, columnspan=2, pady=(0, 20), padx=20)
+            empl_info_frame.grid(row=1, column=0, pady=(0, 20), padx=20)
             for row, label, value in zip(range(1, 6), labels, values):
                 ctk.CTkLabel(master=empl_info_frame, text=label).grid(row=row, column=0, padx=(20, 0), sticky="w")
                 ctk.CTkLabel(master=empl_info_frame, text=value).grid(row=row, column=1, padx=20, sticky="e")
 
-        radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
         display_list(
             _master=main_frame,
             options=tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees),
