@@ -332,15 +332,26 @@ class BenefitPlanGui(ctk.CTk):
                     return
 
                 selected_empl.benefits.append(selected_bnf.name)
+                selected_bnf.enrolled_employees.append(selected_empl)
+
                 if os.getenv("HRMGR_DB") == "TRUE":
                     employee_repo.update_one(
                         {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"benefits"})}, upsert=True
                     )
+                    benefit_repo.update_one(
+                        {"_id": selected_bnf.id}, {"$set": selected_bnf.dict(include={"enrolled_employees"})}, upsert=True
+                    )
+
             elif current_submenu == 2:  # remove
                 selected_empl.benefits.remove(selected_bnf.name)
+                selected_bnf.enrolled_employees.remove(selected_empl)
+
                 if os.getenv("HRMGR_DB") == "TRUE":
                     employee_repo.update_one(
                         {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"benefits"})}, upsert=True
+                    )
+                    benefit_repo.update_one(
+                        {"_id": selected_bnf.id}, {"$set": selected_bnf.dict(include={"enrolled_employees"})}, upsert=True
                     )
 
             msgbox.showinfo(
