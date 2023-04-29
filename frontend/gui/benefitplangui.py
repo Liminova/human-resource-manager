@@ -271,7 +271,7 @@ class BenefitPlanGui(ctk.CTk):
             custom_bnf_items = tuple([f"{bnf.name} - {bnf.cost}" for bnf in custom_bnfs])
 
             # this list will be refreshed every time user select an employee
-            bnf_list_frame[1].destroy()
+            bnf_list_frame.destroy()
             bnf_list_frame = display_list(
                 _master=main_frame,
                 options=custom_bnf_items,
@@ -441,7 +441,7 @@ class BenefitPlanGui(ctk.CTk):
             bnf_item_have_pending = tuple(f"{bnf.name} - {bnf.cost}" for bnf in bnfs_have_pending)
             pending_empls = bnfs_have_pending[bnf_idx_select.get()].pending_requests
 
-            empl_list_frame[1].destroy()
+            empl_list_frame.destroy()
             empl_list_frame = display_list(
                 _master=main_frame,
                 options=tuple(f"{empl.name} - {empl.employee_id}" for empl in pending_empls),
@@ -536,7 +536,7 @@ class BenefitPlanGui(ctk.CTk):
         def _update_empl_list():
             nonlocal bnf_idx_select, bnfs_items, bnf_detail_widget, empl_list_frame
             selected_bnf = the_company.benefits[bnf_idx_select.get()]
-            empl_list_frame[1].destroy()
+            empl_list_frame.destroy()
             empl_list_frame = display_list(
                 _master=main_frame,
                 options=tuple(f"{empl.name} - {empl.employee_id}" for empl in selected_bnf.enrolled_employees),
