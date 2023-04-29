@@ -413,9 +413,11 @@ class BenefitPlanGui(ctk.CTk):
             msgbox.showinfo("Success", f"Benefit plan {selected_bnf.name} requested")
             merge_callable(self.__clear_right_frame, self.__request)()
 
-        ctk.CTkButton(master=main_frame, text="Request", command=_request_handler, **btn_action_style).grid(
-            row=1, column=0, pady=20
-        )
+        btn_request = ctk.CTkButton(master=main_frame, text="Request", command=_request_handler, **btn_action_style)
+        btn_request.grid(row=1, column=0, pady=20)
+        if len(bnfs_empl_not_in) == 0:
+            btn_request.configure(state=DISABLED)
+
         # endregion
 
     def __admin_resolve(self):
