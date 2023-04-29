@@ -285,7 +285,7 @@ class BenefitPlanGui(ctk.CTk):
         _update_bnf_list()
         display_list(
             _master=main_frame,
-            options=tuple([f"{empl.employee_id} - {empl.name}" for empl in the_company.employees]),
+            options=tuple([f"{empl.name} - {empl.employee_id}" for empl in the_company.employees]),
             returned_idx=[empl_idx_select],
             err_msg="No employees",
             place=(1, 0),
