@@ -186,51 +186,50 @@ class BenefitPlanGui(ctk.CTk):
                     if os.getenv("HRMGR_DB") == "TRUE":
                         benefit_repo.insert_one(new_benefit.dict(by_alias=True))
 
-                    msgbox.showinfo("Success", f"Benefit plan {name} added")
-
                 case 2:  # remove
-                    _bnf = benefits[benefit_idx_select]
-                    _bnf_name = _bnf.name
+                    selected_bnf = bnfs[bnf_idx_select]
+                    bnf_name = selected_bnf.name
 
-                    if benefit_idx_select is None:
+                    if bnf_idx_select is None:
                         msgbox.showerror("Error", "Please select a benefit plan to remove")
                         return
 
                     # remove the benefit from the company
-                    the_company.benefits.remove(the_company.benefits[benefit_idx_select])
+                    the_company.benefits.remove(the_company.benefits[bnf_idx_select])
                     if os.getenv("HRMGR_DB") == "TRUE":
-                        benefit_repo.delete_one({"_id": _bnf.id})
+                        benefit_repo.delete_one({"_id": selected_bnf.id})
 
                     # remove the benefit from employees
                     for empl in the_company.employees:
-                        if _bnf.name not in empl.benefits:
+                        if selected_bnf.name not in empl.benefits:
                             continue
-                        empl.benefits.remove(_bnf.name)
+                        empl.benefits.remove(selected_bnf.name)
                         if os.getenv("HRMGR_DB") == "TRUE":
                             employee_repo.update_one(
                                 {"_id": empl.id}, {"$set": empl.dict(include={"benefits"})}, upsert=True
                             )
-                    msgbox.showinfo("Success", f"Benefit plan {_bnf_name} removed")
 
                 case 3:  # modify
-                    if benefit_idx_select is None:
+                    if bnf_idx_select is None:
                         msgbox.showerror("Error", "Please select a benefit plan to modify")
                         return
                     if (not name) and (not desc) and (not cost):
                         msgbox.showerror("Error", "Please fill in at least one field")
                         return
-                    _bnf = the_company.benefits[benefit_idx_select]
-                    _bnf.set_name(name) if name else None
-                    _bnf.set_description(desc) if desc else None
-                    _bnf.set_cost(float(cost)) if cost else None
+                    selected_bnf = the_company.benefits[bnf_idx_select]
+                    selected_bnf.set_name(name) if name else None
+                    selected_bnf.set_description(desc) if desc else None
+                    selected_bnf.set_cost(float(cost)) if cost else None
 
                     if os.getenv("HRMGR_DB") == "TRUE":
-                        benefit_repo.update_one({"_id": _bnf.id}, {"$set": _bnf.dict(by_alias=True)}, upsert=True)
+                        benefit_repo.update_one(
+                            {"_id": selected_bnf.id}, {"$set": selected_bnf.dict(by_alias=True)}, upsert=True
+                        )
 
-                    msgbox.showinfo("Success", "Benefit plan modified")
+            msgbox.showinfo("Success", f"Benefit plan {bnf_name} has been {['added', 'removed', 'modified'][mode - 1]}")
 
             self.__clear_right_frame()
-            self.__admin_add_rm_modify(current_submenu)
+            self.__admin_add_rm_modify(mode)
 
         ctk.CTkButton(master=main_frame, text="Submit", command=_submit_handler, **btn_action_style).grid(
             row=5, column=0, columnspan=3, pady=20
