@@ -350,20 +350,34 @@ class DepartmentGui(ctk.CTk):
         )
 
         # Select a department from a list
-        radio_dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        empl_list_frame = ctk.CTkBaseClass(None)
+
+        def update_empl_list_frame():
+            nonlocal empl_list_frame, dept_idx_select
+
+            empl_list_frame.destroy()
+            empl_list_frame = ctk.CTkFrame(master=main_frame)
+            empl_list_frame.grid(row=1, column=0, columnspan=1)
+
+            dept = the_company.departments[dept_idx_select.get()]
+            empl_list_frame = display_list(
+                _master=main_frame,
+                options=tuple(f"{empl.name} - {empl.employee_id}" for empl in dept.members),
+                err_msg="No employee in this department",
+                place=(1, 0),
+                colspan=1,
+                pady=(0, 20),
+            )
+
+        update_empl_list_frame()
+
         display_list(
             _master=main_frame,
             options=tuple(f"{dept.name} - {dept.dept_id}" for dept in the_company.departments),
-            returned_idx=[radio_dept_idx_select],
+            returned_idx=[dept_idx_select],
             err_msg="No department to view",
             place=(0, 0),
             colspan=1,
-        )
-
-        def _view_dept_handler():
-            _dept = the_company.departments[radio_dept_idx_select.get()]
-            msgbox.showinfo("Department", f"Name: {_dept.name}\nID: {_dept.dept_id}")
-
-        ctk.CTkButton(master=main_frame, text="View", command=_view_dept_handler, **btn_action_style).grid(
-            row=2, column=0, columnspan=2, pady=(0, 20)
+            cmd=update_empl_list_frame,
         )
