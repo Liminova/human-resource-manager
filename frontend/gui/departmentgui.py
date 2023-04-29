@@ -43,18 +43,13 @@ class DepartmentGui(ctk.CTk):
             "Remove Department": self.__admin_remove_department,
             "Update Department": self.__admin_update_department,
             "View Department": self.__view_department,
-            "List Employees Without Department": self.__admin_list_employees_wo_department,
-            "Add Employee": self.__admin_add_employee,
-            "Remove Employee": self.__admin_remove_employee,
+            "Employees w/o department": self.__admin_list_employees_wo_department,
+            "Add/remove Employee": self.__admin_add_remove_employee,
             "Back": self.__back_to_homepage,
         }
 
     def employee(self):
-        return {
-            # "View Department": self.__employee_view_department,
-            # "List All Departments": self.__employee_list_all_department,
-            "Back": self.__back_to_homepage
-        }
+        return {"View Department": self.__view_department, "Back": self.__back_to_homepage}
 
     def __clear_right_frame(self):
         for widget in self.right_frame.winfo_children():
