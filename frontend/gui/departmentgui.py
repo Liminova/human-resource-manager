@@ -324,33 +324,14 @@ class DepartmentGui(ctk.CTk):
 
         # Select employee from list
         radio_emp_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        empl_items = tuple(f"{empl.name} - {empl.id}" for empl in the_company.employees if empl.department_id is None)
-        _display_list = display_list(
-            _master=main_frame, options=empl_items, returned_idx=[radio_emp_idx_select], selectable=True
-        )
-        if _display_list[0] is False:
-            ctk.CTkLabel(master=main_frame, text="No employee without department", **label_desc_style).grid(
-                row=1, column=0, columnspan=2, pady=(20, 0)
-            )
-        _display_list[1].grid(row=1, column=0, columnspan=2, pady=(20, 0))
-
-        def _add_employee():
-            _empl = the_company.employees[radio_emp_idx_select.get()]
-
-            # add employee to department
-            the_company.departments[0].members.append(_empl)
-
-            # update db
-            if os.getenv("HRMGR_DB") == "TRUE":
-                department_repo.update_one(
-                    {"id": the_company.departments[0].id}, {"$set": {"employees": the_company.departments[0].members}}
-                )
-
-            msgbox.showinfo("Success", "Employee added successfully")
-            merge_callable(self.__clear_right_frame, self.__admin_list_employees_wo_department)()
-
-        ctk.CTkButton(master=main_frame, text="Add", command=_add_employee, **btn_action_style).grid(
-            row=2, column=0, columnspan=2, pady=20
+        empl_items = tuple(f"{empl.name} - {empl.employee_id}" for empl in the_company.employees if empl.department_id == "")
+        display_list(
+            _master=main_frame,
+            options=empl_items,
+            returned_idx=[radio_emp_idx_select],
+            err_msg="No employee without department",
+            place=(0, 0),
+            colspan=1,
         )
 
     # endregion
