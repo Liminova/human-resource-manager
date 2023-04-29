@@ -1,6 +1,7 @@
 import os
 import customtkinter as ctk
 from tkinter import messagebox as msgbox
+from tkinter import NORMAL, DISABLED
 
 from models import Company, Department
 from database.mongo import department_repo, employee_repo
@@ -209,7 +210,7 @@ class DepartmentGui(ctk.CTk):
             row=3, column=0, columnspan=2, pady=20
         )
 
-    def __admin_add_employee(self):
+    def __admin_add_remove_employee(self, mode: int = 1):
         # - 2 columns
         # 0: 2 buttons, switch between 2 modes: 1. add, 2. remove
         # 1: select employee from list | select department from list (depends on mode)
@@ -218,97 +219,100 @@ class DepartmentGui(ctk.CTk):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
+        # based on add/remove mode, this contains dept without/with the selected employee
+        filtered_depts: list[Department] = []
+        emp_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
+
+        select_dept_frame = ctk.CTkBaseClass(None)
+
+        def _switch_mode():
+            nonlocal mode
+            mode = 2 if mode == 1 else 1
+            self.__clear_right_frame()
+            self.__admin_add_remove_employee(mode=mode)
+
+        ctk.CTkButton(
+            master=main_frame,
+            **btn_action_style,
+            text="Add",
+            command=_switch_mode,
+            state=(NORMAL if mode == 2 else DISABLED),
+        ).grid(row=0, column=0, pady=(20, 0), padx=20)
+        ctk.CTkButton(
+            master=main_frame,
+            **btn_action_style,
+            text="Remove",
+            command=_switch_mode,
+            state=(NORMAL if mode == 1 else DISABLED),
+        ).grid(row=0, column=1, pady=(20, 0), padx=20)
 
         # Select employee from list
-        radio_emp_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        empl_items = tuple(f"{empl.name} - ({empl.id})" for empl in the_company.employees)
-        _display_list = display_list(
-            _master=main_frame, options=empl_items, returned_idx=[radio_emp_idx_select], selectable=True
-        )
-        if _display_list[0] is False:
-            ctk.CTkLabel(master=main_frame, text="No employee to add", **label_desc_style).grid(
-                row=1, column=0, columnspan=2, pady=(20, 0)
+        def _update_dept_list():
+            nonlocal emp_idx_select, select_dept_frame, dept_idx_select, filtered_depts
+
+            depts = the_company.departments
+            empls = the_company.employees
+
+            if mode == 1:
+                filtered_depts = [dept for dept in depts if dept.dept_id != empls[emp_idx_select.get()].department_id]
+            elif mode == 2:
+                filtered_depts = [dept for dept in depts if dept.dept_id == empls[emp_idx_select.get()].department_id]
+
+            select_dept_frame.destroy()
+            select_dept_frame = display_list(
+                _master=main_frame,
+                options=tuple(f"{dept.dept_id} - {dept.name}" for dept in filtered_depts),
+                returned_idx=[dept_idx_select],
+                err_msg=f"No department to {'add' if mode == 1 else 'remove'}",
+                place=(1, 1),
+                colspan=1,
+                padx=(0, 20),
             )
-        _display_list[1].grid(row=1, column=0, columnspan=2, pady=(20, 0))
 
-        # Select department from list
-        radio_dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        dept_items = tuple(f"{dept.dept_id} - {dept.name}" for dept in the_company.departments)
-        _display_list = display_list(
-            _master=main_frame, options=dept_items, returned_idx=[radio_dept_idx_select], selectable=True
+        _update_dept_list()
+
+        display_list(
+            _master=main_frame,
+            options=tuple(f"{empl.name} - {empl.employee_id}" for empl in the_company.employees),
+            returned_idx=[emp_idx_select],
+            err_msg="No employee to remove",
+            place=(1, 0),
+            colspan=1,
+            cmd=_update_dept_list,
         )
-        if _display_list[0] is False:
-            ctk.CTkLabel(master=main_frame, text="No department to add", **label_desc_style).grid(
-                row=2, column=0, columnspan=2, pady=(20, 0)
-            )
-        _display_list[1].grid(row=2, column=0, columnspan=2, pady=(20, 0))
 
-        def _add_employee():
-            _empl = the_company.employees[radio_emp_idx_select.get()]
-            _dept = the_company.departments[radio_dept_idx_select.get()]
+        def _add_rm_empl_handler():
+            nonlocal filtered_depts, emp_idx_select, dept_idx_select
 
-            # add employee to department
-            _dept.members.append(_empl)
+            selected_dept = filtered_depts[dept_idx_select.get()]
+            selected_empl = the_company.employees[emp_idx_select.get()]
+
+            if mode == 1:
+                selected_dept.members.append(selected_empl)
+                selected_empl.department_id = selected_dept.dept_id
+            elif mode == 2:
+                selected_dept.members.remove(selected_empl)
+                selected_empl.department_id = ""
 
             # update db
             if os.getenv("HRMGR_DB") == "TRUE":
-                department_repo.update_one({"id": _dept.id}, {"$set": {"employees": _dept.members}})
+                department_repo.update_one(
+                    {"_id": selected_dept.id}, {"$set": selected_dept.dict(include={"members"})}, upsert=True
+                )
+                employee_repo.update_one(
+                    {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"department_id"})}, upsert=True
+                )
 
-            msgbox.showinfo("Success", "Employee added successfully")
-            merge_callable(self.__clear_right_frame, self.__admin_add_employee)()
-
-        ctk.CTkButton(master=main_frame, text="Add", command=_add_employee, **btn_action_style).grid(
-            row=3, column=0, columnspan=2, pady=20
-        )
-
-    def __admin_remove_employee(self):
-        main_frame = ctk.CTkFrame(master=self.right_frame)
-        main_frame.grid(row=0, column=0)
-
-        ctk.CTkLabel(master=main_frame, text="Remove Employee", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
-        )
-
-        # Select employee from list
-        radio_emp_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        empl_items = tuple(f"{empl.name} - {empl.id}" for empl in the_company.employees)
-        _display_list = display_list(
-            _master=main_frame, options=empl_items, returned_idx=[radio_emp_idx_select], selectable=True
-        )
-        if _display_list[0] is False:
-            ctk.CTkLabel(master=main_frame, text="No employee to remove", **label_desc_style).grid(
-                row=1, column=0, columnspan=2, pady=(20, 0)
+            msgbox.showinfo(
+                "Success",
+                f"Employee {selected_empl.name} {'added to' if mode == 1 else 'removed from'} {selected_dept.name} successfully",
             )
-        _display_list[1].grid(row=1, column=0, columnspan=2, pady=(20, 0))
+            self.__clear_right_frame()
+            self.__admin_add_remove_employee(mode)
 
-        # Select department from list
-        radio_dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        dept_items = tuple(f"{dept.dept_id} - {dept.name}" for dept in the_company.departments)
-        _display_list = display_list(
-            _master=main_frame, options=dept_items, returned_idx=[radio_dept_idx_select], selectable=True
-        )
-        if _display_list[0] is False:
-            ctk.CTkLabel(master=main_frame, text="No department to remove", **label_desc_style).grid(
-                row=2, column=0, columnspan=2, pady=(20, 0)
-            )
-        _display_list[1].grid(row=2, column=0, columnspan=2, pady=(20, 0))
-
-        def _remove_employee():
-            _empl = the_company.employees[radio_emp_idx_select.get()]
-            _dept = the_company.departments[radio_dept_idx_select.get()]
-
-            # remove employee from department
-            _dept.members.remove(_empl)
-
-            # update db
-            if os.getenv("HRMGR_DB") == "TRUE":
-                department_repo.update_one({"id": _dept.id}, {"$set": {"employees": _dept.members}})
-
-            msgbox.showinfo("Success", "Employee removed successfully")
-            merge_callable(self.__clear_right_frame, self.__admin_remove_employee)()
-
-        ctk.CTkButton(master=main_frame, text="Remove", command=_remove_employee, **btn_action_style).grid(
-            row=3, column=0, columnspan=2, pady=20
+        ctk.CTkButton(master=main_frame, text="Submit", command=_add_rm_empl_handler, **btn_action_style).grid(
+            row=3, column=0, columnspan=2, pady=(0, 20)
         )
 
     def __admin_list_employees_wo_department(self):
