@@ -83,7 +83,6 @@ class DepartmentGui(ctk.CTk):
         def _add_department():
             nonlocal entries
             values = [entry.get() for entry in entries]
-            print("DEBUG", *values)  # tang Kien <3
 
             for value in values:
                 if not value:
@@ -163,16 +162,15 @@ class DepartmentGui(ctk.CTk):
         main_frame.grid(row=0, column=0)
 
         # Select a department from a list
-        radio_dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        dept_items = tuple(f"{dept.dept_id} - {dept.name}" for dept in the_company.departments)
-        _display_list = display_list(
-            _master=main_frame, options=dept_items, returned_idx=[radio_dept_idx_select], selectable=True
+        dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        display_list(
+            _master=main_frame,
+            options=tuple(f"{dept.dept_id} - {dept.name}" for dept in the_company.departments),
+            returned_idx=[dept_idx_select],
+            err_msg="No department found",
+            place=(0, 0),
+            colspan=2,
         )
-        if _display_list[0] is False:
-            ctk.CTkLabel(master=main_frame, text="No department found", **label_desc_style).grid(
-                row=1, column=0, columnspan=2, pady=20, padx=20
-            )
-        _display_list[1].grid(row=1, column=0, columnspan=2, pady=0, padx=20)
 
         # Input new department name
         entries = [ctk.CTkEntry(master=main_frame) for _ in range(1)]
