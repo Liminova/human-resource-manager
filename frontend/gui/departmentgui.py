@@ -171,6 +171,7 @@ class DepartmentGui(ctk.CTk):
             err_msg="No department found",
             place=(0, 0),
             colspan=2,
+            pady=(20, 0),
         )
 
         # Input new department name
