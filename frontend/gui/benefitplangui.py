@@ -298,8 +298,8 @@ class BenefitPlanGui(ctk.CTk):
         # region: 2 buttons to switch between apply and remove submenu
         btn_apply = ctk.CTkButton(master=main_frame, text="Add benefit to employee", **btn_action_style)
         btn_remove = ctk.CTkButton(master=main_frame, text="Remove benefit from employee", **btn_action_style)
-        btn_apply.grid(row=0, column=0, padx=10, pady=20)
-        btn_remove.grid(row=0, column=1, padx=10, pady=20)
+        btn_apply.grid(row=0, column=0, padx=(20, 10), pady=20)
+        btn_remove.grid(row=0, column=1, padx=(10, 20), pady=20)
 
         def _apply():
             nonlocal btn_apply, btn_remove, current_submenu, bnf_list_frame, _update_bnf_list
@@ -547,8 +547,10 @@ class BenefitPlanGui(ctk.CTk):
 
             # update description
             bnf_detail_widget.destroy()
-            bnf_detail_widget = ctk.CTkLabel(master=main_frame, text=selected_bnf.description)
-            bnf_detail_widget.grid(row=1, column=0, columnspan=2, pady=20, padx=20)
+            bnf_detail_widget = ctk.CTkLabel(
+                master=main_frame, text=(selected_bnf.description if selected_bnf.description else "No description")
+            )
+            bnf_detail_widget.grid(row=1, column=0, columnspan=2, pady=(0, 20), padx=20)
 
         display_list(
             _master=main_frame,
