@@ -180,15 +180,27 @@ class DepartmentGui(ctk.CTk):
             entry.grid(row=row, column=1, pady=(20, 0), padx=(0, 20))
 
         def _update_department():
-            # thich thi viet Debug nha, Pechy luoi roi
-            _dept = the_company.departments[radio_dept_idx_select.get()]
+            nonlocal dept_idx_select, entries
+            values = [entry.get() for entry in entries]
+            selected_dept = the_company.departments[dept_idx_select.get()]
 
+            old_dept_id = selected_dept.dept_id
             # update department
-            _dept.name = entries[0].get()
+            selected_dept.name = values[0]
+            selected_dept.dept_id = values[1]
+
+            # update employees
+            affected_emps = []
+            for emp in the_company.employees:
+                if emp.department_id == old_dept_id:
+                    emp.department_id = selected_dept.dept_id
+                    affected_emps.append(emp)
 
             # update db
             if os.getenv("HRMGR_DB") == "TRUE":
-                department_repo.update_one({"id": _dept.id}, {"$set": {"name": _dept.name}})
+                department_repo.update_one({"id": selected_dept.id}, selected_dept.dict(by_alias=True), upsert=True)
+                for emp in affected_emps:
+                    employee_repo.update_one({"id": emp.id}, emp.dict(include={"department_id"}), upsert=True)
 
             msgbox.showinfo("Success", "Department updated successfully")
             merge_callable(self.__clear_right_frame, self.__admin_update_department)()
