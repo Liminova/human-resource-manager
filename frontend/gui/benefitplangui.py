@@ -241,26 +241,20 @@ class BenefitPlanGui(ctk.CTk):
         # 1: Table to choose employee | Table to choose benefit
         # 2: - if in apply: Apply button
         #    - if in remove: Benefits of this employee | Remove button
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
-        # region: variables
-        first_row = ctk.CTkFrame(master=main_frame)
-        first_row.grid(row=1, column=0, columnspan=2, padx=20)
-
-        empl_idx_select = ctk.IntVar()
-        bnf_idx_select = ctk.IntVar()
         # because later we will have index of benefits (in empl || not in empl), not the list of benefits in the company
         custom_bnfs: list[BenefitPlan] = []
-        # a list of strings representing each benefit
         custom_bnf_items = tuple()
-        # to store the frame of the benefits list, so we can refresh it each time another employee is selected
-        bnf_list_frame = (True, ctk.CTkFrame(master=main_frame))
-
-        current_submenu = 1
-        # endregion
 
         # region: when user select an employee, update the benefits list
+        bnf_idx_select = ctk.IntVar()
+        bnf_list_frame = ctk.CTkBaseClass(None)
+
+        empl_idx_select = ctk.IntVar()
+
         def _update_bnf_list():
             nonlocal bnf_idx_select, empl_idx_select, current_submenu, custom_bnf_items, bnf_list_frame, custom_bnfs
 
@@ -379,8 +373,6 @@ class BenefitPlanGui(ctk.CTk):
 
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
-        zero_row = ctk.CTkFrame(master=main_frame)
-        zero_row.grid(row=0, column=0, padx=20, pady=(20, 0))
 
         # region: variables
         bnf_idx_select = ctk.IntVar()
@@ -440,10 +432,7 @@ class BenefitPlanGui(ctk.CTk):
 
         # this changes every time the user select a benefit
         pending_empls: list[Employee] = []
-
-        zero_row = ctk.CTkFrame(master=main_frame)
-        zero_row.grid(row=0, column=0, columnspan=2, padx=20, pady=(20, 0))
-        empl_list_frame = (True, ctk.CTkFrame(master=main_frame))
+        empl_list_frame = ctk.CTkBaseClass(None)
         # endregion
 
         # region: when user select a benefit, update the employee list
@@ -482,12 +471,10 @@ class BenefitPlanGui(ctk.CTk):
         # endregion
 
         # region: approve button | reject button
-        btn_approve = ctk.CTkButton(master=main_frame, text="Approve", **btn_action_style)
         btn_approve.grid(row=1, column=0, pady=20)
-        btn_reject = ctk.CTkButton(master=main_frame, text="Reject", **btn_action_style)
         btn_reject.grid(row=1, column=1, pady=20)
 
-        def _approve_handler():
+        def _action_handler(mode: int):
             nonlocal bnf_idx_select, empl_idx_select, bnfs_have_pending, pending_empls
             selected_bnf = bnfs_have_pending[bnf_idx_select.get()]
             selected_empl = pending_empls[empl_idx_select.get()]
@@ -543,20 +530,17 @@ class BenefitPlanGui(ctk.CTk):
         main_frame.grid(row=0, column=0)
 
         # region: variables
-        zero_row = ctk.CTkFrame(master=main_frame)
-        zero_row.grid(row=0, column=0, columnspan=2)
         bnf_idx_select = ctk.IntVar()
-        empl_list_frame = (True, ctk.CTkFrame(master=zero_row))
+        empl_list_frame = ctk.CTkBaseClass(None)
         bnf_detail_widget = ctk.CTkLabel(master=main_frame)
         # endregion
 
         # region: when user select a benefit, update the employee list
         bnfs_items = tuple(f"{bnf.name} - {bnf.cost}" for bnf in the_company.benefits)
 
-        def bnf_select_handler():
-            nonlocal bnf_idx_select, bnfs_items, zero_row, bnf_detail_widget, empl_list_frame
+        def _update_empl_list():
+            nonlocal bnf_idx_select, bnfs_items, bnf_detail_widget, empl_list_frame
             selected_bnf = the_company.benefits[bnf_idx_select.get()]
-            _empls_in_bnf = selected_bnf.enrolled_employees
             empl_list_frame[1].destroy()
             empl_list_frame = display_list(
                 _master=main_frame,
