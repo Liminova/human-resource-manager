@@ -73,9 +73,7 @@ class DepartmentGui(ctk.CTk):
         main_frame.grid(row=0, column=0)
 
         entries = [ctk.CTkEntry(master=main_frame) for _ in range(2)]
-        labels = ("Name: ", "ID: ")
-        placeholders = ("BHYT", "1")
-        for row, entry, label, placeholder in zip(range(1, 3), entries, labels, placeholders):
+        for row, entry, label, placeholder in zip((0, 1), entries, ("Name: ", "ID: "), ("BHYT", "1")):
             ctk.CTkLabel(master=main_frame, text=label, **label_desc_style).grid(
                 row=row, column=0, pady=(20, 0), padx=20, sticky="w"
             )
