@@ -290,11 +290,6 @@ class EmployeeGui(ctk.CTk):
     def __employee_view_employee(self):
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
-
-        ctk.CTkLabel(master=main_frame, text="View Employee", **label_title_style).grid(
-            row=0, column=0, columnspan=2, pady=(20, 0)
-        )
-
         empl = the_company.logged_in_employee
 
         labels = ("Name: ", "Date of birth: ", "ID: ", "Phone Number: ", "Email: ")
