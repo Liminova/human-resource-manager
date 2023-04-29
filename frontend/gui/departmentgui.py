@@ -64,6 +64,11 @@ class DepartmentGui(ctk.CTk):
     # region: admin functions
 
     def __admin_add_department(self):
+        # - 2 columns
+        # 0: label + name entry
+        # 1: label + id entry
+        # 2: add btn
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
@@ -106,6 +111,10 @@ class DepartmentGui(ctk.CTk):
         )
 
     def __admin_remove_department(self):
+        # - 1 column
+        # 0: select department from list
+        # 1: remove department btn
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
@@ -153,6 +162,12 @@ class DepartmentGui(ctk.CTk):
         )
 
     def __admin_update_department(self):
+        # - 2 columns
+        # 0: select department from list
+        # 1: label + input name
+        # 2: label + input id
+        # 3: update btn
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
@@ -198,6 +213,11 @@ class DepartmentGui(ctk.CTk):
         )
 
     def __admin_add_employee(self):
+        # - 2 columns
+        # 0: 2 buttons, switch between 2 modes: 1. add, 2. remove
+        # 1: select employee from list | select department from list (depends on mode)
+        # 2: submit btn
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
@@ -298,6 +318,9 @@ class DepartmentGui(ctk.CTk):
         )
 
     def __admin_list_employees_wo_department(self):
+        # - 1 column
+        # 0: list of employees without department
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
@@ -339,6 +362,10 @@ class DepartmentGui(ctk.CTk):
     # endregion
 
     def __view_department(self):
+        # - 1 column
+        # 0: select department from list
+        # 1: view department btn
+
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
 
