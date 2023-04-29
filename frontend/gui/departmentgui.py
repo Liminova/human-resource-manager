@@ -126,24 +126,25 @@ class DepartmentGui(ctk.CTk):
         def _remove_department():
             if not msgbox.askyesno("Confirmation", "Are you sure you want to remove this department?"):
                 return
-            _depts = the_company.departments
-            _dept = _depts[radio_dept_idx_select.get()]
+            depts = the_company.departments
+            selected_dept = depts[dept_idx_select.get()]
 
-            _db_update_emps = []
             # remove department from company
-            _depts.remove(_dept)
+            depts.remove(selected_dept)
 
             # remove department from employees
+            affected_empls = []
             for emp in the_company.employees:
-                if emp.department_id == _dept.id:
+                if emp.department_id == selected_dept.id:
                     emp.department_id = ""
-                    _db_update_emps.append(emp)
+                    affected_empls.append(emp)
 
             # update db
             if os.getenv("HRMGR_DB") == "TRUE":
-                department_repo.delete_one(_dept.dict(by_alias=True))
-                for emp in _db_update_emps:
-                    employee_repo.update_one({"id": emp.id}, {"$set": {"department_id": emp.department_id}})
+                department_repo.delete_one({"id": selected_dept.id})
+                for emp in affected_empls:
+                    employee_repo.update_one({"id": emp.id}, emp.dict(include={"department_id"}), upsert=True)
+
             msgbox.showinfo("Success", "Department removed successfully")
             merge_callable(self.__clear_right_frame, self.__admin_remove_department)()
 
