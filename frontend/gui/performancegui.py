@@ -1,5 +1,4 @@
 import os
-import tkinter
 import customtkinter as ctk
 from datetime import datetime
 from tkinter import messagebox as msgbox
