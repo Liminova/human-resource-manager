@@ -121,6 +121,7 @@ class Signup(ctk.CTk):
         if os.getenv("HRMGR_DB") == "TRUE":
             employee_repo.insert_one(owner.dict(by_alias=True))
 
+        self.destroy()
         Homepage().mainloop()
 
 
