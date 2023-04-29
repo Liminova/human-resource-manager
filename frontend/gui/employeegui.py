@@ -1,6 +1,7 @@
 import os
 import customtkinter as ctk
 from tkinter import messagebox as msgbox
+from tkinter import W, E
 
 from models import Company, Employee, hash
 from database.mongo import employee_repo, department_repo, benefit_repo
@@ -275,8 +276,11 @@ class EmployeeGui(ctk.CTk):
             empl_info_frame = ctk.CTkFrame(master=main_frame)
             empl_info_frame.grid(row=1, column=0, pady=(0, 20), padx=20)
             for row, label, value in zip(range(1, 6), labels, values):
-                ctk.CTkLabel(master=empl_info_frame, text=label).grid(row=row, column=0, padx=(20, 0), sticky="w")
-                ctk.CTkLabel(master=empl_info_frame, text=value).grid(row=row, column=1, padx=20, sticky="e")
+                pady = (20, 0) if row == 1 else (0, 20) if row == len(labels) - 1 else 0
+                ctk.CTkLabel(master=empl_info_frame, text=label).grid(row=row, column=0, padx=(20, 0), pady=pady, sticky=W)
+                ctk.CTkLabel(master=empl_info_frame, text=value).grid(row=row, column=1, padx=20, pady=pady, sticky=E)
+
+        update_empl_info_frame()
 
         display_list(
             _master=main_frame,
@@ -300,8 +304,9 @@ class EmployeeGui(ctk.CTk):
         labels = ("Name: ", "Date of birth: ", "ID: ", "Phone Number: ", "Email: ")
         values = (empl.name, empl.dob, empl.employee_id, empl.phone, empl.email)
         for row, label, value in zip(range(0, 5), labels, values):
-            ctk.CTkLabel(master=main_frame, text=label).grid(row=row, column=0, padx=(20, 0), pady=(20, 0), sticky="w")
-            ctk.CTkLabel(master=main_frame, text=value).grid(row=row, column=1, padx=20, pady=(20, 0), sticky="w")
+            pady = (20, 0) if row == 0 else (0, 20) if row == len(labels) - 1 else 0
+            ctk.CTkLabel(master=main_frame, text=label).grid(row=row, column=0, padx=(20, 0), pady=pady, sticky=W)
+            ctk.CTkLabel(master=main_frame, text=value).grid(row=row, column=1, padx=20, pady=pady, sticky=E)
 
     # endregion
 

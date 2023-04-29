@@ -1,6 +1,7 @@
 import os
 import customtkinter as ctk
 from tkinter import messagebox as msgbox
+from tkinter import W, E
 
 from models import Company
 from database.mongo import employee_repo
@@ -158,8 +159,11 @@ class PayrollGui(ctk.CTk):
             titles = ("Salary", "Bonus", "Tax", "Penalty", "Total")
             values = (payroll.salary, payroll.bonus, payroll.tax, payroll.punish, payroll.total)
             for row, title, value in zip(range(5), titles, values):
-                ctk.CTkLabel(master=payrol_table_frame, text=title).grid(row=row, column=0, padx=20, sticky="w")
-                ctk.CTkLabel(master=payrol_table_frame, text=str(value)).grid(row=row, column=1, padx=(0, 20), sticky="e")
+                pady = (20, 0) if row == 0 else (0, 20) if row == len(titles) - 1 else 0
+                ctk.CTkLabel(master=payrol_table_frame, text=title).grid(row=row, column=0, padx=20, pady=pady, sticky=W)
+                ctk.CTkLabel(master=payrol_table_frame, text=str(value)).grid(
+                    row=row, column=1, padx=(0, 20), pady=pady, sticky=E
+                )
 
         update_payroll_table()
 
@@ -184,7 +188,8 @@ class PayrollGui(ctk.CTk):
         labels = ("Salary", "Bonus", "Tax", "Penalty", "Total")
         values = (empl.payroll.salary, empl.payroll.bonus, empl.payroll.tax, empl.payroll.punish, empl.payroll.total)
         for row, label, value in zip(range(5), labels, values):
-            ctk.CTkLabel(master=main_frame, text=label).grid(row=row, column=0, padx=20, sticky="w")
-            ctk.CTkLabel(master=main_frame, text=str(value)).grid(row=row, column=1, padx=(0, 20), sticky="e")
+            pady = (20, 0) if row == 0 else (0, 20) if row == len(labels) - 1 else 0
+            ctk.CTkLabel(master=main_frame, text=label).grid(row=row, column=0, padx=20, pady=pady, sticky=W)
+            ctk.CTkLabel(master=main_frame, text=str(value)).grid(row=row, column=1, padx=(0, 20), pady=pady, sticky=E)
 
     # endregion
