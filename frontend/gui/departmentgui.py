@@ -101,7 +101,7 @@ class DepartmentGui(ctk.CTk):
             msgbox.showinfo("Success", "Department added successfully")
 
         ctk.CTkButton(master=main_frame, text="Add", command=_add_department, **btn_action_style).grid(
-            row=3, column=0, columnspan=2, pady=20
+            row=2, column=0, columnspan=2, pady=20
         )
 
     def __admin_remove_department(self):
@@ -149,7 +149,7 @@ class DepartmentGui(ctk.CTk):
             merge_callable(self.__clear_right_frame, self.__admin_remove_department)()
 
         ctk.CTkButton(master=main_frame, text="Remove", command=_remove_department, **btn_action_style).grid(
-            row=2, column=0, columnspan=2, pady=20
+            row=2, column=0, columnspan=2, pady=(0, 20)
         )
 
     def __admin_update_department(self):
