@@ -129,7 +129,7 @@ class PayrollGui(ctk.CTk):
                 employee_repo.update_one(
                     {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"payroll"})}, upsert=True
                 )
-            msgbox.showinfo("Success", f"Payroll {btn_label.lower()} successfully")
+            msgbox.showinfo("Success", f"Payroll {btn_label.lower()} successfully for {selected_empl.name}")
 
         submit_btn.configure(command=_create_update_payroll_handler)
         # endregion
