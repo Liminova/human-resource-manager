@@ -263,7 +263,7 @@ class DepartmentGui(ctk.CTk):
             select_dept_frame.destroy()
             select_dept_frame = display_list(
                 _master=main_frame,
-                options=tuple(f"{dept.dept_id} - {dept.name}" for dept in filtered_depts),
+                options=tuple(f"{dept.name} - {dept.dept_id}" for dept in filtered_depts),
                 returned_idx=[dept_idx_select],
                 err_msg=f"No department to {'add' if mode == 1 else 'remove'}",
                 place=(1, 1),
