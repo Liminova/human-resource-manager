@@ -58,3 +58,5 @@ $ pnpm i
 - Every time you want to commit something, use `pnpm cz` after adding files
   with `git add`. This will give you an automated prompt to fill in the
   details of your commit, according to the Conventional Commits format.
+
+If you're using VSCode, I suggest changing `"python.analysis.typeCheckingMode"` in `.vscode/settings.json` to `"basic"` when working with the GUI, `"strict"` otherwise. The GUI relies heavily on `tkinter` and `customtkinter`, which are very weakly typed and have a lot of dynamic attributes. This will cause a lot of false positives in the type checker, and will make it very difficult to work with.

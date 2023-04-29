@@ -1,11 +1,12 @@
-import customtkinter as ctk
-import tkinter
 import os
-
+import customtkinter as ctk
 from tkinter import messagebox as msgbox
-from models import Company, BenefitPlan
-from database.mongo import employee_repo, benefit_repo
-from frontend.helpers import merge_callable
+from tkinter import W, E, NORMAL, DISABLED
+
+from models import Company, BenefitPlan, Employee
+from database.mongo import benefit_repo, employee_repo
+from frontend.helpers_gui import *
+from frontend.helpers_gui.global_styling import *
 
 the_company = Company()
 
@@ -22,107 +23,40 @@ class BenefitPlanGui(ctk.CTk):
         self.title("Benefit Plan Management")
         self.geometry(f"{Width}x{Height}")
         self.resizable(True, True)
+
         self.left_frame = ctk.CTkFrame(master=self, corner_radius=10)
-
-        if the_company.logged_in_employee.is_admin:
-            self.admin()
-        else:
-            self.employee()
-
         self.left_frame.pack(side=ctk.LEFT)
         self.left_frame.pack_propagate(False)
         self.left_frame.configure(width=320, height=760)
 
-        self.right_frame = ctk.CTkFrame(master=self, border_width=2, corner_radius=10)
-        self.right_frame.pack(side=ctk.RIGHT)
+        self.right_frame = ctk.CTkFrame(master=self)
+        self.right_frame.pack(side=ctk.RIGHT, expand=True)
         self.right_frame.pack_propagate(False)
-        self.right_frame.configure(width=700, height=760)
+
+        menu_buttons = MenuButtons(
+            self.left_frame, self.right_frame, self.admin() if the_company.logged_in_employee.is_admin else self.employee()
+        )
+        menu_buttons.create()
 
     def admin(self):
-        self.button1 = ctk.CTkButton(
-            master=self.left_frame, text="Add Benefit Plan", command=merge_callable(self.__destroy_all_frames, self.__admin_add_benefit_plan)
-        )
-        self.__button_style(self.button1)
-        self.button1.place(relx=0.5, rely=0.1, anchor=tkinter.CENTER)
-
-        self.button2 = ctk.CTkButton(
-            master=self.left_frame, text="Remove Benefit Plan", command=merge_callable(self.__destroy_all_frames, self.__admin_remove_benefit_plan)
-        )
-        self.__button_style(self.button2)
-        self.button2.place(relx=0.5, rely=0.2, anchor=tkinter.CENTER)
-
-        self.button3 = ctk.CTkButton(
-            master=self.left_frame, text="Update Benefit Plan", command=merge_callable(self.__destroy_all_frames, self.__admin_update_benefit_plan)
-        )
-        self.__button_style(self.button3)
-        self.button3.place(relx=0.5, rely=0.3, anchor=tkinter.CENTER)
-
-        self.button4 = ctk.CTkButton(
-            master=self.left_frame, text="View Benefit Plan", command=merge_callable(self.__destroy_all_frames, self.__admin_view_benefit_plan)
-        )
-        self.__button_style(self.button4)
-        self.button4.place(relx=0.5, rely=0.4, anchor=tkinter.CENTER)
-
-        self.button5 = ctk.CTkButton(
-            master=self.left_frame, text="Apply to the employee", command=merge_callable(self.__destroy_all_frames, self.__admin_apply_benefit_plan)
-        )
-        self.__button_style(self.button5)
-        self.button5.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
-
-        self.button6 = ctk.CTkButton(
-            master=self.left_frame,
-            text="Resolve Benefit Request",
-            command=merge_callable(self.__destroy_all_frames, self.__admin_resolve_pending_request),
-        )
-        self.__button_style(self.button6)
-        self.button6.place(relx=0.5, rely=0.6, anchor=tkinter.CENTER)
-
-        self.button7 = ctk.CTkButton(
-            master=self.left_frame, text="List all", command=merge_callable(self.__destroy_all_frames, self.__admin_list_all_plans)
-        )
-        self.__button_style(self.button7)
-        self.button7.place(relx=0.5, rely=0.7, anchor=tkinter.CENTER)
-
-        self.button8 = ctk.CTkButton(
-            master=self.left_frame, text="Request to enroll", command=merge_callable(self.__destroy_all_frames, self.__admin_request_to_enroll)
-        )
-        self.__button_style(self.button8)
-        self.button8.place(relx=0.5, rely=0.8, anchor=tkinter.CENTER)
-
-        self.button9 = ctk.CTkButton(master=self.left_frame, text="Back", command=lambda self=self: self.__back_to_homepage())
-        self.button9.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
-        self.button9.place(relx=0.5, rely=0.9, anchor=tkinter.CENTER)
+        return {
+            "Add/remove/modify": self.__admin_add_rm_modify,
+            "Apply/remove": self.__admin_apply_rm,
+            "Request to enroll": self.__request,
+            "Resolve requests": self.__admin_resolve,
+            "View details": self.__view_details,
+            "List empls w/o benefit": self.__admin_empls_w_o_benefit,
+            "Back": self.__back_to_homepage,
+        }
 
     def employee(self):
-        self.button1 = ctk.CTkButton(
-            master=self.left_frame, text="View Benefit Plan", command=merge_callable(self.__destroy_all_frames, self.__employee_view_benefit_plan)
-        )
-        self.__button_style(self.button1)
-        self.button1.place(relx=0.5, rely=0.15, anchor=tkinter.CENTER)
+        return {
+            "View benefit plans": self.__view_details,
+            "Request to enroll": self.__request,
+            "Back": self.__back_to_homepage,
+        }
 
-        self.button2 = ctk.CTkButton(
-            master=self.left_frame, text="List all", command=merge_callable(self.__destroy_all_frames, self.__employee_list_all_plans)
-        )
-        self.__button_style(self.button2)
-        self.button2.place(relx=0.5, rely=0.25, anchor=tkinter.CENTER)
-
-        self.button3 = ctk.CTkButton(
-            master=self.left_frame, text="Request to enroll", command=merge_callable(self.__destroy_all_frames, self.__employee_request_to_enroll)
-        )
-        self.__button_style(self.button3)
-        self.button3.place(relx=0.5, rely=0.35, anchor=tkinter.CENTER)
-
-        self.button4 = ctk.CTkButton(master=self.left_frame, text="Back", fg_color="red", command=lambda self=self: self.__back_to_homepage())
-        self.button4.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="red")
-        self.button4.place(relx=0.5, rely=0.45, anchor=tkinter.CENTER)
-
-    def __style_input_box(self, element):
-        element.configure(width=400, height=30, font=("Century Gothic", 14), corner_radius=10)
-
-    def __button_style(self, button):
-        button.configure(width=260, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-
-    def __destroy_all_frames(self):
+    def __clear_right_frame(self):
         for widget in self.right_frame.winfo_children():
             widget.destroy()
 
@@ -132,449 +66,524 @@ class BenefitPlanGui(ctk.CTk):
         self.destroy()
         Homepage().mainloop()
 
-    # region: admin functions
+    def __admin_add_rm_modify(self, mode: int = 1):
+        # - 3 columns
+        # 0: 3 buttons, switch between 3 modes: 1. add, 2. remove, 3. modify
+        # 1: Table to choose bnf if modify or remove, "Creating..." if add
+        # 2: Label | Input name
+        # 3: Label | Input desc
+        # 4: Label | Input cost
+        # 5: Button to submit
 
-    def __admin_add_benefit_plan(self):
-        self.button1_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-        self.label = ctk.CTkLabel(master=self.button1_frame, text="Information", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        # region: initialize widgets and variables
+        input_name = ctk.CTkEntry(master=main_frame, **input_box_style)
+        input_desc = ctk.CTkEntry(master=main_frame, **input_box_style)
+        input_cost = ctk.CTkEntry(master=main_frame, **input_box_style)
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.1, rely=0.15, anchor=tkinter.CENTER)
+        bnf_idx_select = ctk.IntVar()
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Name")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+        btn_add = ctk.CTkButton(master=main_frame, text="Add", **btn_action_style)
+        btn_remove = ctk.CTkButton(master=main_frame, text="Remove", **btn_action_style)
+        btn_modify = ctk.CTkButton(master=main_frame, text="Modify", **btn_action_style)
+        # endregion
 
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="Description: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.135, rely=0.275, anchor=tkinter.CENTER)
+        # region: switch between modes handler
+        first_row: ctk.CTkBaseClass = ctk.CTkFrame(None)
 
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Description")
-        self.__style_input_box(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
+        def _switch_mode(new_mode: int):
+            nonlocal input_name, input_desc, input_cost, btn_modify, btn_remove, btn_add
+            nonlocal first_row, mode, bnf_idx_select, main_frame
+            first_row.destroy()
+            first_row = ctk.CTkLabel(master=main_frame, text="Adding new benefit...", **label_desc_style)
+            first_row.grid(row=1, column=0, columnspan=3, padx=20, pady=(0, 20))
 
-        self.label3 = ctk.CTkLabel(master=self.right_frame, text="Cost: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.085, rely=0.4, anchor=tkinter.CENTER)
+            mode = new_mode
+            match new_mode:
+                case 1:  # add
+                    # enable input boxes, <remove> and <modify> buttons
+                    # disable <add> button (already clicked)
+                    for elem in (input_name, input_desc, input_cost, btn_modify, btn_remove):
+                        elem.configure(state=NORMAL)
+                    btn_add.configure(state=DISABLED)
 
-        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Cost")
-        self.__style_input_box(self.entry3)
-        self.entry3.place(relx=0.325, rely=0.445, anchor=tkinter.CENTER)
+                case 2:  # remove
+                    first_row.destroy()
+                    first_row = display_list(
+                        _master=main_frame,
+                        options=tuple(f"{b.name} - {b.cost}" for b in the_company.benefits),
+                        err_msg="No benefit plan to remove",
+                        returned_idx=[bnf_idx_select],
+                        place=(1, 0),
+                        colspan=3,
+                        pady=(0, 15),
+                    )
+                    # disable input boxes, <delete> btn (clicked)
+                    # enable <add> and <modify> buttons
+                    for elem in (input_name, input_desc, input_cost, btn_remove):
+                        elem.configure(state=DISABLED)
+                    for elem in (btn_add, btn_modify):
+                        elem.configure(state=NORMAL)
 
-        self.button = ctk.CTkButton(master=self.right_frame, text="Confirm", command=(lambda: add_successfully(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.55, anchor=tkinter.CENTER)
+                case 3:  # modify
+                    first_row.destroy()
+                    first_row = display_list(
+                        _master=main_frame,
+                        options=tuple(f"{b.name} - {b.cost}" for b in the_company.benefits),
+                        err_msg="No benefit plan to modify",
+                        returned_idx=[bnf_idx_select],
+                        place=(1, 0),
+                        colspan=3,
+                        pady=(0, 15),
+                    )
+                    # enable input boxes, <add> and <remove> buttons
+                    # disable <modify> button (clicked)
+                    for elem in (input_name, input_desc, input_cost, btn_add, btn_remove):
+                        elem.configure(state=NORMAL)
+                    btn_modify.configure(state=DISABLED)
 
-        self.button1_frame.pack(pady=20)
+        _switch_mode(mode)
 
-        def add_successfully(self):
-            name = self.entry1.get()
-            description = self.entry2.get()
-            cost = self.entry3.get()
-            # create a blank benefit plan object
-            benefit = BenefitPlan()
-            if name == "" or description == "" or cost == "":
-                msgbox.showerror("Error", "Please fill in all the fields")
-            elif not name.isalpha():
-                msgbox.showerror("Error", "Name must be a string")
-            elif not cost.isdigit():
-                msgbox.showerror("Error", "Cost must be a number")
+        btn_add.grid(row=0, column=0, padx=(20, 0), pady=20)
+        btn_add.configure(command=lambda: _switch_mode(1))
+        btn_remove.grid(row=0, column=1, padx=20, pady=20)
+        btn_remove.configure(command=lambda: _switch_mode(2))
+        btn_modify.grid(row=0, column=2, padx=(0, 20), pady=20)
+        btn_modify.configure(command=lambda: _switch_mode(3))
+        # endregion
+
+        # region: input boxes
+        entries = [input_name, input_desc, input_cost]
+        for row, entry, title in zip(range(2, 5), entries, ("Name: ", "Description: ", "Cost: ")):
+            ctk.CTkLabel(master=main_frame, text=title, **label_desc_style).grid(
+                row=row, column=0, sticky=W, padx=(20, 0), pady=10
+            )
+            entry.grid(row=row, column=1, columnspan=2, padx=20, sticky=E)
+        # endregion
+
+        # region: submit button
+        def _submit_handler():
+            nonlocal input_name, input_desc, input_cost, bnf_idx_select, mode
+            name, desc, cost = input_name.get(), input_desc.get(), input_cost.get()
+            bnf_idx_select = bnf_idx_select.get()
+            bnfs = the_company.benefits
+
+            # for message box later
+            bnf_name = bnfs[bnf_idx_select].name if mode == 3 else ""
+
+            match mode:
+                case 1:  # add
+                    new_benefit = BenefitPlan()
+                    new_benefit.set_name(name)
+                    new_benefit.set_description(desc)
+                    new_benefit.set_cost(float(cost))
+                    if (not name) and (not desc) and (not cost):
+                        msgbox.showerror("Error", "Please fill in all fields")
+
+                    the_company.benefits.append(new_benefit)
+                    if os.getenv("HRMGR_DB") == "TRUE":
+                        benefit_repo.insert_one(new_benefit.dict(by_alias=True))
+
+                case 2:  # remove
+                    selected_bnf = bnfs[bnf_idx_select]
+                    bnf_name = selected_bnf.name
+
+                    if bnf_idx_select is None:
+                        msgbox.showerror("Error", "Please select a benefit plan to remove")
+                        return
+
+                    # remove the benefit from the company
+                    the_company.benefits.remove(the_company.benefits[bnf_idx_select])
+                    if os.getenv("HRMGR_DB") == "TRUE":
+                        benefit_repo.delete_one({"_id": selected_bnf.id})
+
+                    # remove the benefit from employees
+                    for empl in the_company.employees:
+                        if selected_bnf.name not in empl.benefits:
+                            continue
+                        empl.benefits.remove(selected_bnf.name)
+                        if os.getenv("HRMGR_DB") == "TRUE":
+                            employee_repo.update_one(
+                                {"_id": empl.id}, {"$set": empl.dict(include={"benefits"})}, upsert=True
+                            )
+
+                case 3:  # modify
+                    if bnf_idx_select is None:
+                        msgbox.showerror("Error", "Please select a benefit plan to modify")
+                        return
+                    if (not name) and (not desc) and (not cost):
+                        msgbox.showerror("Error", "Please fill in at least one field")
+                        return
+                    selected_bnf = the_company.benefits[bnf_idx_select]
+                    selected_bnf.set_name(name) if name else None
+                    selected_bnf.set_description(desc) if desc else None
+                    selected_bnf.set_cost(float(cost)) if cost else None
+
+                    if os.getenv("HRMGR_DB") == "TRUE":
+                        benefit_repo.update_one(
+                            {"_id": selected_bnf.id}, {"$set": selected_bnf.dict(by_alias=True)}, upsert=True
+                        )
+
+            msgbox.showinfo("Success", f"Benefit plan {bnf_name} has been {['added', 'removed', 'modified'][mode - 1]}")
+
+            self.__clear_right_frame()
+            self.__admin_add_rm_modify(mode)
+
+        ctk.CTkButton(master=main_frame, text="Submit", command=_submit_handler, **btn_action_style).grid(
+            row=5, column=0, columnspan=3, pady=20
+        )
+        # endregion
+
+    def __admin_apply_rm(self, current_submenu: int = 1):
+        # 0: 2 buttons: apply, remove
+        # 1: Table to choose employee | Table to choose benefit
+        # 2: - if in apply: Apply button
+        #    - if in remove: Benefits of this employee | Remove button
+
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
+
+        # because later we will have index of benefits (in empl || not in empl), not the list of benefits in the company
+        custom_bnfs: list[BenefitPlan] = []
+        custom_bnf_items = tuple()
+
+        # region: when user select an employee, update the benefits list
+        bnf_idx_select = ctk.IntVar()
+        bnf_list_frame = ctk.CTkBaseClass(None)
+
+        empl_idx_select = ctk.IntVar()
+
+        def _update_bnf_list():
+            nonlocal bnf_idx_select, empl_idx_select, current_submenu, custom_bnf_items, bnf_list_frame, custom_bnfs
+
+            # get the employee
+            selected_empl = the_company.employees[empl_idx_select.get()]
+
+            bnfs = the_company.benefits
+            custom_bnfs = [bnf for bnf in bnfs if (current_submenu == 1) ^ (bnf.name in selected_empl.benefits)]
+            # Explanation:
+            # the ^ operator is XOR, which means it will return True if only one of the two operands is True
+            # so if it's in apply mode, we want to show only the benefits that are not in the employee's benefits list
+            # if it's in remove mode, we want to show only the benefits that are in the employee's benefits list
+
+            custom_bnf_items = tuple([f"{bnf.name} - {bnf.cost}" for bnf in custom_bnfs])
+
+            # this list will be refreshed every time user select an employee
+            bnf_list_frame.destroy()
+            bnf_list_frame = display_list(
+                _master=main_frame,
+                options=custom_bnf_items,
+                returned_idx=[bnf_idx_select],
+                err_msg="No benefits",
+                place=(1, 1),
+                colspan=1,
+                pady=0,
+            )
+
+        _update_bnf_list()
+        display_list(
+            _master=main_frame,
+            options=tuple([f"{empl.name} - {empl.employee_id}" for empl in the_company.employees]),
+            returned_idx=[empl_idx_select],
+            err_msg="No employees",
+            place=(1, 0),
+            colspan=(1 if len(the_company.employees) > 0 else 2),
+            cmd=_update_bnf_list,
+            pady=0,
+        )
+        # endregion
+
+        # region: 2 buttons to switch between apply and remove submenu
+        btn_apply = ctk.CTkButton(master=main_frame, text="Add benefit to employee", **btn_action_style)
+        btn_remove = ctk.CTkButton(master=main_frame, text="Remove benefit from employee", **btn_action_style)
+        btn_apply.grid(row=0, column=0, padx=(20, 10), pady=20)
+        btn_remove.grid(row=0, column=1, padx=(10, 20), pady=20)
+
+        def _switch_mode_handler():
+            nonlocal btn_apply, btn_remove, current_submenu, bnf_list_frame, _update_bnf_list
+            current_submenu = 3 - current_submenu
+
+            if current_submenu == 1:
+                btn_apply.configure(state=DISABLED)
+                btn_remove.configure(state=NORMAL)
             else:
-                # assign values to the benefit plan object
-                benefit.name = name
-                benefit.description = description
-                benefit.cost = cost
+                btn_apply.configure(state=NORMAL)
+                btn_remove.configure(state=DISABLED)
+            bnf_list_frame.destroy()
+            _update_bnf_list()
 
-                # add the benefit plan to the company and database
-                the_company.benefits.append(benefit)
+        _switch_mode_handler()
+        btn_apply.configure(command=_switch_mode_handler)
+        btn_remove.configure(command=_switch_mode_handler)
+        # endregion
+
+        # region: submit button
+        def _submit_handler():
+            nonlocal empl_idx_select, bnf_idx_select, current_submenu
+            selected_empl = the_company.employees[empl_idx_select.get()]
+            selected_bnf = custom_bnfs[bnf_idx_select.get()]
+
+            if current_submenu == 1:  # apply
+                if not the_company.can_modify("benefits", selected_empl):
+                    msgbox.showerror("Error", "Cannot modify benefits")
+                    self.__clear_right_frame()
+                    self.__admin_apply_rm(current_submenu)
+                    return
+
+                selected_empl.benefits.append(selected_bnf.name)
+                selected_bnf.enrolled_employees.append(selected_empl)
 
                 if os.getenv("HRMGR_DB") == "TRUE":
-                    benefit_repo.insert_one(benefit.dict(by_alias=True))
-                msgbox.showinfo("Success", "Benefit Plan added successfully")
+                    employee_repo.update_one(
+                        {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"benefits"})}, upsert=True
+                    )
+                    benefit_repo.update_one(
+                        {"_id": selected_bnf.id}, {"$set": selected_bnf.dict(include={"enrolled_employees"})}, upsert=True
+                    )
 
-    def __admin_remove_benefit_plan(self):
-        self.button2_frame = ctk.CTkFrame(master=self.right_frame)
+            elif current_submenu == 2:  # remove
+                selected_empl.benefits.remove(selected_bnf.name)
+                selected_bnf.enrolled_employees.remove(selected_empl)
 
-        self.label = ctk.CTkLabel(master=self.button2_frame, text="Remove Benefit Plan", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+                if os.getenv("HRMGR_DB") == "TRUE":
+                    employee_repo.update_one(
+                        {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"benefits"})}, upsert=True
+                    )
+                    benefit_repo.update_one(
+                        {"_id": selected_bnf.id}, {"$set": selected_bnf.dict(include={"enrolled_employees"})}, upsert=True
+                    )
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Benefit Plan ID: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.145, rely=0.15, anchor=tkinter.CENTER)
+            msgbox.showinfo(
+                "Success",
+                "Benefit plan {} {} employee {} successfully".format(
+                    selected_bnf.name, "added to" if current_submenu == 1 else "removed from", selected_empl.name
+                ),
+            )
 
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
+            self.__clear_right_frame()
+            self.__admin_apply_rm(current_submenu)
 
-        self.button = ctk.CTkButton(master=self.right_frame, text="Remove", fg_color="red", command=(lambda: remove_successfully(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
+        ctk.CTkButton(master=main_frame, text="Submit", command=_submit_handler, **btn_action_style).grid(
+            row=2, column=0, columnspan=2, pady=20
+        )
+        # endregion
 
-        self.button2_frame.pack(pady=20)
+    def __request(self):
+        # 0: Table to choose benefit
+        # 1: Request button
 
-        def remove_successfully(self):
-            benefit_name = self.entry1.get()
-            
-            if benefit_name == "":
-                msgbox.showerror("Error", "Please fill in all the fields")
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
 
-            for bp in the_company.benefits:
-                if bp.name == benefit_name:
-                    the_company.benefits.remove(bp)
-                    if os.getenv("HRMGR_DB") == "TRUE":
-                        benefit_repo.delete_one({"name": bp.name})
-                    msgbox.showinfo("Success", "Benefit Plan removed successfully")
-                    break
-            else:
-                msgbox.showerror("Error", "Benefit Plan not found")        
+        # region: variables
+        bnf_idx_select = ctk.IntVar()
+        bnfs_empl_not_in = tuple(
+            bnf for bnf in the_company.benefits if bnf.name not in the_company.logged_in_employee.benefits
+        )
+        # endregion
 
-    def __admin_update_benefit_plan(self):
-        self.button3_frame = ctk.CTkFrame(master=self.right_frame)
+        # region: table to choose benefit
+        display_list(
+            _master=main_frame,
+            options=tuple(f"{bnf.name} - {bnf.cost}" for bnf in bnfs_empl_not_in),
+            returned_idx=[bnf_idx_select],
+            err_msg="No benefits",
+            place=(0, 0),
+            colspan=1,
+            pady=(20, 0),
+        )
+        # endregion
 
-        self.label = ctk.CTkLabel(master=self.button3_frame, text="Update Information", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
+        # region: request button
+        def _request_handler():
+            nonlocal bnf_idx_select
+            selected_bnf = bnfs_empl_not_in[bnf_idx_select.get()]
 
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Benefit Plan Name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.175, rely=0.15, anchor=tkinter.CENTER)
-        
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter name")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-                        
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="New name: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.135, rely=0.275, anchor=tkinter.CENTER)
-
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter new name")
-        self.__style_input_box(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
-
-        self.label3 = ctk.CTkLabel(master=self.right_frame, text="New Description: ", font=("Century Gothic", 20, "italic"))
-        self.label3.place(relx=0.175, rely=0.4, anchor=tkinter.CENTER)
-
-        self.entry3 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter new description")
-        self.__style_input_box(self.entry3)
-        self.entry3.place(relx=0.325, rely=0.445, anchor=tkinter.CENTER)
-
-        self.label4 = ctk.CTkLabel(master=self.right_frame, text="New cost: ", font=("Century Gothic", 20, "italic"))
-        self.label4.place(relx=0.135, rely=0.525, anchor=tkinter.CENTER)
-
-        self.entry4 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter new cost")
-        self.__style_input_box(self.entry4)
-        self.entry4.place(relx=0.325, rely=0.57, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="Update", command=(lambda: update_successfully(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.675, anchor=tkinter.CENTER)
-
-        self.button3_frame.pack(pady=20)
-
-        def update_successfully(self):
-            input_benefit_name = self.entry1.get()
-            new_name = self.entry2.get()
-            new_description = self.entry3.get()
-            new_cost = self.entry4.get()
-            
-            if input_benefit_name == "" or new_name == "" or new_description == "" or new_cost == "": 
-                msgbox.showerror("Error", "Please fill in all the fields")
-            elif not new_name.isalpha():
-                msgbox.showerror("Error", "Please enter a valid name")
-            elif not new_cost.isdigit():
-                msgbox.showerror("Error", "Please enter a valid cost")
-            else:
-                for bp in the_company.benefits:
-                    if bp.name == input_benefit_name:
-                        if new_name != "":
-                            bp.name = new_name
-                            if os.getenv("HRMGR_DB") == "TRUE":
-                                benefit_repo.update_one({"name": bp.name}, {"$set": {"name": new_name}})
-                        if new_description != "":
-                            bp.description = new_description
-                            if os.getenv("HRMGR_DB") == "TRUE":
-                                benefit_repo.update_one({"name": bp.name}, {"$set": {"description": new_description}})
-                        if new_cost != "":
-                            bp.cost = new_cost
-                            if os.getenv("HRMGR_DB") == "TRUE":
-                                benefit_repo.update_one({"name": bp.name}, {"$set": {"cost": new_cost}})
-                msgbox.showinfo("Success", "Benefit Plan Updated")
-
-    def __admin_apply_benefit_plan(self):
-        self.button5_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button5_frame, text="Apply Benefit Plan", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Benefit Plan Name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.175, rely=0.15, anchor=tkinter.CENTER)
-    
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter name")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
-        self.label2 = ctk.CTkLabel(master=self.right_frame, text="Employee ID: ", font=("Century Gothic", 20, "italic"))
-        self.label2.place(relx=0.135, rely=0.275, anchor=tkinter.CENTER)
-
-        self.entry2 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter ID")
-        self.__style_input_box(self.entry2)
-        self.entry2.place(relx=0.325, rely=0.32, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="Apply", command=(lambda: apply_successfully(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10, fg_color="purple")
-        self.button.place(relx=0.5, rely=0.425, anchor=tkinter.CENTER)
-
-        self.button5_frame.pack(pady=20)
-
-        def apply_successfully(self):
-            input_benefit_id = self.entry1.get()
-            input_employee_id = self.entry2.get()
-            
-            if input_benefit_id == "" or input_employee_id == "":
-                msgbox.showerror("Error", "Please fill in all the fields")
+            if the_company.logged_in_employee in selected_bnf.pending_requests:
+                msgbox.showinfo("Error", "You have already requested this benefit")
                 return
-            
-            for bp in the_company.benefits:
-                if bp.id != input_benefit_id:
-                    continue
-                for emp in the_company.employees:
-                    if emp.id != input_employee_id:
-                        continue
-                    emp.benefits.append(bp.name)
-                    bp.enrolled_employees.append(emp)
-                    msgbox.showinfo("Success", "Benefit Plan applied successfully")
-                    if os.getenv("HRMGR_DB") == "TRUE":
-                        employee_repo.update_one({"id": emp.id}, {"$set": {"benefits": emp.benefits}})
-                        benefit_repo.update_one({"id": bp.id}, {"$set": {"enrolled_employees": bp.enrolled_employees}})
-            else:
-                msgbox.showerror("Error", "Benefit Plan or Employee does not exist")
 
-    def __admin_view_benefit_plan(self):
-        self.button2_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button2_frame, text="View Benefit Plan", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Benefit Plan Name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.175, rely=0.15, anchor=tkinter.CENTER)
-        
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Name")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)    
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="View", fg_color="purple", command=(lambda: view_benefit(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
-
-        self.button2_frame.pack(pady=20)
-
-        def view_benefit(self):
-            benefit_name = self.entry1.get()
-            benefits = the_company.benefits
-            
-            if benefit_name == "":
-                msgbox.showerror("Error", "Please fill in all the fields")
-            else:
-                for bp in benefits:
-                    if bp.name == benefit_name:
-                        msgbox.showinfo("Benefit Plan", f"Name: {bp.name}\nDescription: {bp.description}\nCost: {bp.cost}")
-                        break
-                else:
-                    msgbox.showerror("Error", "Benefit Plan does not exist")
-                
-    def __admin_list_all_plans(self):
-        self.button3_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button3_frame, text="List All Benefit Plans", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="List", fg_color="purple", command=(lambda: list_benefits(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button.place(relx=0.5, rely=0.15, anchor=tkinter.CENTER)
-
-        self.button3_frame.pack(pady=20)
-
-        def list_benefits(self):
-            benefits = the_company.benefits
-            if len(benefits) == 0:
-                msgbox.showerror("Error", "There are no benefit plans")
-            else:
-                msgbox.showinfo("Benefit Plans", f"Benefit Plans: {[bp.name for bp in benefits]}")
-
-    def __admin_request_to_enroll(self):
-        self.button4_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button4_frame, text="Request to Enroll", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Benefit Plan: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.175, rely=0.15, anchor=tkinter.CENTER)
-    
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Name")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="Request", fg_color="purple", command=lambda self=self: request_benefit(self))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
-
-        self.button4_frame.pack(pady=20)
-
-        def request_benefit(self):
-            benefit_name = self.entry1.get()
-            benefits = the_company.benefits
-            if benefit_name == "":
-                msgbox.showerror("Error", "Please fill in all the fields")
-            else:
-                for bp in benefits:
-                    if bp.name == benefit_name:
-                        if bp.name in the_company.benefits:
-                            msgbox.showerror("Error", "You have already requested to enroll in this benefit plan")
-                        else:
-                            msgbox.showinfo("Success", "Request sent successfully")
-                else:
-                    msgbox.showerror("Error", "Benefit Plan does not exist")
-
-    def __admin_resolve_pending_request(self):
-        self.button5_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button5_frame, text="Resolve Pending Request", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Select a Benefit Plan: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.145, rely=0.15, anchor=tkinter.CENTER)
-
-        self.entry1 = ctk.CTkComboBox(master=self.right_frame)
-        self.entry1.configure(width=400, height=30, font=("Century Gothic", 14), corner_radius=10)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
-        benefits = the_company.benefits
-        # a list containing the name of each benefit
-        benefit_items = [f"{benefit.name}" for benefit in benefits]
-        # set the combobox values to the list of benefit items
-        self.entry1["values"] = benefit_items
-
-        self.button1 = ctk.CTkButton(master=self.right_frame, text="Approve", fg_color="purple")
-        self.button1.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button1.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
-
-        self.button2 = ctk.CTkButton(master=self.right_frame, text="Deny", fg_color="purple")
-        self.button2.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button2.place(relx=0.5, rely=0.395, anchor=tkinter.CENTER)
-
-        self.button5_frame.pack(pady=20)
-
-        def resolve_request(self):
-            selection = self.entry1.get()
-            benefits = the_company.benefits
-            # a list containing the name of each benefit
-            benefit_items = [f"{benefit.name}" for benefit in benefits]
-            # get the index of the benefit selected by the user
-            benefit_index = benefit_items.index(selection)
-            # get the benefit object
-            benefit = benefits[benefit_index]
-            # get the employee object
-            employee = benefit.pending_requests[0]
-            # remove the employee from the pending requests list
-            benefit.pending_requests.remove(employee)
-            # add the employee to the enrolled employees list if approved
-            if self.button1["text"] == "Approve":
-                benefit.enrolled_employees.append(employee)
-                # show a success message
-                msgbox.showinfo("Request", f"{employee.name} has been enrolled in {benefit.name}")
-
-    # endregion
-
-    # region: employee functions
-
-    def __employee_view_benefit_plan(self):
-        self.button2_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button2_frame, text="View Benefit Plan", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Benefit Plan Name: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.175, rely=0.15, anchor=tkinter.CENTER)
-        
-        self.entry1 = ctk.CTkEntry(master=self.right_frame, placeholder_text="Enter Name")
-        self.__style_input_box(self.entry1)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)    
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="View", fg_color="purple", command=(lambda: view_benefit(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
-
-        self.button2_frame.pack(pady=20)
-
-        def view_benefit(self):
-            benefit_name = self.entry1.get()
-            benefits = the_company.benefits
-            
-            if benefit_name == "":
-                msgbox.showerror("Error", "Please fill in all the fields")
-            else:
-                for bp in benefits:
-                    if bp.name == benefit_name:
-                        msgbox.showinfo("Benefit Plan", f"Name: {bp.name}\nDescription: {bp.description}\nCost: {bp.cost}")
-                        break
-                else:
-                    msgbox.showerror("Error", "Benefit Plan does not exist")
-
-    def __employee_list_all_plans(self):
-        self.button3_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button3_frame, text="List All Benefit Plans", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="List", fg_color="purple", command=(lambda: list_benefits(self)))
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button.place(relx=0.5, rely=0.15, anchor=tkinter.CENTER)
-
-        self.button3_frame.pack(pady=20)
-
-        def list_benefits(self):
-            benefits = the_company.benefits
-            if len(benefits) == 0:
-                msgbox.showerror("Error", "There are no benefit plans")
-            else:
-                msgbox.showinfo("Benefit Plans", f"Benefit Plans: {[bp.name for bp in benefits]}")
-
-    def __employee_request_to_enroll(self):
-        self.button4_frame = ctk.CTkFrame(master=self.right_frame)
-
-        self.label = ctk.CTkLabel(master=self.button4_frame, text="Request to Enroll", font=("Century Gothic", 30, "bold"))
-        self.label.pack()
-
-        self.label1 = ctk.CTkLabel(master=self.right_frame, text="Select a Benefit Plan: ", font=("Century Gothic", 20, "italic"))
-        self.label1.place(relx=0.145, rely=0.15, anchor=tkinter.CENTER)
-
-        self.entry1 = ctk.CTkComboBox(master=self.right_frame)
-        self.entry1.configure(width=400, height=30, font=("Century Gothic", 14), corner_radius=10)
-        self.entry1.place(relx=0.325, rely=0.195, anchor=tkinter.CENTER)
-
-        benefits = the_company.benefits
-        # a list containing the string representation of each benefit
-        benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
-        # set the combobox values to the list of benefit items
-        self.entry1["values"] = benefit_items
-
-        self.button = ctk.CTkButton(master=self.right_frame, text="Request", fg_color="purple")
-        self.button.configure(width=100, height=40, font=("Century Gothic", 15, "bold"), corner_radius=10)
-        self.button.place(relx=0.5, rely=0.295, anchor=tkinter.CENTER)
-
-        self.button4_frame.pack(pady=20)
-
-        def request_benefit(self):
-            selection = self.entry1.get()
-            benefits = the_company.benefits
-            # a list containing the string representation of each benefit
-            benefit_items = [f"{benefit.name} ({benefit.cost})" for benefit in benefits]
-            # get the index of the benefit selected by the user
-            benefit_index = benefit_items.index(selection)
-            # get the benefit object
-            benefit = benefits[benefit_index]
-            # append request to pending_request
-            benefit.pending_requests.append(the_company.logged_in_employee)
+            selected_bnf.pending_requests.append(the_company.logged_in_employee)
 
             if os.getenv("HRMGR_DB") == "TRUE":
-                benefit_repo.update_one({"_id": benefit.id}, {"$set": benefit.dict(include={"pending_requests"})}, upsert=True)
-            # show a success message
-            msgbox.showinfo("Request", f"Request to enroll in {benefit.name} has been sent to HR Manager")
+                benefit_repo.update_one(
+                    {"_id": selected_bnf.id}, {"$set": selected_bnf.dict(include={"pending_requests"})}, upsert=True
+                )
+            msgbox.showinfo("Success", f"Benefit plan {selected_bnf.name} requested")
+            merge_callable(self.__clear_right_frame, self.__request)()
 
-    # endregion
+        btn_request = ctk.CTkButton(master=main_frame, text="Request", command=_request_handler, **btn_action_style)
+        btn_request.grid(row=1, column=0, pady=20)
+        if len(bnfs_empl_not_in) == 0:
+            btn_request.configure(state=DISABLED)
+
+        # endregion
+
+    def __admin_resolve(self):
+        # 0: Table to choose benefit | Table to choose employee
+        # 1: Approve button | Reject button
+
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
+
+        # region: variables
+        # we need them here to disable the buttons when there is no pending request
+        btn_approve = ctk.CTkButton(master=main_frame, text="Approve", **btn_action_style)
+        btn_reject = ctk.CTkButton(master=main_frame, text="Reject", **btn_action_style)
+
+        bnf_idx_select = ctk.IntVar()
+        empl_idx_select = ctk.IntVar()
+
+        bnfs_have_pending: list[BenefitPlan] = []
+        bnf_item_have_pending: tuple[str] = tuple()
+
+        # this changes every time the user select a benefit
+        pending_empls: list[Employee] = []
+        empl_list_frame = ctk.CTkBaseClass(None)
+        # endregion
+
+        # region: when user select a benefit, update the employee list
+        def _update_empl_list():
+            nonlocal empl_idx_select, bnfs_have_pending, bnf_item_have_pending, pending_empls, empl_list_frame
+            bnfs_have_pending = [bnf for bnf in the_company.benefits if bnf.pending_requests]
+
+            if len(bnfs_have_pending) == 0:
+                btn_approve.configure(state=DISABLED)
+                btn_reject.configure(state=DISABLED)
+                return
+
+            bnf_item_have_pending = tuple(f"{bnf.name} - {bnf.cost}" for bnf in bnfs_have_pending)
+            pending_empls = bnfs_have_pending[bnf_idx_select.get()].pending_requests
+
+            empl_list_frame.destroy()
+            empl_list_frame = display_list(
+                _master=main_frame,
+                options=tuple(f"{empl.name} - {empl.employee_id}" for empl in pending_empls),
+                returned_idx=[empl_idx_select],
+                err_msg="No pending requests",
+                place=(0, 1),
+                colspan=1,
+                pady=(20, 0),
+            )
+
+        _update_empl_list()
+
+        display_list(
+            _master=main_frame,
+            options=bnf_item_have_pending,
+            returned_idx=[bnf_idx_select],
+            err_msg="No employees requesting",
+            place=(0, 0),
+            colspan=(1 if len(bnf_item_have_pending) > 0 else 2),
+            cmd=_update_empl_list,
+            pady=(20, 0),
+        )
+        # endregion
+
+        # region: approve button | reject button
+        btn_approve.grid(row=1, column=0, pady=20)
+        btn_reject.grid(row=1, column=1, pady=20)
+
+        def _action_handler(mode: int):
+            nonlocal bnf_idx_select, empl_idx_select, bnfs_have_pending, pending_empls
+            selected_bnf = bnfs_have_pending[bnf_idx_select.get()]
+            selected_empl = pending_empls[empl_idx_select.get()]
+
+            if not the_company.can_modify("benefits", selected_empl):
+                msgbox.showinfo("Error", "You do not have permission to modify this employee")
+                return
+
+            if mode == 1:
+                selected_empl.benefits.append(selected_bnf.name)
+                selected_bnf.enrolled_employees.append(selected_empl)
+                selected_bnf.pending_requests.remove(selected_empl)
+            elif mode == 0:
+                selected_bnf.pending_requests.remove(selected_empl)
+
+            if os.getenv("HRMGR_DB") == "TRUE":
+                if mode == 0:  # only remove from pending
+                    benefit_repo.update_one(
+                        {"_id": selected_bnf.id}, {"$set": selected_bnf.dict(include={"pending_requests"})}, upsert=True
+                    )
+                elif mode == 1:  # remove from pending and add to enrolled
+                    benefit_repo.update_one(
+                        {"_id": selected_bnf.id},
+                        {"$set": selected_bnf.dict(include={"pending_requests", "enrolled_employees"})},
+                        upsert=True,
+                    )
+                    employee_repo.update_one(
+                        {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"benefits"})}, upsert=True
+                    )
+
+            msgbox.showinfo(
+                "Success",
+                f"Benefit plan {selected_bnf.name} {'approved' if mode == 1 else 'rejected'} for {selected_empl.name}",
+            )
+            merge_callable(self.__clear_right_frame, self.__admin_resolve)()
+
+        btn_approve.configure(command=lambda: _action_handler(1))
+        btn_reject.configure(command=lambda: _action_handler(0))
+        # endregion
+
+    def __view_details(self):
+        # 0: List of benefits | List of employees enrolled in that benefit
+        # 1: Description of benefit
+
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
+
+        # region: variables
+        bnf_idx_select = ctk.IntVar()
+        empl_list_frame = ctk.CTkBaseClass(None)
+        bnf_detail_widget = ctk.CTkLabel(master=main_frame)
+        # endregion
+
+        # region: when user select a benefit, update the employee list
+        bnfs_items = tuple(f"{bnf.name} - {bnf.cost}" for bnf in the_company.benefits)
+
+        def _update_empl_list():
+            nonlocal bnf_idx_select, bnfs_items, bnf_detail_widget, empl_list_frame
+            if len(bnfs_items) == 0:
+                return
+            selected_bnf = the_company.benefits[bnf_idx_select.get()]
+            empl_list_frame.destroy()
+            empl_list_frame = display_list(
+                _master=main_frame,
+                options=tuple(f"{empl.name} - {empl.employee_id}" for empl in selected_bnf.enrolled_employees),
+                err_msg="No employees enrolled",
+                place=(0, 1),
+                colspan=1,
+                padx=(0, 20),
+            )
+
+            # update description
+            bnf_detail_widget.destroy()
+            bnf_detail_widget = ctk.CTkLabel(
+                master=main_frame, text=(selected_bnf.description if selected_bnf.description else "No description")
+            )
+            bnf_detail_widget.grid(row=1, column=0, columnspan=2, pady=(0, 20), padx=20)
+
+        _update_empl_list()
+        display_list(
+            _master=main_frame,
+            options=bnfs_items,
+            returned_idx=[bnf_idx_select],
+            err_msg="No benefits",
+            place=(0, 0),
+            colspan=(1 if len(bnfs_items) > 0 else 2),
+            cmd=_update_empl_list,
+        )
+        # endregion
+
+    def __admin_empls_w_o_benefit(self):
+        main_frame = ctk.CTkFrame(master=self.right_frame)
+        main_frame.grid(row=0, column=0)
+        display_list(
+            _master=main_frame,
+            options=tuple(f"{e.name} - {e.employee_id}" for e in the_company.employees if len(e.benefits) == 0),
+            err_msg="No employees",
+            place=(1, 0),
+            colspan=1,
+        )

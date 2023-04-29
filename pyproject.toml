@@ -1,8 +1,8 @@
 [tool.black]
-line-length = 150
+line-length = 125
 
 [tool.ruff]
-line-length = 150
+line-length = 125
 # ignore glob undefined names, bare excepts, line too long errors
 ignore = ["F405", "F403", "E501", "E722"]
 

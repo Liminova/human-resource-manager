@@ -4,7 +4,7 @@ import sys
 import os
 import textwrap
 
-from frontend.helpers import *
+from frontend.helpers_tui import *
 from frontend.tui import *
 from models import Company, Employee, BenefitPlan, Department
 from dotenv import load_dotenv
@@ -39,7 +39,7 @@ def initialize_data():
 
 
 def main():
-    last_msg: str = ""
+    last_msg = ""
     # fmt: off
     if (
         not os.getenv("MONGO_USER")
@@ -78,13 +78,25 @@ def main():
         first_account_name_is_owner = the_company.employees[0].name == "Owner"
         only_one_owner = len([employee for employee in the_company.employees if employee.name == "Owner"]) == 1
         if not first_account_is_admin:
-            print(FCOLORS.RED + "WARNING: The first account is not an admin! Contact the IT department immediately!" + FCOLORS.END)
+            print(
+                FCOLORS.RED
+                + "WARNING: The first account is not an admin! Contact the IT department immediately!"
+                + FCOLORS.END
+            )
             raise KeyboardInterrupt
         if not first_account_name_is_owner:
-            print(FCOLORS.RED + "WARNING: The first account's name is not 'Owner'! Contact the IT department immediately!" + FCOLORS.END)
+            print(
+                FCOLORS.RED
+                + "WARNING: The first account's name is not 'Owner'! Contact the IT department immediately!"
+                + FCOLORS.END
+            )
             raise KeyboardInterrupt
         elif not only_one_owner:
-            print(FCOLORS.RED + "WARNING: There are more than one owner accounts! Contact the IT department immediately!" + FCOLORS.END)
+            print(
+                FCOLORS.RED
+                + "WARNING: There are more than one owner accounts! Contact the IT department immediately!"
+                + FCOLORS.END
+            )
             raise KeyboardInterrupt
 
     # ==========================
@@ -106,10 +118,10 @@ def main():
 
     while is_logged_in:
         clrscr()
-        last_msg: str = ""
+        last_msg = ""
         if last_msg:
             print(last_msg)
-            last_msg: str = ""
+            last_msg = ""
         main_menu = [
             "[1] Employee management",
             "[2] Benefit plan management",
@@ -122,7 +134,7 @@ def main():
         user_choice = get_user_option_from_menu("Main menu", main_menu)
 
         if user_choice in [3, 4, 6] and not the_company.employees:
-            last_msg: str = NO_EMPLOYEE_MSG
+            last_msg = NO_EMPLOYEE_MSG
             continue
 
         respond: Result[None, str] = Ok(None)
@@ -142,11 +154,11 @@ def main():
             case 7:
                 break
             case _:
-                last_msg: str = FCOLORS.RED + "Invalid choice!" + FCOLORS.END
+                last_msg = FCOLORS.RED + "Invalid choice!" + FCOLORS.END
         try:
             respond.unwrap()
         except (ValueError, TypeError) as e:
-            last_msg: str = str(e)
+            last_msg = str(e)
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ import sys
 from option import Result, Ok, Err
 import textwrap
 from pydantic import BaseModel, Field
-from frontend.helpers import styling
+from frontend.helpers_tui import styling
 
 if sys.version_info >= (3, 11):
     from typing import Self, TYPE_CHECKING

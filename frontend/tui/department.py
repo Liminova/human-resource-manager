@@ -1,8 +1,9 @@
+from __future__ import annotations
 import os
 
-from ..helpers import *
+from ..helpers_tui import *
 from models import Department, Company
-from database.mongo import department_repo, employee_repo
+from database.mongo import department_repo, employee_repo  # type: ignore
 from option import Result, Ok
 
 the_company: Company = Company()
@@ -10,260 +11,268 @@ the_company: Company = Company()
 
 class MenuDepartment:
     def __init__(self) -> None:
-        if the_company.logged_in_employee.is_admin:
-            self.mainloop = self.admin
-        else:
-            self.mainloop = self.employee
+        self.mainloop = self.admin if the_company.logged_in_employee.is_admin else self.employee
 
     def admin(self) -> Result[None, str]:
-        last_msg: str = ""
+        last_msg = ""
         while True:
-            clrscr()
-            if last_msg:
-                print(last_msg)
-                last_msg: str = ""
+            last_msg = refresh(last_msg)
             department_menu = [
-                "[1] Add department",
-                "[2] Remove department",
-                "[3] Update information for department",
-                "[4] Add employee to department",
-                "[5] Remove employee from department",
-                "[6] View details of department",
-                "[7] List all departments",
-                "[8] List employees without a department",
-                "[9] Back",
+                "[1] Add/remove/update",
+                "[2] Add/remove employee from department",
+                "[3] View details",
+                "[4] List empls w/o benefit	",
+                "[5] Back",
             ]
 
             choice = get_user_option_from_menu("Department management", department_menu)
             match choice:
                 case 1:
-                    last_msg: str = self.__add()
+                    clrscr()
+                    # fmt: off
+                    sub_choice = get_user_option_from_menu(
+                        "Add/remove/update department",
+                        [
+                            "[1] Add",
+                            "[2] Remove",
+                            "[3] Update",
+                            "[else] Back"
+                        ]
+                    )
+                    # fmt: on
+                    match sub_choice:
+                        case 1:
+                            last_msg = self.__add()
+                        case 2:
+                            last_msg = self.__remove()
+                        case 3:
+                            last_msg = self.__update()
+                        case _:
+                            last_msg = ""
                 case 2:
-                    last_msg: str = self.__remove()
+                    clrscr()
+                    # fmt: off
+                    sub_choice = get_user_option_from_menu(
+                        "Add/remove employee from department",
+                        [
+                            "[1] Add",
+                            "[2] Remove",
+                            "[else] Back"
+                        ]
+                    )
+                    # fmt: on
+                    match sub_choice:
+                        case 1:
+                            last_msg = self.__add_employee()
+                        case 2:
+                            last_msg = self.__remove_employee()
+                        case _:
+                            last_msg = ""
                 case 3:
-                    last_msg: str = self.__update()
+                    last_msg = self.__view()
                 case 4:
-                    last_msg: str = self.__add_employee()
+                    last_msg = self.__view_employees_without_dept()
                 case 5:
-                    last_msg: str = self.__remove_employee()
-                case 6:
-                    last_msg: str = self.__view()
-                case 7:
-                    last_msg: str = self.__view_all()
-                case 8:
-                    last_msg: str = self.__view_employees_not_belong_to_any_department()
-                case 9:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
         last_msg: str = ""
         while True:
-            clrscr()
-            if last_msg:
-                print(last_msg)
-                last_msg: str = ""
-            department_menu = ["[1] View details of one", "[2] List all", "[3] Back"]
-
+            last_msg = refresh(last_msg)
+            # fmt: off
+            department_menu = [
+                "[1] View details",
+                "[3] Back"
+            ]
+            # fmt: on
             choice = get_user_option_from_menu("Department management", department_menu)
             match choice:
                 case 1:
-                    last_msg: str = self.__view()
+                    last_msg = self.__view()
                 case 2:
-                    last_msg: str = self.__view_all()
-                case 3:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
         # create a new, empty department
         dept = Department()
 
-        # get user input for department name and ID
-        if (msg := loop_til_valid_input("Enter department name", dept.set_name)) != "":
-            return msg
-        if (msg := loop_til_valid_input("Enter department ID", dept.set_id)) != "":
-            return msg
-
-        if os.getenv("HRMGR_DB") == "TRUE":
-            department_repo.insert_one(dept.dict(by_alias=True))
+        # assign values to the department object
+        input_fields = [("Enter department name", dept.set_name), ("Enter department ID", dept.set_id)]
+        for promt, setter in input_fields:
+            if (msg := loop_til_valid_input(promt, setter)) != "":
+                return msg
 
         # add the department to the company
         the_company.departments.append(dept)
+        if os.getenv("HRMGR_DB") == "TRUE":
+            department_repo.insert_one(dept.dict(by_alias=True))  # type: ignore
+
         return f"Department {FCOLORS.GREEN}{dept.name}{FCOLORS.END} added successfully!"
 
     def __remove(self) -> str:
         depts = the_company.departments
         empls = the_company.employees
 
-        # a list containing the string representation of each department
-        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in depts]
-        dept_selected_index = get_user_option_from_list("Select a department to remove", dept_items)
-        if dept_selected_index == -1:
-            return NO_DEPARTMENT_MSG
-        elif dept_selected_index == -2:
-            return ""
-
-        # get the department name and ID to return a message before removing it
-        dept_name = depts[dept_selected_index].name
-        dept_id = depts[dept_selected_index].dept_id
+        # get the index of the department selected by the user
+        dept_idx_select = get_user_option_from_list(
+            # "Select a department to remove", [f"{dept.name} ({dept.dept_id})" for dept in depts]
+            "Select a department to remove",
+            tuple(f"{dept.name} ({dept.dept_id})" for dept in depts),
+        )
+        if dept_idx_select in (-1, -2):
+            return NO_DEPARTMENT_MSG if dept_idx_select == -1 else ""
+        _dept = depts[dept_idx_select]
 
         # remove the department id from all employees in the department
-        for employee in empls:
-            if employee.department_id == depts[dept_selected_index].dept_id:
-                employee.set_department("").unwrap()
-                if os.getenv("HRMGR_DB") == "TRUE":
-                    employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"department_id"})}, upsert=True)
+        for emp in empls:
+            if emp.department_id != _dept.dept_id:
+                continue
+            emp.department_id = ""
+            if os.getenv("HRMGR_DB") == "TRUE":
+                employee_repo.update_one({"_id": emp.id}, {"$set": emp.dict(exclude={"id"}, by_alias=True)}, upsert=True)
 
         # remove the department from the company
-        del depts[dept_selected_index]
+        depts.remove(_dept)
         if os.getenv("HRMGR_DB") == "TRUE":
-            department_repo.delete_one({"_id": depts[dept_selected_index].id})
+            department_repo.delete_one({"_id": _dept.id})
 
-        return f"Department {FCOLORS.RED}{dept_name}{FCOLORS.END} ({FCOLORS.RED}{dept_id}{FCOLORS.END}) removed successfully!"
+        return f"Department {FCOLORS.RED}{_dept.name}{FCOLORS.END} removed successfully!"
 
     def __update(self) -> str:
         depts = the_company.departments
 
-        # a list containing the string representation of each department
-        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in depts]
-
         # get the index of the department to update
-        dept_selected_index = get_user_option_from_list("Select a department to update", dept_items)
-        if dept_selected_index == -1:
-            return NO_DEPARTMENT_MSG
-        elif dept_selected_index == -2:
-            return ""
+        dept_idx_select = get_user_option_from_list(
+            "Select a department to update", tuple(f"{dept.name} ({dept.dept_id})" for dept in depts)
+        )
+        if dept_idx_select in (-1, -2):
+            return NO_DEPARTMENT_MSG if dept_idx_select == -1 else ""
+        _dept = depts[dept_idx_select]
 
-        # get the department object to update
-        dept = depts[dept_selected_index]
+        # get the new values for the department
+        input_fields = [("Enter new department name", _dept.set_name), ("Enter new department ID", _dept.set_id)]
+        for promt, setter in input_fields:
+            if (msg := loop_til_valid_input(promt, setter)) != "":
+                return msg
 
-        # re-assign the department name and ID
-        if (msg := loop_til_valid_input("Enter department name", dept.set_name)) != "":
-            return msg
-        if (msg := loop_til_valid_input("Enter department ID", dept.set_id)) != "":
-            return msg
-
+        # update the department in the company
         if os.getenv("HRMGR_DB") == "TRUE":
-            department_repo.update_one({"_id": dept.id}, {"$set": dept.dict(exclude={"id"}, by_alias=True)}, upsert=True)
+            department_repo.update_one({"_id": _dept.id}, {"$set": _dept.dict(exclude={"id"}, by_alias=True)}, upsert=True)
 
-        return f"Department {FCOLORS.GREEN}{dept.name}{FCOLORS.END} updated successfully!"
+        return f"Department {FCOLORS.GREEN}{_dept.name}{FCOLORS.END} updated successfully!"
 
     def __add_employee(self) -> str:
         depts = the_company.departments
         empls = the_company.employees
 
-        # a list containing the string representation of each department
-        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in depts]
+        # get the index of the employee selected by the user
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to add to a department",
+            tuple(f"{employee.name} ({employee.employee_id})" for employee in empls),
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
-        # get the index of the department to update
-        dept_selected_index = get_user_option_from_list("Select a department to add an employee to", dept_items)
-        match dept_selected_index:
-            case -1:
-                return NO_DEPARTMENT_MSG
-            case -2:
-                return ""
+        if not the_company.can_modify("department", empls[empl_idx_select]):
+            return "Only other admins can manage departments!"
 
-        # get the index of the employee to add
-        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in empls]
-        employee_selected_index = get_user_option_from_list("Select an employee to add to the department", employee_items)
-        match employee_selected_index:
-            case -1:
-                return NO_EMPLOYEE_MSG
-            case -2:
-                return ""
+        # get the index of the department selected by the user
+        dept_idx_select = get_user_option_from_list(
+            "Select a department to add the employee to", tuple(f"{dept.name} ({dept.dept_id})" for dept in depts)
+        )
+        if dept_idx_select in (-1, -2):
+            return NO_DEPARTMENT_MSG if dept_idx_select == -1 else ""
 
-        if not the_company.can_modify("department", empls[employee_selected_index]):
-            return "You do not have permission to modify this employee's department!"
+        _dept = depts[dept_idx_select]
+        _empl = empls[empl_idx_select]
 
-        # add the employee to the department, department ID to the employee
-        employee = empls[employee_selected_index]
-        department = depts[dept_selected_index]
+        # check if the employee is already in the department
+        if _empl.department_id == _dept.dept_id:
+            return "Employee {}{}{} is already in department {}{}{}!".format(
+                FCOLORS.GREEN, _empl.name, FCOLORS.END, FCOLORS.GREEN, _dept.name, FCOLORS.END
+            )
 
-        employee.set_department(department.dept_id).unwrap()
-        department.members.append(employee)
+        # add the employee to the department and vice versa
+        _empl.department_id = _dept.dept_id
+        _dept.members.append(_empl)
+
+        # update DB
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"department_id"})}, upsert=True)
-            department_repo.update_one({"_id": department.id}, {"$set": department.dict(include={"members"})}, upsert=True)
+            employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(exclude={"id"}, by_alias=True)}, upsert=True)
+            department_repo.update_one({"_id": _dept.id}, {"$set": _dept.dict(exclude={"id"}, by_alias=True)}, upsert=True)
 
-        return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.id}{FCOLORS.END}) added to department {FCOLORS.GREEN}{department.name}{FCOLORS.END} ({FCOLORS.GREEN}{department.id}{FCOLORS.END}) successfully!"
+        return f"Employee {FCOLORS.GREEN}{_empl.name}{FCOLORS.END} added to department {FCOLORS.GREEN}{_dept.name}{FCOLORS.END} successfully!"
 
     def __remove_employee(self) -> str:
         depts = the_company.departments
         empls = the_company.employees
 
-        # a list containing the string representation of each department
-        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in depts]
+        # get the index of the employee selected by the user
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to remove from a department",
+            tuple(f"{employee.name} ({employee.employee_id})" for employee in empls),
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
-        # get the index of the department to update
-        dept_selected_index = get_user_option_from_list("Select a department to remove an employee from", dept_items)
-        match dept_selected_index:
-            case -1:
-                return NO_DEPARTMENT_MSG
-            case -2:
-                return ""
+        # get the index of the department selected by the user
+        dept_idx_select = get_user_option_from_list(
+            "Select a department to remove the employee from", tuple(f"{dept.name} ({dept.dept_id})" for dept in depts)
+        )
+        if dept_idx_select in (-1, -2):
+            return NO_DEPARTMENT_MSG if dept_idx_select == -1 else ""
 
-        department = depts[dept_selected_index]
+        _empl = empls[empl_idx_select]
+        _dept = depts[dept_idx_select]
 
-        # get the index of the employee to remove
-        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in empls if employee.department_id == department.dept_id]
-        employee_selected_index = get_user_option_from_list("Select an employee to remove from the department", employee_items)
-        if employee_selected_index == -1:
-            return NO_EMPLOYEE_MSG
-        elif employee_selected_index == -2:
-            return ""
+        # remove the employee from the department and vice versa
+        if _empl.department_id == "":
+            return "Employee {}{}{} is not in a department!".format(FCOLORS.GREEN, _empl.name, FCOLORS.END)
+        else:
+            _empl.department_id = ""
+            _dept.members.remove(_empl)
 
-        if not the_company.can_modify("department", empls[employee_selected_index]):
-            return "Only the company owner can manage admins! You can only manage employees."
-
-        employee = empls[employee_selected_index + 1]
-
-        # remove the employee from the department
-        employee.set_department("").unwrap()
-        department.members.remove(employee)
+        # update DB
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"department_id"})}, upsert=True)
-            department_repo.update_one({"_id": department.id}, {"$set": department.dict(include={"members"})}, upsert=True)
+            employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(exclude={"id"}, by_alias=True)}, upsert=True)
+            department_repo.update_one({"_id": _dept.id}, {"$set": _dept.dict(exclude={"id"}, by_alias=True)}, upsert=True)
 
-        return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.employee_id}{FCOLORS.END}) removed from department {FCOLORS.GREEN}{department.name}{FCOLORS.END} ({FCOLORS.GREEN}{department.dept_id}{FCOLORS.END}) successfully!"
+        return "Employee {}{}{} removed from department {}{}{} successfully!".format(
+            FCOLORS.GREEN, _empl.name, FCOLORS.END, FCOLORS.GREEN, _dept.name, FCOLORS.END
+        )
 
     def __view(self) -> str:
         depts = the_company.departments
 
-        if not the_company.logged_in_employee.is_admin:
-            dept = [dept for dept in depts if dept.dept_id == the_company.logged_in_employee.department_id]
-            if len(dept) == 0:
-                return NO_DEPARTMENT_MSG
-            print(dept[0])
-        else:
-            # a list containing the string representation of each department
-            dept_items = [f"{dept.name} ({dept.dept_id})" for dept in depts]
+        # get the index of the department from the user
+        dept_idx_select = get_user_option_from_list(
+            "Select a department to view info", tuple(f"{dept.name} ({dept.dept_id})" for dept in depts)
+        )
+        if dept_idx_select in (-1, -2):
+            return NO_DEPARTMENT_MSG if dept_idx_select == -1 else ""
+        _dept = the_company.departments[dept_idx_select]
 
-            # get the index of the department to view
-            dept_selected_index = get_user_option_from_list("Select a department to view info", dept_items)
-            if dept_selected_index == -1:
-                return NO_DEPARTMENT_MSG
-            elif dept_selected_index == -2:
-                return ""
-
-            # print the department info
-            print(depts[dept_selected_index])
-
+        # print the department info
+        clrscr()
+        print(_dept)
         input(ENTER_TO_CONTINUE_MSG)
+
         return ""
 
-    def __view_all(self) -> str:
-        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in the_company.departments]
-        if len(dept_items) == 0:
-            return NO_DEPARTMENT_MSG
-        listing("Departments", dept_items)
-        return ""
-
-    def __view_employees_not_belong_to_any_department(self) -> str:
-        employee_items = [f"{employee.name} ({employee.employee_id})" for employee in the_company.employees if employee.department_id == ""]
-        if len(employee_items) == 0:
+    def __view_employees_without_dept(self) -> str:
+        empls = the_company.employees
+        if len(empls) == 0:
             return NO_EMPLOYEE_MSG
-        listing("Employees not belong to any department", employee_items)
+
+        clrscr()
+        for empl in empls:
+            if empl.department_id == "":
+                print(empl)
+                print("")
+        input(ENTER_TO_CONTINUE_MSG)
+
         return ""

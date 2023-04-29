@@ -6,7 +6,7 @@ from datetime import datetime
 from option import Result, Ok, Err
 from pydantic import BaseModel, Field
 from database import PyObjectId
-from frontend.helpers import styling
+from frontend.helpers_tui import styling
 
 from bson.objectid import ObjectId
 
@@ -73,7 +73,7 @@ class Employee(BaseModel):
         if any(char.isalpha() for char in phone):
             return Err("Phone number cannot contain letters!")
         if len(phone) != 10:
-            return Err("Phone number must be 10 digits long!")
+            return Err(f"Phone number must be 10 digits long, not {len(phone)}!")
         self.phone = phone
         return Ok(self) if phone else Err("Phone number cannot be empty!")
 

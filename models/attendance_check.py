@@ -45,7 +45,7 @@ class Attendance(BaseModel):
     def add_attendance(self, date: datetime, is_present: bool) -> Result[Self, str]:
         date_str = date.strftime("%Y-%m-%d")
         # Check the "allowed_absent_days" first, if it doesn't contain current year, add it and set to 3
-        if date.year not in self.allowed_absent_days:
+        if datetime.strftime(date, "%Y") not in self.allowed_absent_days:
             self.allowed_absent_days[str(date.year)] = 3
         self.attendances[date_str] = is_present
         return Ok(self)

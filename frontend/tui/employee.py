@@ -1,7 +1,7 @@
 import os
-from ..helpers import *
+from ..helpers_tui import *
 from models import Attendance, Employee, Company, hash
-from database.mongo import employee_repo, benefit_repo, department_repo
+from database.mongo import employee_repo, benefit_repo, department_repo  # type: ignore
 from option import Result, Ok
 
 the_company: Company = Company()
@@ -9,18 +9,12 @@ the_company: Company = Company()
 
 class MenuEmployee:
     def __init__(self) -> None:
-        if the_company.logged_in_employee.is_admin:
-            self.mainloop = self.admin
-        else:
-            self.mainloop = self.employee
+        self.mainloop = self.admin if the_company.logged_in_employee.is_admin else self.employee
 
     def admin(self) -> Result[None, str]:
-        last_msg: str = ""
+        last_msg = ""
         while True:
-            clrscr()
-            if last_msg:
-                print(last_msg)
-                last_msg: str = ""
+            last_msg = refresh(last_msg)
 
             employee_menu = [
                 "[1] Add employee",
@@ -37,45 +31,49 @@ class MenuEmployee:
 
             match choice:
                 case 1:
-                    last_msg: str = self.__add()
+                    last_msg = self.__add()
                 case 2:
-                    last_msg: str = self.__remove()
+                    last_msg = self.__remove()
                 case 3:
-                    last_msg: str = self.__update()
+                    last_msg = self.__update()
                 case 4:
-                    last_msg: str = self.__view()
+                    last_msg = self.__view()
                 case 5:
-                    last_msg: str = self.__change_password()
+                    last_msg = self.__change_password()
                 case 6:
-                    last_msg: str = self.__view_all()
+                    last_msg = self.__view_all()
                 case 7:
-                    last_msg: str = self.__grant_admin_rights()
+                    last_msg = self.__grant_admin_rights()
                 case 8:
-                    last_msg: str = self.__revoke_admin_rights()
+                    last_msg = self.__revoke_admin_rights()
                 case 9:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def employee(self) -> Result[None, str]:
-        last_msg: str = ""
+        last_msg = ""
         while True:
-            clrscr()
-            if last_msg:
-                print(last_msg)
-                last_msg: str = ""
-
-            employee_menu = ["[1] View details", "[2] Change password", "[3] Back"]
-            choice = get_user_option_from_menu("Employee management for " + the_company.logged_in_employee.name, employee_menu)
+            last_msg = refresh(last_msg)
+            # fmt: off
+            employee_menu = [
+                "[1] View details",
+                "[2] Change password",
+                "[3] Back"
+            ]
+            # fmt: on
+            choice = get_user_option_from_menu(
+                "Employee management for " + the_company.logged_in_employee.name, employee_menu
+            )
             match choice:
                 case 1:
-                    last_msg: str = self.__view()
+                    last_msg = self.__view()
                 case 2:
-                    last_msg: str = self.__change_password()
+                    last_msg = self.__change_password()
                 case 3:
                     return Ok(None)
                 case _:
-                    last_msg: str = FCOLORS.RED + "Invalid option!" + FCOLORS.END
+                    last_msg = FCOLORS.RED + "Invalid option!" + FCOLORS.END
 
     def __add(self) -> str:
         depts = the_company.departments
@@ -98,106 +96,123 @@ class MenuEmployee:
         employee.is_admin = False
         employee.attendance = Attendance().default()
 
-        # a list containing the string representation of each department
-        dept_items = [f"{dept.name} ({dept.dept_id})" for dept in depts]
+        # # a list containing the string representation of each department
+        depts_items = tuple(f"{dept.name} ({dept.dept_id})" for dept in depts)
 
-        if len(dept_items) > 0:
+        if depts_items:
             # get the index of the department to add the employee to
-            dept_index = get_user_option_from_list("Select a department to add the employee to", dept_items)
-            dept = depts[dept_index]
-            if dept_index == -1:
-                return NO_DEPARTMENT_MSG
-            elif dept_index == -2:
-                return ""
+            depts_idx_select = get_user_option_from_list("Select a department to add the employee to", depts_items)
+            if depts_idx_select in (-1, -2):
+                return NO_DEPARTMENT_MSG if depts_idx_select == -1 else ""
+            _dept = depts[depts_idx_select]
 
             # add the employee to the department's members
-            dept.members.append(employee)
+            _dept.members.append(employee)
+            employee.set_department(_dept.dept_id).unwrap()
             if os.getenv("HRMGR_DB") == "TRUE":
-                department_repo.update_one({"_id": dept.id}, {"$set": dept.dict(include={"members"})}, upsert=True)
-
-            # add the department id to the employee's department_id
-            employee.set_department(depts[dept_index].dept_id).unwrap()
+                department_repo.update_one({"_id": _dept.id}, {"$set": _dept.dict(include={"members"})}, upsert=True)
 
         # append the employee to the company's employees
         the_company.employees.append(employee)
 
         # add employee to mongodb database
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.insert_one(employee.dict(by_alias=True))
+            employee_repo.insert_one(employee.dict(by_alias=True))  # type: ignore
 
-        return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.employee_id}{FCOLORS.END}) added successfully!"
+        return "Employee {}{}{} ({}{}{}) added successfully!".format(
+            FCOLORS.GREEN, employee.name, FCOLORS.END, FCOLORS.GREEN, employee.employee_id, FCOLORS.END
+        )
 
     def __remove(self) -> str:
-        # a list containing the string representation of each employee that isn't an admin
-        employee_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees if not e.is_admin]
+        empls = the_company.employees
 
         # get the index of the employee to remove
-        employee_index = get_user_option_from_list("Select an employee to remove", employee_items)
-        if employee_index == -1:
-            return NO_EMPLOYEE_MSG
-        elif employee_index == -2:
-            return ""
-
-        # get the actual employee
-        employee = the_company.employees[employee_index + 1]
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to remove", tuple(f"{e.name} ({e.employee_id})" for e in empls if not e.is_admin)
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
         # if employee.is_admin and not the_company.owner:
-        if not the_company.can_modify("employee", employee):
+        if not the_company.can_modify("employee", empls[empl_idx_select]):
             return "Only the owner can remove admins!"
+
+        if not (empl_idx_select == 0):
+            return "Cannot remove owner!"
+
+        _empl = empls[empl_idx_select]
+        _empl_id = _empl.employee_id
+        _empl_name = _empl.name
 
         # remove employee from the department they're in
         for dept in the_company.departments:
-            if employee in dept.members:
-                dept.members.remove(employee)
-                if os.getenv("HRMGR_DB") == "TRUE":
-                    department_repo.update_one({"_id": dept.id}, {"$set": dept.dict(include={"members"})}, upsert=True)
+            if _empl not in dept.members:
+                continue
+            dept.members.remove(_empl)
+            if os.getenv("HRMGR_DB") == "TRUE":
+                department_repo.update_one({"_id": dept.id}, {"$set": dept.dict(include={"members"})}, upsert=True)
 
         # remove employee from the benefits they're enrolled in
         for benefit in the_company.benefits:
-            if employee in benefit.enrolled_employees:
-                benefit.enrolled_employees.remove(employee)
-                if os.getenv("HRMGR_DB") == "TRUE":
-                    benefit_repo.update_one({"_id": benefit.id}, {"$set": benefit.dict(include={"enrolled_employees"})}, upsert=True)
+            if _empl not in benefit.enrolled_employees:
+                continue
+            benefit.enrolled_employees.remove(_empl)
+            if os.getenv("HRMGR_DB") == "TRUE":
+                benefit_repo.update_one(
+                    {"_id": benefit.id}, {"$set": benefit.dict(include={"enrolled_employees"})}, upsert=True
+                )
 
         # remove from the company
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.delete_one({"_id": employee.id})
-        del the_company.employees[employee_index]
+            employee_repo.delete_one({"employee_id": _empl.id})
+        del empls[empl_idx_select]
 
-        return f"Employee {FCOLORS.RED}{employee.name}{FCOLORS.END} ({FCOLORS.RED}{employee.employee_id}{FCOLORS.END}) removed successfully!"
+        return "Employee {}{}{} ({}{}{}) removed successfully!".format(
+            FCOLORS.RED, _empl_name, FCOLORS.END, FCOLORS.RED, _empl_id, FCOLORS.END
+        )
 
     def __update(self) -> str:
-        # a list containing the string representation of each employee
-        employee_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees]
+        empls = the_company.employees
 
         # get the employee to update
-        selected_employee_index = get_user_option_from_list("Select an employee to update", employee_items)
-        if selected_employee_index == -1:
-            return NO_EMPLOYEE_MSG
-        elif selected_employee_index == -2:
-            return ""
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to update", tuple(f"{e.name} ({e.employee_id})" for e in the_company.employees)
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
+        _empl = empls[empl_idx_select]
 
-        # get the actual employee object
-        employee = the_company.employees[selected_employee_index]
+        if not the_company.can_modify("employee", _empl) and (not the_company.is_owner):
+            return "Only the owner can update admins!"
+
+        # Owner's name should not be changed
+        if not (empl_idx_select == 0):
+            if (msg := loop_til_valid_input("Enter employee name", _empl.set_name)) != "":
+                return msg
 
         # get the new data
         fields_data = [
-            ("Enter employee name", employee.set_name),
-            ("Enter employee date of birth (YYYY-MM-DD)", employee.set_dob),
-            ("Enter employee ID", employee.set_id),
-            ("Enter employee phone number", employee.set_phone),
-            ("Enter employee email", employee.set_email),
-            ("Enter employee password", employee.set_password),
+            ("Enter employee ID", _empl.set_id),
+            ("Enter employee date of birth (YYYY-MM-DD)", _empl.set_dob),
+            ("Enter employee phone number", _empl.set_phone),
+            ("Enter employee email", _empl.set_email),
+            ("Enter employee password", _empl.set_password),
         ]
         for field, setter in fields_data:
             if (msg := loop_til_valid_input(field, setter)) != "":
                 return msg
 
-        the_company.employees[selected_employee_index] = employee
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(exclude={"id"}, by_alias=True)}, upsert=True)
+            employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(exclude={"id"}, by_alias=True)}, upsert=True)
 
-        return f"Employee {FCOLORS.GREEN}{employee.name}{FCOLORS.END} ({FCOLORS.GREEN}{employee.employee_id}{FCOLORS.END}) updated successfully!"
+        return "Employee {}{}{} ({}{}{}) updated successfully!".format(
+            FCOLORS.GREEN,
+            empls[empl_idx_select].name,
+            FCOLORS.END,
+            FCOLORS.GREEN,
+            empls[empl_idx_select].employee_id,
+            FCOLORS.END,
+        )
 
     def __view(self) -> str:
         empls = the_company.employees
@@ -208,47 +223,37 @@ class MenuEmployee:
             input(ENTER_TO_CONTINUE_MSG)
             return ""
 
-        # a list containing the string representation of each employee
-        employee_items = [f"{e.name} ({e.employee_id})" for e in empls]
-
         # get the employee to view
-        selected_employee_index = get_user_option_from_list("Select an employee to view", employee_items)
-        if selected_employee_index == -1:
-            return NO_EMPLOYEE_MSG
-        elif selected_employee_index == -2:
-            return ""
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to view", tuple(f"{e.name} ({e.employee_id})" for e in empls)
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
 
         # print the employee
-        print(empls[selected_employee_index])
+        print(empls[empl_idx_select])
         input(ENTER_TO_CONTINUE_MSG)
         return ""
 
     def __view_all(self) -> str:
-        # a list containing the string representation of each employee
-        employee_items = [f"{e.name} ({e.employee_id})" for e in the_company.employees]
-
-        # print the list
-        listing("Employees", employee_items)
+        listing("Employees", tuple(f"{e.name} ({e.employee_id})" for e in the_company.employees))
         return ""
 
     def __change_password(self) -> str:
         empls = the_company.employees
+        logged_in_employee = the_company.logged_in_employee
 
         # as an admin
-        logged_in_employee = the_company.logged_in_employee
         if logged_in_employee.is_admin:
-            # return "You must be logged in to change your password"
-            empl_items = [f"{e.name} ({e.employee_id})" for e in empls if not e.is_admin]
-            empl_index = get_user_option_from_list("Select an employee to change the password of", empl_items)
-            if empl_index == -1:
-                return NO_EMPLOYEE_MSG
-            elif empl_index == -2:
-                return ""
+            empl_idx_select = get_user_option_from_list(
+                "Select an employee to change the password of",
+                tuple(f"{e.name} ({e.employee_id})" for e in empls if not e.is_admin),
+            )
+            if empl_idx_select in (-1, -2):
+                return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
+            _empl = empls[empl_idx_select]
 
-            # get the employee
-            employee = empls[empl_index]
-
-            if not the_company.can_modify("password", employee):
+            if not the_company.can_modify("password", empls[empl_idx_select]):
                 return "Only the owner or an admin can change another admin's password"
 
             # get the new password
@@ -266,13 +271,13 @@ class MenuEmployee:
                 return "Passwords do not match"
 
             # confirm
-            if input(f"Are you sure you want to change {employee.name}'s password? (y/n): ").lower() != "y":
+            if input(f"Are you sure you want to change {_empl.name}'s password? (y/n): ").lower() != "y":
                 return ""
 
             # change the password
-            employee.set_password(new_password)
+            _empl.set_password(new_password)
             if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"hashed_password"})}, upsert=True)
+                employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(by_alias=True)}, upsert=True)
 
         # as an employee
         else:
@@ -307,7 +312,11 @@ class MenuEmployee:
             # change the password
             logged_in_employee.hashed_password = hash(logged_in_employee.employee_id, new_password)
             if os.getenv("HRMGR_DB") == "TRUE":
-                employee_repo.update_one({"_id": logged_in_employee.id}, {"$set": logged_in_employee.dict(include={"hashed_password"})}, upsert=True)
+                employee_repo.update_one(
+                    {"_id": logged_in_employee.id},
+                    {"$set": logged_in_employee.dict(include={"hashed_password"})},
+                    upsert=True,
+                )
 
         return ""
 
@@ -319,27 +328,25 @@ class MenuEmployee:
             return "Only the owner can grant admin rights"
 
         # a list containing the string representation of each employee
-        employee_items = [f"{e.name} ({e.employee_id})" for e in empls]
-        selected_employee_index = get_user_option_from_list("Select an employee to grant admin rights to", employee_items)
-        if selected_employee_index == -1:
-            return NO_EMPLOYEE_MSG
-        elif selected_employee_index == -2:
-            return ""
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to grant admin rights to", tuple(f"{e.name} ({e.employee_id})" for e in empls)
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
+        _empl = empls[empl_idx_select]
 
-        # get the employee
-        employee = empls[selected_employee_index]
-        if employee.is_admin:
-            return f"{employee.name} already has admin rights"
+        if empls[empl_idx_select].is_admin:
+            return f"{_empl.name} already has admin rights"
 
         # confirm
-        if input(f"Are you sure you want to grant {employee.name} admin rights? (y/n): ").lower() != "y":
+        if input(f"Are you sure you want to grant {_empl.name} admin rights? (y/n): ").lower() != "y":
             return ""
 
         # grant admin rights
-        employee.is_admin = True
+        _empl.is_admin = True
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"is_admin"})}, upsert=True)
-        return f"Admin rights granted to {employee.name}"
+            employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(include={"is_admin"})}, upsert=True)
+        return f"Admin rights granted to {empls[empl_idx_select].name}"
 
     def __revoke_admin_rights(self):
         empls = the_company.employees
@@ -348,28 +355,26 @@ class MenuEmployee:
         if not the_company.can_modify("revoke_admin", the_company.logged_in_employee):
             return "Only the owner can revoke admin rights"
 
-        # a list containing the string representation of each employee
-        employee_items = [f"{e.name} ({e.employee_id})" for e in empls]
-        selected_employee_index = get_user_option_from_list("Select an employee to revoke admin rights from", employee_items)
-        if selected_employee_index == -1:
-            return NO_EMPLOYEE_MSG
-        elif selected_employee_index == -2:
-            return ""
+        # getting the index of the employee to revoke admin rights from
+        empl_idx_select = get_user_option_from_list(
+            "Select an employee to revoke admin rights from", tuple(f"{e.name} ({e.employee_id})" for e in empls)
+        )
+        if empl_idx_select in (-1, -2):
+            return NO_EMPLOYEE_MSG if empl_idx_select == -1 else ""
+        _empl = empls[empl_idx_select]
 
-        if selected_employee_index == 0:
-            return "You cannot revoke your own admin rights"
+        if empl_idx_select == 0:
+            return "Cannot revoke admin rights from the owner"
 
-        # get the employee
-        employee = empls[selected_employee_index]
-        if not employee.is_admin:
-            return f"{employee.name} does not have admin rights"
+        if not _empl.is_admin:
+            return f"{_empl.name} does not have admin rights"
 
         # confirm
-        if input(f"Are you sure you want to revoke {employee.name}'s admin rights? (y/n): ").lower() != "y":
+        if input(f"Are you sure you want to revoke {_empl.name}'s admin rights? (y/n): ").lower() != "y":
             return ""
 
         # revoke admin rights
-        employee.is_admin = False
+        empls[empl_idx_select].is_admin = False
         if os.getenv("HRMGR_DB") == "TRUE":
-            employee_repo.update_one({"_id": employee.id}, {"$set": employee.dict(include={"is_admin"})}, upsert=True)
-        return f"Admin rights revoked from {employee.name}"
+            employee_repo.update_one({"_id": _empl.id}, {"$set": _empl.dict(include={"is_admin"})}, upsert=True)
+        return f"Admin rights revoked from {_empl.name}"

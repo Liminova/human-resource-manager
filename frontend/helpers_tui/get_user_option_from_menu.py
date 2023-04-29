@@ -1,9 +1,17 @@
 from .COLORS import FCOLORS
 
 
-def print_menu(title: str, entries: list[str]) -> None:
-    longest_entry = len(max(entries + [title], key=len)) + 9
+def __filter_colors(string: str) -> str:
+    for color in FCOLORS.__dict__.values():
+        if not isinstance(color, str):
+            continue
+        string = string.replace(color, "")
+    return string
 
+
+def print_menu(title: str, entries: list[str]) -> None:
+    _entries = [__filter_colors(entry) for entry in entries] + [__filter_colors(title)]
+    longest_entry = len(max(_entries, key=len)) + 9
     print(FCOLORS.GREEN + "╔" + "═" * (longest_entry - 1) + "╗" + FCOLORS.END)
     border = FCOLORS.GREEN + "║" + FCOLORS.END
     print(border + " " * (longest_entry - 1) + border)

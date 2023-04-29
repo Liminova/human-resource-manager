@@ -4,7 +4,7 @@ import textwrap
 from option import Result, Ok, Err
 from pydantic import BaseModel, Field
 from bson.objectid import ObjectId
-from frontend.helpers import styling
+from frontend.helpers_tui import styling
 
 from database.pyobjectid import PyObjectId
 
