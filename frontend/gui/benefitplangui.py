@@ -155,18 +155,12 @@ class BenefitPlanGui(ctk.CTk):
         # endregion
 
         # region: input boxes
-        ctk.CTkLabel(master=main_frame, text="Name: ", **label_desc_style).grid(
-            row=2, column=0, sticky=W, padx=(20, 0), pady=10
-        )
-        input_name.grid(row=2, column=1, columnspan=2, padx=20, sticky=E)
-        ctk.CTkLabel(master=main_frame, text="Description: ", **label_desc_style).grid(
-            row=3, column=0, sticky=W, padx=(20, 0)
-        )
-        input_desc.grid(row=3, column=1, columnspan=2, padx=20, sticky=E)
-        ctk.CTkLabel(master=main_frame, text="Cost: ", **label_desc_style).grid(
-            row=4, column=0, sticky=W, padx=(20, 0), pady=10
-        )
-        input_cost.grid(row=4, column=1, columnspan=2, padx=20, sticky=E)
+        entries = [input_name, input_desc, input_cost]
+        for row, entry, title in zip(range(2, 5), entries, ("Name: ", "Description: ", "Cost: ")):
+            ctk.CTkLabel(master=main_frame, text=title, **label_desc_style).grid(
+                row=row, column=0, sticky=W, padx=(20, 0), pady=10
+            )
+            entry.grid(row=row, column=1, columnspan=2, padx=20, sticky=E)
         # endregion
 
         # region: submit button
