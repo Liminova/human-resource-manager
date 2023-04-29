@@ -171,11 +171,15 @@ class BenefitPlanGui(ctk.CTk):
 
         # region: submit button
         def _submit_handler():
-            nonlocal input_name, input_desc, input_cost, benefit_idx_select, current_submenu
+            nonlocal input_name, input_desc, input_cost, bnf_idx_select, mode
             name, desc, cost = input_name.get(), input_desc.get(), input_cost.get()
-            benefit_idx_select = benefit_idx_select.get()
-            benefits = the_company.benefits
-            match current_submenu:
+            bnf_idx_select = bnf_idx_select.get()
+            bnfs = the_company.benefits
+
+            # for message box later
+            bnf_name = bnfs[bnf_idx_select].name if mode == 3 else ""
+
+            match mode:
                 case 1:  # add
                     new_benefit = BenefitPlan()
                     new_benefit.set_name(name)
