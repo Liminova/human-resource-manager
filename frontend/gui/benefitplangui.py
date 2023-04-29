@@ -236,7 +236,7 @@ class BenefitPlanGui(ctk.CTk):
         )
         # endregion
 
-    def __admin_apply_rm(self, default_submenu: int = 1):
+    def __admin_apply_rm(self, current_submenu: int = 1):
         # 0: 2 buttons: apply, remove
         # 1: Table to choose employee | Table to choose benefit
         # 2: - if in apply: Apply button
