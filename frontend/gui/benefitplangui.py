@@ -282,7 +282,6 @@ class BenefitPlanGui(ctk.CTk):
                 pady=0,
             )
 
-        # this list is persistent so we can leave it out here
         _update_bnf_list()
         display_list(
             _master=main_frame,
