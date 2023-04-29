@@ -340,7 +340,7 @@ class DepartmentGui(ctk.CTk):
     def __view_department(self):
         # - 1 column
         # 0: select department from list
-        # 1: view department btn
+        # 1: display a list of enrolled employees
 
         main_frame = ctk.CTkFrame(master=self.right_frame)
         main_frame.grid(row=0, column=0)
