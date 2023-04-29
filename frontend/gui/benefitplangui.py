@@ -283,6 +283,7 @@ class BenefitPlanGui(ctk.CTk):
             )
 
         # this list is persistent so we can leave it out here
+        _update_bnf_list()
         display_list(
             _master=main_frame,
             options=tuple([f"{empl.employee_id} - {empl.name}" for empl in the_company.employees]),
