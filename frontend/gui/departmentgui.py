@@ -359,10 +359,10 @@ class DepartmentGui(ctk.CTk):
             colspan=1,
         )
 
-        def _view_department():
+        def _view_dept_handler():
             _dept = the_company.departments[radio_dept_idx_select.get()]
             msgbox.showinfo("Department", f"Name: {_dept.name}\nID: {_dept.dept_id}")
 
-        ctk.CTkButton(master=main_frame, text="View", command=_view_department, **btn_action_style).grid(
-            row=2, column=0, columnspan=2, pady=20
+        ctk.CTkButton(master=main_frame, text="View", command=_view_dept_handler, **btn_action_style).grid(
+            row=2, column=0, columnspan=2, pady=(0, 20)
         )
