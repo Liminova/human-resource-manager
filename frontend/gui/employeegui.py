@@ -131,20 +131,14 @@ class EmployeeGui(ctk.CTk):
 
         # Select employee from a list
         radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
-        empl_select_frame = display_list(
+        empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        display_list(
             _master=main_frame,
-            options=empl_items,
-            returned_idx=[radio_empl_idx_select],
-            selectable=True,
-            place_col=0,
-            place_row=0,
-            colspan=2,
+            options=tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees),
+            returned_idx=[empl_idx_select],
+            err_msg="No employee to remove",
+            place=(0, 0),
         )
-        if empl_select_frame[0] is False:
-            ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
-                row=1, column=0, columnspan=2, pady=20, padx=20
-            )
 
         def _remove_handler():
             nonlocal radio_empl_idx_select
@@ -204,18 +198,16 @@ class EmployeeGui(ctk.CTk):
 
         # Select employee from a list
         radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        empl_select_frame = display_list(
+        empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
+        display_list(
             _master=main_frame,
             options=tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees),
-            returned_idx=[radio_empl_idx_select],
-            selectable=True,
             err_msg="No employee found",
+            returned_idx=[empl_idx_select],
+            place=(0, 0),
+            colspan=2,
+            pady=(20, 0),
         )
-        if empl_select_frame[0] is False:
-            ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
-                row=0, column=0, columnspan=2, pady=20, padx=20
-            )
-        empl_select_frame[1].grid(row=0, column=0, columnspan=2, pady=(20, 0), padx=20)
 
         entries = [ctk.CTkEntry(master=main_frame) for _ in range(6)]
         labels = ("Name: ", "Date of birth: ", "ID: ", "Phone Number: ", "Email: ", "Password: ")
@@ -281,22 +273,15 @@ class EmployeeGui(ctk.CTk):
                 ctk.CTkLabel(master=empl_info_frame, text=value).grid(row=row, column=1, padx=20, sticky="e")
 
         radio_empl_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        empl_items = tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees)
-        empl_select_frame = display_list(
+        display_list(
             _master=main_frame,
-            options=empl_items,
-            returned_idx=[radio_empl_idx_select],
-            selectable=True,
+            options=tuple(f"{empl.employee_id} - {empl.name}" for empl in the_company.employees),
+            returned_idx=[empl_idx_select],
             cmd=update_empl_info_frame,
-            place_col=0,
-            place_row=0,
+            place=(0, 0),
             colspan=2,
             err_msg="No employee found",
         )
-        if empl_select_frame[0] is False:
-            ctk.CTkLabel(master=main_frame, text="No employee found", **label_desc_style).grid(
-                row=1, column=0, columnspan=2, pady=20, padx=20
-            )
 
     # endregion
 
