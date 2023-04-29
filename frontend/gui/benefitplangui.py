@@ -66,7 +66,7 @@ class BenefitPlanGui(ctk.CTk):
         self.destroy()
         Homepage().mainloop()
 
-    def __admin_add_rm_modify(self, default_submenu: int = 1):
+    def __admin_add_rm_modify(self, mode: int = 1):
         # - 3 columns
         # 0: 3 buttons, switch between 3 modes: 1. add, 2. remove, 3. modify
         # 1: Table to choose bnf if modify or remove, "Creating..." if add
@@ -83,93 +83,75 @@ class BenefitPlanGui(ctk.CTk):
         input_desc = ctk.CTkEntry(master=main_frame, **input_box_style)
         input_cost = ctk.CTkEntry(master=main_frame, **input_box_style)
 
-        benefit_idx_select = ctk.IntVar()
-        first_row = ctk.CTkFrame(master=main_frame)
-        first_row.grid(row=1, column=0, columnspan=3, pady=10)
+        bnf_idx_select = ctk.IntVar()
 
         btn_add = ctk.CTkButton(master=main_frame, text="Add", **btn_action_style)
         btn_remove = ctk.CTkButton(master=main_frame, text="Remove", **btn_action_style)
         btn_modify = ctk.CTkButton(master=main_frame, text="Modify", **btn_action_style)
         # endregion
 
-        # region: 3 button representing 3 options: 1. add, 2. remove, 3. modify
-        def _add():
-            nonlocal input_name, input_desc, input_cost, current_submenu, btn_modify, btn_remove, btn_add
-            for widget in first_row.winfo_children():
-                widget.destroy()
-            ctk.CTkLabel(master=first_row, text="Adding new benefit...", **label_desc_style).grid(
-                row=0, column=0, columnspan=3, padx=10, pady=10
-            )
+        # region: switch between modes handler
+        first_row: ctk.CTkBaseClass = ctk.CTkFrame(None)
 
-            current_submenu = 1
+        def _switch_mode(new_mode: int):
+            nonlocal input_name, input_desc, input_cost, btn_modify, btn_remove, btn_add
+            nonlocal first_row, mode, bnf_idx_select, main_frame
+            first_row.destroy()
+            first_row = ctk.CTkLabel(master=main_frame, text="Adding new benefit...", **label_desc_style)
+            first_row.grid(row=1, column=0, columnspan=3, padx=20, pady=(0, 20))
 
-            # enable input boxes, <remove> and <modify> buttons
-            # disable <add> button (already clicked)
-            for elem in (input_name, input_desc, input_cost, btn_modify, btn_remove):
-                elem.configure(state=NORMAL)
-            btn_add.configure(state=DISABLED)
+            mode = new_mode
+            match new_mode:
+                case 1:  # add
+                    # enable input boxes, <remove> and <modify> buttons
+                    # disable <add> button (already clicked)
+                    for elem in (input_name, input_desc, input_cost, btn_modify, btn_remove):
+                        elem.configure(state=NORMAL)
+                    btn_add.configure(state=DISABLED)
 
-        btn_add.grid(row=0, column=0, padx=10, pady=(20, 10))
-        btn_add.configure(command=_add)
+                case 2:  # remove
+                    first_row.destroy()
+                    first_row = display_list(
+                        _master=main_frame,
+                        options=tuple(f"{b.name} - {b.cost}" for b in the_company.benefits),
+                        err_msg="No benefit plan to remove",
+                        returned_idx=[bnf_idx_select],
+                        place=(1, 0),
+                        colspan=3,
+                        pady=(0, 15),
+                    )
+                    # disable input boxes, <delete> btn (clicked)
+                    # enable <add> and <modify> buttons
+                    for elem in (input_name, input_desc, input_cost, btn_remove):
+                        elem.configure(state=DISABLED)
+                    for elem in (btn_add, btn_modify):
+                        elem.configure(state=NORMAL)
 
-        def _remove():
-            nonlocal input_name, input_desc, input_cost, benefit_idx_select, current_submenu, btn_modify, btn_remove, btn_add
-            for widget in first_row.winfo_children():
-                widget.destroy()
-            display_list(
-                _master=first_row,
-                options=tuple(f"{b.name} - {b.cost}" for b in the_company.benefits),
-                returned_idx=[benefit_idx_select],
-                place_row=0,
-                colspan=1,
-                err_msg="No benefit plan to remove",
-            )
-            current_submenu = 2
+                case 3:  # modify
+                    first_row.destroy()
+                    first_row = display_list(
+                        _master=main_frame,
+                        options=tuple(f"{b.name} - {b.cost}" for b in the_company.benefits),
+                        err_msg="No benefit plan to modify",
+                        returned_idx=[bnf_idx_select],
+                        place=(1, 0),
+                        colspan=3,
+                        pady=(0, 15),
+                    )
+                    # enable input boxes, <add> and <remove> buttons
+                    # disable <modify> button (clicked)
+                    for elem in (input_name, input_desc, input_cost, btn_add, btn_remove):
+                        elem.configure(state=NORMAL)
+                    btn_modify.configure(state=DISABLED)
 
-            # disable input boxes, <delete> btn (clicked)
-            # enable <add> and <modify> buttons
-            for elem in (input_name, input_desc, input_cost, btn_remove):
-                elem.configure(state=DISABLED)
-            for elem in (btn_add, btn_modify):
-                elem.configure(state=NORMAL)
+        _switch_mode(mode)
 
-        btn_remove.grid(row=0, column=1, padx=10, pady=(20, 10))
-        btn_remove.configure(command=_remove)
-
-        def _modify():
-            nonlocal input_name, input_desc, input_cost, benefit_idx_select, current_submenu, btn_modify, btn_remove, btn_add
-            for widget in first_row.winfo_children():
-                widget.destroy()
-            display_list(
-                _master=first_row,
-                options=tuple(f"{b.name} - {b.cost}" for b in the_company.benefits),
-                returned_idx=[benefit_idx_select],
-                place_row=0,
-                colspan=1,
-            )
-            current_submenu = 3
-
-            # enable input boxes, <add> and <remove> buttons
-            # disable <modify> button (clicked)
-            for elem in (input_name, input_desc, input_cost, btn_add, btn_remove):
-                elem.configure(state=NORMAL)
-            btn_modify.configure(state=DISABLED)
-
-        btn_modify.grid(row=0, column=2, padx=10, pady=(20, 10))
-        btn_modify.configure(command=_modify)
-        # endregion
-
-        # region: initializing the default menu
-        match default_submenu:
-            case 1:
-                _add()
-                current_submenu = 1
-            case 2:
-                _remove()
-                current_submenu = 2
-            case 3:
-                _modify()
-                current_submenu = 3
+        btn_add.grid(row=0, column=0, padx=(20, 0), pady=20)
+        btn_add.configure(command=lambda: _switch_mode(1))
+        btn_remove.grid(row=0, column=1, padx=20, pady=20)
+        btn_remove.configure(command=lambda: _switch_mode(2))
+        btn_modify.grid(row=0, column=2, padx=(0, 20), pady=20)
+        btn_modify.configure(command=lambda: _switch_mode(3))
         # endregion
 
         # region: input boxes
