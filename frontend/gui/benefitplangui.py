@@ -314,6 +314,7 @@ class BenefitPlanGui(ctk.CTk):
             bnf_list_frame.destroy()
             _update_bnf_list()
 
+        _switch_mode_handler()
         btn_apply.configure(command=_switch_mode_handler)
         btn_remove.configure(command=_switch_mode_handler)
         # endregion
