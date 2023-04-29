@@ -350,14 +350,14 @@ class DepartmentGui(ctk.CTk):
 
         # Select a department from a list
         radio_dept_idx_select: ctk.Variable = ctk.IntVar(value=0)
-        dept_items = tuple(f"{dept.name} - {dept.dept_id}" for dept in the_company.departments)
-        _display_list = display_list(
-            _master=main_frame, options=dept_items, returned_idx=[radio_dept_idx_select], selectable=True
+        display_list(
+            _master=main_frame,
+            options=tuple(f"{dept.name} - {dept.dept_id}" for dept in the_company.departments),
+            returned_idx=[radio_dept_idx_select],
+            err_msg="No department to view",
+            place=(0, 0),
+            colspan=1,
         )
-        if _display_list[0] is False:
-            ctk.CTkLabel(master=main_frame, text="No department to view", **label_desc_style).grid(
-                row=1, column=0, columnspan=2, pady=(20, 0)
-            )
 
         def _view_department():
             _dept = the_company.departments[radio_dept_idx_select.get()]
