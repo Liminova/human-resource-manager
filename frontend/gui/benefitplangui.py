@@ -67,11 +67,12 @@ class BenefitPlanGui(ctk.CTk):
         Homepage().mainloop()
 
     def __admin_add_rm_modify(self, default_submenu: int = 1):
-        # 0: 3 buttons: 1. add, 2. remove, 3. modify
+        # - 3 columns
+        # 0: 3 buttons, switch between 3 modes: 1. add, 2. remove, 3. modify
         # 1: Table to choose bnf if modify or remove, "Creating..." if add
-        # 2: Input name
-        # 3: Input desc
-        # 4: Input cost
+        # 2: Label | Input name
+        # 3: Label | Input desc
+        # 4: Label | Input cost
         # 5: Button to submit
 
         main_frame = ctk.CTkFrame(master=self.right_frame)
