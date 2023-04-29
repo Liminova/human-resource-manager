@@ -503,43 +503,36 @@ class BenefitPlanGui(ctk.CTk):
                 msgbox.showinfo("Error", "You do not have permission to modify this employee")
                 return
 
-            selected_bnf.pending_requests.remove(selected_empl)
-            selected_bnf.enrolled_employees.append(selected_empl)
+            if mode == 1:
+                selected_empl.benefits.append(selected_bnf.name)
+                selected_bnf.enrolled_employees.append(selected_empl)
+                selected_bnf.pending_requests.remove(selected_empl)
+            elif mode == 0:
+                selected_bnf.pending_requests.remove(selected_empl)
+
             if os.getenv("HRMGR_DB") == "TRUE":
-                benefit_repo.update_one(
-                    {"_id": selected_bnf.id},
-                    {"$set": selected_bnf.dict(include={"pending_requests", "enrolled_employees"})},
-                    upsert=True,
-                )
-            msgbox.showinfo("Success", f"Benefit plan {selected_bnf.name} approved for {selected_empl.name}")
-            merge_callable(self.__clear_right_frame, self.__admin_resolve)()
+                if mode == 0:  # only remove from pending
+                    benefit_repo.update_one(
+                        {"_id": selected_bnf.id}, {"$set": selected_bnf.dict(include={"pending_requests"})}, upsert=True
+                    )
+                elif mode == 1:  # remove from pending and add to enrolled
+                    benefit_repo.update_one(
+                        {"_id": selected_bnf.id},
+                        {"$set": selected_bnf.dict(include={"pending_requests", "enrolled_employees"})},
+                        upsert=True,
+                    )
+                    employee_repo.update_one(
+                        {"_id": selected_empl.id}, {"$set": selected_empl.dict(include={"benefits"})}, upsert=True
+                    )
 
-        def _reject_handler():
-            nonlocal bnf_idx_select, empl_idx_select, bnfs_have_pending, pending_empls
-            selected_bnf = bnfs_have_pending[bnf_idx_select.get()]
-            selected_empl = pending_empls[empl_idx_select.get()]
-
-            selected_bnf.pending_requests.remove(selected_empl)
-            if os.getenv("HRMGR_DB") == "TRUE":
-                benefit_repo.update_one(
-                    {"_id": selected_bnf.id}, {"$set": selected_bnf.dict(include={"pending_requests"})}, upsert=True
-                )
-            msgbox.showinfo("Success", f"Benefit plan {selected_bnf.name} rejected for {selected_empl.name}")
-            merge_callable(self.__clear_right_frame, self.__admin_resolve)()
-
-        btn_approve.configure(command=_approve_handler)
-        btn_reject.configure(command=_reject_handler)
-        # endregion
-
-        # region: if no pending requests, show message
-        if len(bnfs_have_pending) == 0:
-            for widget in zero_row.winfo_children():
-                widget.destroy()
-            ctk.CTkLabel(master=zero_row, text="No pending requests", **label_desc_style).grid(
-                row=0, column=0, pady=20, padx=20
+            msgbox.showinfo(
+                "Success",
+                f"Benefit plan {selected_bnf.name} {'approved' if mode == 1 else 'rejected'} for {selected_empl.name}",
             )
-            btn_approve.configure(state=DISABLED)
-            btn_reject.configure(state=DISABLED)
+            merge_callable(self.__clear_right_frame, self.__admin_resolve)()
+
+        btn_approve.configure(command=lambda: _action_handler(1))
+        btn_reject.configure(command=lambda: _action_handler(0))
         # endregion
 
     def __view_details(self):
