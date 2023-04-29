@@ -556,6 +556,8 @@ class BenefitPlanGui(ctk.CTk):
 
         def _update_empl_list():
             nonlocal bnf_idx_select, bnfs_items, bnf_detail_widget, empl_list_frame
+            if len(bnfs_items) == 0:
+                return
             selected_bnf = the_company.benefits[bnf_idx_select.get()]
             empl_list_frame.destroy()
             empl_list_frame = display_list(
