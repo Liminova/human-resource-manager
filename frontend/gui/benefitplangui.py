@@ -1,12 +1,13 @@
 import os
-import customtkinter as ctk
+from tkinter import DISABLED, NORMAL, E, W
 from tkinter import messagebox as msgbox
-from tkinter import W, E, NORMAL, DISABLED
 
-from models import Company, BenefitPlan, Employee
+import customtkinter as ctk
+
 from database.mongo import benefit_repo, employee_repo
 from frontend.helpers_gui import *
 from frontend.helpers_gui.global_styling import *
+from models import BenefitPlan, Company, Employee
 
 the_company = Company()
 

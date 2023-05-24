@@ -1,12 +1,13 @@
 import os
-import customtkinter as ctk
+from tkinter import E, W
 from tkinter import messagebox as msgbox
-from tkinter import W, E
 
-from models import Company, Employee, hash
-from database.mongo import employee_repo, department_repo, benefit_repo
+import customtkinter as ctk
+
+from database.mongo import benefit_repo, department_repo, employee_repo
 from frontend.helpers_gui import *
 from frontend.helpers_gui.global_styling import *
+from models import Company, Employee, hash
 
 the_company = Company()
 ctk.set_appearance_mode("dark")

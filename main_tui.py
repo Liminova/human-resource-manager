@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-import sys
 import os
+import sys
 import textwrap
 
+from dotenv import load_dotenv
+from option import Ok, Result
+
+from database.mongo import benefit_repo, department_repo, employee_repo
 from frontend.helpers_tui import *
 from frontend.tui import *
-from models import Company, Employee, BenefitPlan, Department
-from dotenv import load_dotenv
-from database.mongo import employee_repo, department_repo, benefit_repo
-from option import Result, Ok
+from models import BenefitPlan, Company, Department, Employee
 
 load_dotenv()
 

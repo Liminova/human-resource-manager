@@ -1,5 +1,3 @@
-from . import gui
-from . import helpers_tui
-from . import tui
+from . import gui, helpers_tui, tui
 
 __all__ = ["gui", "helpers_tui", "tui"]

@@ -1,14 +1,17 @@
 from __future__ import annotations
+
 import sys
-from option import Result, Ok, Err
 import textwrap
+
+from option import Err, Ok, Result
 from pydantic import BaseModel, Field
+
 from frontend.helpers_tui import styling
 
 if sys.version_info >= (3, 11):
-    from typing import Self, TYPE_CHECKING
+    from typing import TYPE_CHECKING, Self
 else:
-    from typing_extensions import Self, TYPE_CHECKING
+    from typing_extensions import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
     from .employee import Employee

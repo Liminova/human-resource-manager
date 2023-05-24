@@ -1,8 +1,11 @@
-from ..helpers_tui import *
-from models import Payroll, Company
-from option import Result, Ok
-from database.mongo import employee_repo  # type: ignore
 import os
+
+from option import Ok, Result
+
+from database.mongo import employee_repo  # type: ignore
+from models import Company, Payroll
+
+from ..helpers_tui import *
 
 the_company: Company = Company()
 

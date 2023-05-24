@@ -1,10 +1,12 @@
 from __future__ import annotations
+
 import os
+from getpass import getpass
+
+from database.mongo import employee_repo  # type: ignore
+from models import Company, Employee, hash, validate
 
 from ..helpers_tui import *
-from models import Employee, Company, validate, hash
-from database.mongo import employee_repo  # type: ignore
-from getpass import getpass
 
 the_company: Company = Company()
 

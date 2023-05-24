@@ -1,9 +1,11 @@
 import sys
 import textwrap
-from option import Result, Ok, Err
 from datetime import datetime
+
+from option import Err, Ok, Result
 from pydantic import BaseModel, Field
-from frontend.helpers_tui import styling, FCOLORS
+
+from frontend.helpers_tui import FCOLORS, styling
 
 if sys.version_info >= (3, 11):
     from typing import Self

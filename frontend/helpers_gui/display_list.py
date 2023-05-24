@@ -1,8 +1,10 @@
 import tkinter as tk
-import customtkinter as ctk
-from frontend.helpers_tui import clustering
-from frontend.helpers_gui.global_styling import btn_action_style, label_desc_style
 from typing import Callable
+
+import customtkinter as ctk
+
+from frontend.helpers_gui.global_styling import btn_action_style, label_desc_style
+from frontend.helpers_tui import clustering
 
 
 def display_list(

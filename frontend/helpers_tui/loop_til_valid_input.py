@@ -1,6 +1,8 @@
 from __future__ import annotations
-from .COLORS import FCOLORS
+
 import sys
+
+from .COLORS import FCOLORS
 
 if sys.version_info >= (3, 11):
     from typing import Callable

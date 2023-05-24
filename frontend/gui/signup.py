@@ -1,13 +1,13 @@
 import os
-import customtkinter as ctk
 import tkinter.messagebox as msgbox
 
-from .homepage import Homepage
-from models import Employee
+import customtkinter as ctk
 from dotenv import load_dotenv
-from models import hash
-from models import Company
+
 from database.mongo import employee_repo
+from models import Company, Employee, hash
+
+from .homepage import Homepage
 
 the_company = Company()
 

@@ -1,12 +1,13 @@
 import os
-import customtkinter as ctk
+from tkinter import E, W
 from tkinter import messagebox as msgbox
-from tkinter import W, E
 
-from models import Company
+import customtkinter as ctk
+
 from database.mongo import employee_repo
 from frontend.helpers_gui import *
 from frontend.helpers_gui.global_styling import *
+from models import Company
 
 the_company = Company()
 

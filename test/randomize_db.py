@@ -1,9 +1,11 @@
 import os
 import random
 import string
+
 from faker import Faker
-from models import Employee, Department, BenefitPlan, Company
-from database.mongo import employee_repo, department_repo, benefit_repo
+
+from database.mongo import benefit_repo, department_repo, employee_repo
+from models import BenefitPlan, Company, Department, Employee
 
 the_company = Company()
 __current_employee_count = len(the_company.employees)
