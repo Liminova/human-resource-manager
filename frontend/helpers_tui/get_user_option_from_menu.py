@@ -9,33 +9,34 @@ def __filter_colors(string: str) -> str:
     return string
 
 
-def print_menu(title: str, entries: list[str]) -> None:
+def print_menu(title: str, entries: list[str], padding: int = 5) -> None:
     _entries = [__filter_colors(entry) for entry in entries] + [__filter_colors(title)]
-    longest_entry = len(max(_entries, key=len)) + 9
-    print(FCOLORS.GREEN + "╔" + "═" * (longest_entry - 1) + "╗" + FCOLORS.END)
     border = FCOLORS.GREEN + "║" + FCOLORS.END
-    print(border + " " * (longest_entry - 1) + border)
+    longest_entry = len(max(_entries, key=len)) + padding * 2
+    data_to_print = []
 
-    if len(title) < longest_entry:
-        l_padding = " " * int(round(((longest_entry - len(title)) // 2), 0) - 4)
-        r_padding = " " * (longest_entry - len(title) - len(l_padding) - 9)
-        title = l_padding + title + r_padding
-    title = " " * 4 + title + " " * 4
-    print(border + title + border)
-    print(border + " " * (longest_entry - 1) + border)
-    print(border + "-" * (longest_entry - 1) + border)
-    print(border + " " * (longest_entry - 1) + border)
+    data_to_print.append(FCOLORS.GREEN + "╔" + ("═" * longest_entry) + "╗" + FCOLORS.END)
+    data_to_print.append(border + " " * longest_entry + border)
+
+    title_left_padding = (longest_entry - len(title)) // 2
+    title_right_padding = longest_entry - title_left_padding - len(title)
+    title = (" " * title_left_padding) + title + (" " * title_right_padding)
+
+    data_to_print.append(border + title + border)
+    data_to_print.append(border + " " * longest_entry + border)
+    data_to_print.append(border + "-" * longest_entry + border)
+    data_to_print.append(border + " " * longest_entry + border)
 
     for entry in entries:
-        if len(entry) < longest_entry:
-            index = entry[0 : entry.index("]") + 1]
-            entry = entry.replace(index, f"{FCOLORS.YELLOW}{index}{FCOLORS.END}")
-            entry = entry + " " * (longest_entry - len(entry))
-        entry = "    " + entry + "    "
-        print(border + entry + border)
+        left_padding = " " * padding
+        right_padding = " " * (longest_entry - padding - len(entry))
+        entry = FCOLORS.YELLOW + entry[0 : entry.index("]") + 1] + FCOLORS.END + entry[entry.index("]") + 1 :]
+        data_to_print.append(border + left_padding + entry + right_padding + border)
 
-    print(border + " " * (longest_entry - 1) + border)
-    print(FCOLORS.GREEN + "╚" + "═" * (longest_entry - 1) + "╝" + FCOLORS.END)
+    data_to_print.append(border + " " * longest_entry + border)
+    data_to_print.append(FCOLORS.GREEN + "╚" + ("═" * longest_entry) + "╝" + FCOLORS.END)
+
+    print("\n".join(data_to_print))
 
 
 def get_user_option_from_menu(title: str, menu_list: list[str]) -> int:
