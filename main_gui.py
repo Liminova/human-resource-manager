@@ -2,12 +2,13 @@
 
 import os
 import sys
-
-from frontend.gui import Login, Signup
-from models import Company, Employee, BenefitPlan, Department
-from dotenv import load_dotenv
-from database.mongo import employee_repo, benefit_repo, department_repo
 import tkinter.messagebox as msgbox
+
+from dotenv import load_dotenv
+
+from database.mongo import benefit_repo, department_repo, employee_repo
+from frontend.gui import Login, Signup
+from models import BenefitPlan, Company, Department, Employee
 
 load = load_dotenv()
 

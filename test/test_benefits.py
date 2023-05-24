@@ -1,5 +1,6 @@
-from models import BenefitPlan, Employee
 import unittest
+
+from models import BenefitPlan, Employee
 
 
 class TestBenefit(unittest.TestCase):

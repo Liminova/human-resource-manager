@@ -1,7 +1,9 @@
 from __future__ import annotations
+
 import sys
-from option import Result, Ok, Err
 from datetime import datetime
+
+from option import Err, Ok, Result
 from pydantic import BaseModel, Field
 
 if sys.version_info >= (3, 11):

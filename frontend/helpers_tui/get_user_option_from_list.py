@@ -1,6 +1,6 @@
-from .COLORS import FCOLORS
 from .clrscr import clrscr
 from .clustering import clustering
+from .COLORS import FCOLORS
 
 
 def get_user_option_from_list(title: str, options: tuple[str]) -> int:  # type: ignore

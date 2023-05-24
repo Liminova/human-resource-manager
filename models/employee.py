@@ -1,28 +1,29 @@
 from __future__ import annotations
+
 import re
 import sys
 import textwrap
 from datetime import datetime
-from option import Result, Ok, Err
+
+from bson.objectid import ObjectId
+from option import Err, Ok, Result
 from pydantic import BaseModel, Field
+
 from database import PyObjectId
 from frontend.helpers_tui import styling
 
-from bson.objectid import ObjectId
-
 if sys.version_info >= (3, 11):
-    from typing import Self, TYPE_CHECKING
+    from typing import TYPE_CHECKING, Self
 else:
-    from typing_extensions import Self, TYPE_CHECKING
+    from typing_extensions import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
     from .benefits import BenefitPlan
 
 from .attendance_check import Attendance
+from .password import hash
 from .payroll import Payroll
 from .performance import Performance
-
-from .password import hash
 
 
 class Employee(BaseModel):

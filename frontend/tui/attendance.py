@@ -1,9 +1,12 @@
-from ..helpers_tui import *
-from datetime import datetime
-from option import Result, Ok, Err
-from models import Company
-from database.mongo import employee_repo  # type: ignore
 import os
+from datetime import datetime
+
+from option import Err, Ok, Result
+
+from database.mongo import employee_repo  # type: ignore
+from models import Company
+
+from ..helpers_tui import *
 
 the_company: Company = Company()
 

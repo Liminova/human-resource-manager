@@ -1,6 +1,8 @@
-import customtkinter as ctk
 import tkinter
 from tkinter import messagebox
+
+import customtkinter as ctk
+
 from models import Company
 
 width = 800

@@ -1,13 +1,14 @@
 import os
 import tkinter
-import customtkinter as ctk
 from datetime import datetime
 from tkinter import messagebox
 
-from models import Company
+import customtkinter as ctk
+
 from database.mongo import employee_repo
 from frontend.helpers_gui import *
 from frontend.helpers_gui.global_styling import *
+from models import Company
 
 the_company = Company()
 

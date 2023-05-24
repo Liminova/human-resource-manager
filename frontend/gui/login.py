@@ -1,11 +1,12 @@
 import tkinter
-import customtkinter as ctk
 from tkinter import messagebox
 
-from .homepage import Homepage
+import customtkinter as ctk
 from dotenv import load_dotenv
-from models import hash
-from models import Company
+
+from models import Company, hash
+
+from .homepage import Homepage
 
 the_company = Company()
 

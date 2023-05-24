@@ -1,5 +1,6 @@
-from models import Department, Employee
 import unittest
+
+from models import Department, Employee
 
 
 class TestDepartment(unittest.TestCase):

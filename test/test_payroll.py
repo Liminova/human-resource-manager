@@ -1,5 +1,6 @@
-from models import Payroll
 import unittest
+
+from models import Payroll
 
 
 class TestPayroll(unittest.TestCase):

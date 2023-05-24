@@ -1,12 +1,14 @@
 from __future__ import annotations
+
 import sys
 import textwrap
-from option import Result, Ok, Err
-from pydantic import BaseModel, Field
+
 from bson.objectid import ObjectId
-from frontend.helpers_tui import styling
+from option import Err, Ok, Result
+from pydantic import BaseModel, Field
 
 from database.pyobjectid import PyObjectId
+from frontend.helpers_tui import styling
 
 if sys.version_info >= (3, 11):
     from typing import Self

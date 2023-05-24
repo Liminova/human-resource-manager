@@ -1,8 +1,11 @@
 import os
+
+from option import Ok, Result
+
+from database.mongo import benefit_repo, department_repo, employee_repo  # type: ignore
+from models import Attendance, Company, Employee, hash
+
 from ..helpers_tui import *
-from models import Attendance, Employee, Company, hash
-from database.mongo import employee_repo, benefit_repo, department_repo  # type: ignore
-from option import Result, Ok
 
 the_company: Company = Company()
 

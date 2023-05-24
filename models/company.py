@@ -1,13 +1,16 @@
 from __future__ import annotations
+
 import sys
 from threading import Lock
-from option import Result, Ok, Err
+
+from option import Err, Ok, Result
+
 from .employee import Employee
 
 if sys.version_info >= (3, 11):
-    from typing import Self, TYPE_CHECKING
+    from typing import TYPE_CHECKING, Self
 else:
-    from typing_extensions import Self, TYPE_CHECKING
+    from typing_extensions import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
     from .benefits import BenefitPlan

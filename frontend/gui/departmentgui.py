@@ -1,12 +1,13 @@
 import os
-import customtkinter as ctk
+from tkinter import DISABLED, NORMAL
 from tkinter import messagebox as msgbox
-from tkinter import NORMAL, DISABLED
 
-from models import Company, Department
+import customtkinter as ctk
+
 from database.mongo import department_repo, employee_repo
 from frontend.helpers_gui import *
 from frontend.helpers_gui.global_styling import *
+from models import Company, Department
 
 the_company = Company()
 

@@ -1,7 +1,9 @@
 import tkinter as tk
-import customtkinter as ctk
 from typing import Callable
-from .global_styling import btn_menu_style, btn_exit_style
+
+import customtkinter as ctk
+
+from .global_styling import btn_exit_style, btn_menu_style
 from .merge_callable import merge_callable
 
 

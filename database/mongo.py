@@ -1,9 +1,9 @@
 import os
 
+from dotenv import load_dotenv
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
-from dotenv import load_dotenv
 
 load_dotenv()
 

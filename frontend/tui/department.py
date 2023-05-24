@@ -1,10 +1,13 @@
 from __future__ import annotations
+
 import os
 
-from ..helpers_tui import *
-from models import Department, Company
+from option import Ok, Result
+
 from database.mongo import department_repo, employee_repo  # type: ignore
-from option import Result, Ok
+from models import Company, Department
+
+from ..helpers_tui import *
 
 the_company: Company = Company()
 
